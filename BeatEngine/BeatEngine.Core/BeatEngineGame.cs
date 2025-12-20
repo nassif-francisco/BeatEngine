@@ -21,7 +21,7 @@ namespace BeatEngine
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class PlatformerGame : Microsoft.Xna.Framework.Game
+    public class BeatEngineGame : Microsoft.Xna.Framework.Game
     {
         // Resources for drawing.
         private GraphicsDeviceManager graphics;
@@ -60,7 +60,7 @@ namespace BeatEngine
         // or handle exceptions, both of which can add unnecessary time to level loading.
         private const int numberOfLevels = 3;
 
-        public PlatformerGame()
+        public BeatEngineGame()
         {
             graphics = new GraphicsDeviceManager(this);
 

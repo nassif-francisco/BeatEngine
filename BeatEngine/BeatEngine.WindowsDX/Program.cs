@@ -1,5 +1,5 @@
 ﻿
 using BeatEngine;
 
-using var game = new PlatformerGame();
+using var game = new BeatEngineGame();
 game.Run();

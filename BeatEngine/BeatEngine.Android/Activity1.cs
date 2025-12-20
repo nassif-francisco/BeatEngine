@@ -18,14 +18,14 @@ namespace BeatEngine.Android
     )]
     public class Activity1 : AndroidGameActivity
     {
-        private PlatformerGame _game;
+        private BeatEngineGame _game;
         private View _view;
 
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
 
-            _game = new PlatformerGame();
+            _game = new BeatEngineGame();
             _view = _game.Services.GetService(typeof(View)) as View;
 
             SetContentView(_view);
