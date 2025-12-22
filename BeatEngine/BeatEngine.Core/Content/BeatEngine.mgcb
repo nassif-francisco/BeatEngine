@@ -196,6 +196,7 @@
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:Sounds/Music.wma
+/build:Sounds/ElectricSunshine.mp3
 
 #begin Sounds/PlayerFall.wav
 /importer:WavImporter

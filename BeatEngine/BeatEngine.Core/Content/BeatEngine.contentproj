@@ -127,6 +127,11 @@
       <Importer>WmaImporter</Importer>
       <Processor>SongProcessor</Processor>
     </Compile>
+    <Compile Include="Sounds\ElectricSunshine.mp3">
+      <Name>ElectricSunshine</Name>
+      <Importer>WmaImporter</Importer>
+      <Processor>SongProcessor</Processor>
+    </Compile>
     <Compile Include="Sprites\Gem.png">
       <Name>Gem</Name>
       <Importer>TextureImporter</Importer>

@@ -1,8 +1,12 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.Media;
+using System;
+using System.Diagnostics;
+using System.Reflection.Metadata;
 
 namespace BeatEngine
 {
@@ -14,6 +18,7 @@ namespace BeatEngine
 
         private float secondsSinceLastInput;
         private float opacity;
+        private bool musicStarted = false;
 
         public VirtualGamePad(Vector2 baseScreenSize, Matrix globalTransformation, Texture2D texture)
         {
@@ -54,7 +59,7 @@ namespace BeatEngine
         /// <summary>
         /// Generates a GamePadState based on the touch input provided (as applied to the on screen controls) and the gamepad state
         /// </summary>
-        public GamePadState GetState(TouchCollection touchState, GamePadState gpState)
+        public GamePadState GetState(TouchCollection touchState, GamePadState gpState, ref Stopwatch stopwatch, TimeSpan? lastClickTime, ContentManager Content)
         {
             //Work out what buttons are pressed based on the touchState
             Buttons buttonsPressed = 0;
@@ -63,6 +68,25 @@ namespace BeatEngine
             {
                 if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
                 {
+                    if(!musicStarted)
+                    {
+                        stopwatch = Stopwatch.StartNew();
+                        MediaPlayer.Play(Content.Load<Song>("Sounds/ElectricSunshine"));
+                        musicStarted = true;
+                    }
+
+                    var current = stopwatch?.Elapsed;
+
+                    //if (lastClickTime != null && current != null)
+                    //{
+                    //    TimeSpan delta = current - lastClickTime.Value;
+                    //    Console.WriteLine($"Time since last click: {delta.TotalMilliseconds} ms");
+                    //}
+                    var posix = MediaPlayer.PlayPosition;
+                    Console.WriteLine($"Time since last click: {posix.TotalMilliseconds} ms");
+
+                    lastClickTime = current;
+
                     //Scale the touch position to be in _baseScreenSize coordinates
                     Vector2 pos = touch.Position;
                     Vector2.Transform(ref pos, ref globalTransformation, out pos);

@@ -7,14 +7,15 @@
 //-----------------------------------------------------------------------------
 #endregion
 
-using System;
-using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Media;
+using System;
+using System.Diagnostics;
+using System.IO;
 
 namespace BeatEngine
 {
@@ -51,6 +52,8 @@ namespace BeatEngine
         private KeyboardState keyboardState;
         private TouchCollection touchState;
         private AccelerometerState accelerometerState;
+        Stopwatch stopwatch;
+        TimeSpan? lastClickTime = null;
 
         private VirtualGamePad virtualGamePad;
 
@@ -107,8 +110,10 @@ namespace BeatEngine
                 //So we have to catch the exception and throw it away
                 try
                 {
-                    MediaPlayer.IsRepeating = true;
-                    MediaPlayer.Play(Content.Load<Song>("Sounds/Music"));
+                    //MediaPlayer.IsRepeating = true;
+                    //stopwatch = Stopwatch.StartNew();
+
+                    //MediaPlayer.Play(Content.Load<Song>("Sounds/ElectricSunshine"));
                 }
                 catch { }
             }
@@ -160,7 +165,7 @@ namespace BeatEngine
             // get all of our input states
             keyboardState = Keyboard.GetState();
             touchState = TouchPanel.GetState();
-            gamePadState = virtualGamePad.GetState(touchState, GamePad.GetState(PlayerIndex.One));
+            gamePadState = virtualGamePad.GetState(touchState, GamePad.GetState(PlayerIndex.One), ref stopwatch, lastClickTime, Content);
             accelerometerState = Accelerometer2D.GetState();
 
             if (!OperatingSystem.IsIOS())
