@@ -83,7 +83,7 @@ namespace BeatEngine
                     //    Console.WriteLine($"Time since last click: {delta.TotalMilliseconds} ms");
                     //}
                     var posix = MediaPlayer.PlayPosition;
-                    Console.WriteLine($"Time since last click: {posix.TotalMilliseconds} ms");
+                    System.Diagnostics.Debug.WriteLine($"Time since last click: {posix.TotalMilliseconds} ms", "LOOK");
 
                     lastClickTime = current;
 
