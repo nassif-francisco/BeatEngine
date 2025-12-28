@@ -39,7 +39,7 @@ namespace BeatEngine
         private Texture2D diedOverlay;
 
         // Meta-level game state.
-        private int levelIndex = -1;
+        private int levelIndex = 0;
         private Level level;
         private bool wasContinuePressed;
 
@@ -96,11 +96,10 @@ namespace BeatEngine
             // Load overlay textures
             winOverlay = Content.Load<Texture2D>("Overlays/you_win");
             loseOverlay = Content.Load<Texture2D>("Overlays/you_lose");
-            diedOverlay = Content.Load<Texture2D>("Overlays/you_died");
 
             ScalePresentationArea();
 
-            virtualGamePad = new VirtualGamePad(baseScreenSize, globalTransformation, Content.Load<Texture2D>("Sprites/VirtualControlArrow"));
+            virtualGamePad = new VirtualGamePad(baseScreenSize, globalTransformation);
 
             if (!OperatingSystem.IsIOS())
             {
@@ -180,23 +179,6 @@ namespace BeatEngine
                 gamePadState.IsButtonDown(Buttons.A) ||
                 touchState.AnyTouch();
 
-            // Perform the appropriate action to advance the game and
-            // to get the player back to playing.
-            if (!wasContinuePressed && continuePressed)
-            {
-                if (!level.Player.IsAlive)
-                {
-                    level.StartNewLife();
-                }
-                else if (level.TimeRemaining == TimeSpan.Zero)
-                {
-                    if (level.ReachedExit)
-                        LoadNextLevel();
-                    else
-                        ReloadCurrentLevel();
-                }
-            }
-
             wasContinuePressed = continuePressed;
 
             virtualGamePad.Update(gameTime);
@@ -205,7 +187,7 @@ namespace BeatEngine
         private void LoadNextLevel()
         {
             // move to the next level
-            levelIndex = (levelIndex + 1) % numberOfLevels;
+            levelIndex = (levelIndex + 1);
 
             // Unloads the content for the current level before loading the next one.
             if (level != null)
@@ -215,12 +197,6 @@ namespace BeatEngine
             string levelPath = string.Format("Content/Levels/{0}.txt", levelIndex);
             using (Stream fileStream = TitleContainer.OpenStream(levelPath))
                 level = new Level(Services, fileStream, levelIndex);
-        }
-
-        private void ReloadCurrentLevel()
-        {
-            --levelIndex;
-            LoadNextLevel();
         }
 
         /// <summary>
@@ -244,58 +220,7 @@ namespace BeatEngine
 
         private void DrawHud()
         {
-            Rectangle titleSafeArea = GraphicsDevice.Viewport.TitleSafeArea;
-            Vector2 hudLocation = new Vector2(titleSafeArea.X, titleSafeArea.Y);
-            //Vector2 center = new Vector2(titleSafeArea.X + titleSafeArea.Width / 2.0f,
-            //                             titleSafeArea.Y + titleSafeArea.Height / 2.0f);
-
-            Vector2 center = new Vector2(baseScreenSize.X / 2, baseScreenSize.Y / 2);
-
-            // Draw time remaining. Uses modulo division to cause blinking when the
-            // player is running out of time.
-            string timeString = "TIME: " + level.TimeRemaining.Minutes.ToString("00") + ":" + level.TimeRemaining.Seconds.ToString("00");
-            Color timeColor;
-            if (level.TimeRemaining > WarningTime ||
-                level.ReachedExit ||
-                (int)level.TimeRemaining.TotalSeconds % 2 == 0)
-            {
-                timeColor = Color.Yellow;
-            }
-            else
-            {
-                timeColor = Color.Red;
-            }
-            DrawShadowedString(hudFont, timeString, hudLocation, timeColor);
-
-            // Draw score
-            float timeHeight = hudFont.MeasureString(timeString).Y;
-            DrawShadowedString(hudFont, "SCORE: " + level.Score.ToString(), hudLocation + new Vector2(0.0f, timeHeight * 1.2f), Color.Yellow);
            
-            // Determine the status overlay message to show.
-            Texture2D status = null;
-            if (level.TimeRemaining == TimeSpan.Zero)
-            {
-                if (level.ReachedExit)
-                {
-                    status = winOverlay;
-                }
-                else
-                {
-                    status = loseOverlay;
-                }
-            }
-            else if (!level.Player.IsAlive)
-            {
-                status = diedOverlay;
-            }
-
-            if (status != null)
-            {
-                // Draw status message.
-                Vector2 statusSize = new Vector2(status.Width, status.Height);
-                spriteBatch.Draw(status, center - statusSize / 2, Color.White);
-            }
-
             if (touchState.IsConnected)
                 virtualGamePad.Draw(spriteBatch);
         }

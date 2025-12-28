@@ -43,12 +43,17 @@ namespace BeatEngine
     struct Tile
     {
         public Texture2D Texture;
-        public TileCollision Collision;
+        public TileCollision Collision; //will be used to define animation when pressed
+        public bool IsPressed
+        {
+            get { return isPressed; }
+        }
+        bool isPressed;
 
-        public const int Width = 40;
-        public const int Height = 32;
+        float Width = 40;
+        float Height = 32;
 
-        public static readonly Vector2 Size = new Vector2(Width, Height);
+        public Vector2 Size = new Vector2();
 
         /// <summary>
         /// Constructs a new tile.
@@ -57,6 +62,8 @@ namespace BeatEngine
         {
             Texture = texture;
             Collision = collision;
+            Size = new Vector2(Width, Height);
+            isPressed = false;
         }
     }
 }

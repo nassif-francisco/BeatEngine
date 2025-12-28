@@ -14,17 +14,15 @@ namespace BeatEngine
     {
         private readonly Vector2 baseScreenSize;
         private Matrix globalTransformation;
-        private readonly Texture2D texture;
 
         private float secondsSinceLastInput;
         private float opacity;
         private bool musicStarted = false;
 
-        public VirtualGamePad(Vector2 baseScreenSize, Matrix globalTransformation, Texture2D texture)
+        public VirtualGamePad(Vector2 baseScreenSize, Matrix globalTransformation)
         {
             this.baseScreenSize = baseScreenSize;
             this.globalTransformation = Matrix.Invert(globalTransformation);
-            this.texture = texture;
             secondsSinceLastInput = float.MaxValue;
         }
 
@@ -51,9 +49,9 @@ namespace BeatEngine
             var spriteCenter = new Vector2(64, 64);
             var color = Color.Multiply(Color.White, opacity);
 
-            spriteBatch.Draw(texture, new Vector2(64, baseScreenSize.Y - 64), null, color, -MathHelper.PiOver2, spriteCenter, 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(192, baseScreenSize.Y - 64), null, color, MathHelper.PiOver2, spriteCenter, 1, SpriteEffects.None, 0);
-            spriteBatch.Draw(texture, new Vector2(baseScreenSize.X - 128, baseScreenSize.Y - 128), null, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
+            //spriteBatch.Draw(texture, new Vector2(64, baseScreenSize.Y - 64), null, color, -MathHelper.PiOver2, spriteCenter, 1, SpriteEffects.None, 0);
+            //spriteBatch.Draw(texture, new Vector2(192, baseScreenSize.Y - 64), null, color, MathHelper.PiOver2, spriteCenter, 1, SpriteEffects.None, 0);
+            //spriteBatch.Draw(texture, new Vector2(baseScreenSize.X - 128, baseScreenSize.Y - 128), null, color, 0, Vector2.Zero, 1, SpriteEffects.None, 0);
         }
 
         /// <summary>
