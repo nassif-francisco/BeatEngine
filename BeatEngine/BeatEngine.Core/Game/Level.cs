@@ -93,7 +93,7 @@ namespace BeatEngine
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");
 
-            LoadTiles(fileStream);
+            //LoadTiles(fileStream);
 
             // Load background layer textures. For now, all levels must
             // use the same backgrounds and only use the left-most part of them.
@@ -102,7 +102,7 @@ namespace BeatEngine
             {
                 // Choose a random segment if each background layer for level variety.
                 int segmentIndex = levelIndex;
-                layers[i] = Content.Load<Texture2D>("Backgrounds/Layer" + i + "_" + segmentIndex);
+                layers[i] = Content.Load<Texture2D>("NewBackgrounds/Layer" + 0 + "_" + i);
             }
 
             // Load sounds.
@@ -148,12 +148,6 @@ namespace BeatEngine
                     tiles[x, y] = LoadTile(tileType, x, y);
                 }
             }
-
-            // Verify that the level has a beginning and an end.
-            if (Player == null)
-                throw new NotSupportedException("A level must have a starting point.");
-            if (exit == InvalidPosition)
-                throw new NotSupportedException("A level must have an exit.");
 
         }
 
@@ -286,7 +280,7 @@ namespace BeatEngine
             for (int i = 0; i <= EntityLayer; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
 
-            DrawTiles(spriteBatch);
+            //DrawTiles(spriteBatch);
 
             for (int i = EntityLayer + 1; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);

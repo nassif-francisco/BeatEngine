@@ -153,9 +153,6 @@ namespace BeatEngine
             level.Update(gameTime, keyboardState, gamePadState, 
                          accelerometerState, Window.CurrentOrientation);
 
-            if (level.Player.Velocity != Vector2.Zero)
-                virtualGamePad.NotifyPlayerIsMoving();
-
             base.Update(gameTime);
         }
 

@@ -23,7 +23,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Backgrounds/Layer0_0.png
+/build:NewBackgrounds/Layer0_0.png
 
 #begin Backgrounds/Layer0_1.png
 /importer:TextureImporter
@@ -35,7 +35,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Backgrounds/Layer0_1.png
+/build:NewBackgrounds/Layer0_1.png
 
 #begin Backgrounds/Layer0_2.png
 /importer:TextureImporter
@@ -47,7 +47,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Backgrounds/Layer0_2.png
+/build:NewBackgrounds/Layer0_2.png
 
 
 

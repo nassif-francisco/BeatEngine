@@ -50,17 +50,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Backgrounds\Layer0_0.png">
+    <Compile Include="NewBackgrounds\Layer0_0.png">
       <Name>Layer0_0</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Backgrounds\Layer0_1.png">
+    <Compile Include="NewBackgrounds\Layer0_1.png">
       <Name>Layer0_1</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
-    <Compile Include="Backgrounds\Layer0_2.png">
+    <Compile Include="NewBackgrounds\Layer0_2.png">
       <Name>Layer0_2</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
