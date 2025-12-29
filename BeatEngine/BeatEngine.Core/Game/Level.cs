@@ -293,7 +293,7 @@ namespace BeatEngine
         {
             // For each tile position
             int initialPosX = 2334;
-            int initialPosY = 865;
+            int initialPosY = 915;
             for (int y = 0; y < 2; ++y)
             {
                 for (int x = 0; x < 2; ++x)
@@ -308,7 +308,7 @@ namespace BeatEngine
                     }
 
                     initialPosX += 0;
-                    initialPosY -= 290;
+                    initialPosY -= 300;
                 }
             }
         }
