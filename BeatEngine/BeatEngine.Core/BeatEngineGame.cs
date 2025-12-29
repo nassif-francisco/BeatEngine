@@ -27,7 +27,7 @@ namespace BeatEngine
         // Resources for drawing.
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        Vector2 baseScreenSize = new Vector2(800, 480);
+        Vector2 baseScreenSize = new Vector2(2664, 1200);
         private Matrix globalTransformation;
         int backbufferWidth, backbufferHeight;
 

@@ -50,8 +50,8 @@ namespace BeatEngine
         }
         bool isPressed;
 
-        float Width = 40;
-        float Height = 32;
+        float Width = 80;
+        float Height = 80;
 
         public Vector2 Size = new Vector2();
 

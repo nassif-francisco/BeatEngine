@@ -280,7 +280,7 @@ namespace BeatEngine
             for (int i = 0; i <= EntityLayer; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
 
-            //DrawTiles(spriteBatch);
+            DrawTiles(spriteBatch);
 
             for (int i = EntityLayer + 1; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
@@ -292,18 +292,23 @@ namespace BeatEngine
         private void DrawTiles(SpriteBatch spriteBatch)
         {
             // For each tile position
-            for (int y = 0; y < Height; ++y)
+            int initialPosX = 2334;
+            int initialPosY = 865;
+            for (int y = 0; y < 2; ++y)
             {
-                for (int x = 0; x < Width; ++x)
+                for (int x = 0; x < 2; ++x)
                 {
                     // If there is a visible tile in that position
                     Texture2D texture = tiles[x, y].Texture;
                     if (texture != null)
                     {
                         // Draw it in screen space.
-                        Vector2 position = new Vector2(x, y) * tiles[x, y].Size;
+                        Vector2 position = new Vector2(initialPosX, initialPosY);
                         spriteBatch.Draw(texture, position, Color.White);
                     }
+
+                    initialPosX += 0;
+                    initialPosY -= 290;
                 }
             }
         }
