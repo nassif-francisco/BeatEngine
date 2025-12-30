@@ -18,6 +18,7 @@ using MonoGame.Framework.Devices.Sensors;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using static System.Net.WebRequestMethods;
 
 namespace BeatEngine
 {
@@ -298,16 +299,24 @@ namespace BeatEngine
         /// </summary>
         private void DrawTiles(SpriteBatch spriteBatch)
         {
-            for (int y = 0; y < 2; ++y)
+            for (int y = 0; y < Height; ++y)
             {
-                for (int x = 0; x < 2; ++x)
+                for (int x = 0; x < Width; ++x)
                 {
                     // If there is a visible tile in that position
                     Texture2D texture = tiles[x, y].Texture;
                     if (texture != null)
                     {
                         // Draw it in screen space.
-                        spriteBatch.Draw(texture, tiles[x, y].Position, Color.White);
+                        Color tint = Color.White;
+
+                        if (tiles[x, y].IsPressed)
+                        {
+                            tint = new Color(200, 200, 200);
+
+                        }
+
+                        spriteBatch.Draw(texture, tiles[x, y].Position, tint);
                     }
                 }
             }
@@ -317,44 +326,125 @@ namespace BeatEngine
         {
             int initialPosX = 2334;
             int initialPosY = 915;
-            for (int y = 0; y < 2; ++y)
+
+            //for (int y = 0; y < Height; ++y)
+            //{
+            //    for (int x = 0; x < Width; ++x)
+            //    {
+            //        // If there is a visible tile in that position
+            //        Texture2D texture = tiles[x, y].Texture;
+            //        if (texture != null)
+            //        {
+            //            // Draw it in screen space.
+            //            Vector2 position = new Vector2(initialPosX, initialPosY);
+            //            tiles[x, y].Position = position;
+
+            //        }
+            //        initialPosX -= 300;
+
+            //    }
+            //    initialPosY -= 300;
+            //}
+
+
+            //for (int x = 0; x < Width; ++x)
+            //{
+            //    for (int y = 0; y < Height; ++y)
+            //    {
+            //        //If there is a visible tile in that position
+            //        Texture2D texture = tiles[x, y].Texture;
+            //        if (texture != null)
+            //        {
+            //            //Draw it in screen space.
+            //            Vector2 position = new Vector2(initialPosX, initialPosY);
+            //            tiles[x, y].Position = position;
+
+            //        }
+            //        initialPosY -= 300;
+
+            //    }
+            //    initialPosY = 915;
+            //    initialPosX -= 300;
+            //}
+
+            for (int y = 0; y < Height; ++y)
             {
-                for (int x = 0; x < 2; ++x)
+                for (int x = 0; x < Width; ++x)
                 {
-                    // If there is a visible tile in that position
+                    //If there is a visible tile in that position
                     Texture2D texture = tiles[x, y].Texture;
                     if (texture != null)
                     {
-                        // Draw it in screen space.
+                        //Draw it in screen space.
                         Vector2 position = new Vector2(initialPosX, initialPosY);
                         tiles[x, y].Position = position;
 
                     }
-
-                    initialPosX += 0;
                     initialPosY -= 300;
+
                 }
+                initialPosY = 915;
+                initialPosX -= 300;
             }
+
+
         }
 
         private void CheckIfTileIsPressed(TouchCollection touchLocations)
         {
-            foreach (Tile tile in tiles)
-            {
-                foreach (var touch in touchLocations)
-                {
-                    Vector2 pos = touch.Position;
-                    Vector2.Transform(ref pos, ref globalTransformation, out pos);
+            //for (int k = 0; k < 3; k++)
+            //{
+            //    foreach (var touch in touchLocations)
+            //    {
+            //        Vector2 pos = touch.Position;
+            //        Vector2.Transform(ref pos, ref globalTransformation, out pos);
 
-                    if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
+            //        if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
+            //        {
+            //            if (tiles[k, 1].BoundingRectangle.Contains(pos))
+            //            {
+            //                tiles[k, 1].IsPressed = true;
+            //            }
+            //        }
+            //    }
+            //}
+
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    foreach (var touch in touchLocations)
                     {
-                        if(tile.BoundingRectangle.Contains(pos))
+                        Vector2 pos = touch.Position;
+                        Vector2.Transform(ref pos, ref globalTransformation, out pos);
+
+                        if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
                         {
-                            int a = 0;
+                            if (tiles[x, y].BoundingRectangle.Contains(pos))
+                            {
+                                tiles[x, y].IsPressed = true;
+                            }
                         }
                     }
+
                 }
             }
+            //foreach (Tile tile in tiles)
+            //{
+            //    foreach (var touch in touchLocations)
+            //    {
+            //        Vector2 pos = touch.Position;
+            //        Vector2.Transform(ref pos, ref globalTransformation, out pos);
+
+            //        if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
+            //        {
+            //            if(tile.BoundingRectangle.Contains(pos))
+            //            {
+            //                tile.IsPressed = true;
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         #endregion
