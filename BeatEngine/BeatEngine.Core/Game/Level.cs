@@ -413,6 +413,8 @@ namespace BeatEngine
             {
                 for (int x = 0; x < Width; ++x)
                 {
+                    tiles[x, y].IsPressed = false;
+
                     foreach (var touch in touchLocations)
                     {
                         Vector2 pos = touch.Position;
@@ -425,6 +427,7 @@ namespace BeatEngine
                                 tiles[x, y].IsPressed = true;
                             }
                         }
+
                     }
 
                 }
