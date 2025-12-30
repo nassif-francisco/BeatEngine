@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Framework.Devices.Sensors;
 using System;
@@ -95,6 +96,7 @@ namespace BeatEngine
             content = new ContentManager(serviceProvider, "Content");
 
             LoadTiles(fileStream);
+            PositionTiles();
 
             // Load background layer textures. For now, all levels must
             // use the same backgrounds and only use the left-most part of them.
@@ -263,9 +265,10 @@ namespace BeatEngine
             KeyboardState keyboardState,
             GamePadState gamePadState,
             AccelerometerState accelState,
+            TouchCollection touchCollection,
             DisplayOrientation orientation)
         {
-           
+            CheckIfTileIsPressed(touchCollection);
 
         }
 
@@ -293,7 +296,23 @@ namespace BeatEngine
         /// </summary>
         private void DrawTiles(SpriteBatch spriteBatch)
         {
-            // For each tile position
+            for (int y = 0; y < 2; ++y)
+            {
+                for (int x = 0; x < 2; ++x)
+                {
+                    // If there is a visible tile in that position
+                    Texture2D texture = tiles[x, y].Texture;
+                    if (texture != null)
+                    {
+                        // Draw it in screen space.
+                        spriteBatch.Draw(texture, tiles[x, y].Position, Color.White);
+                    }
+                }
+            }
+        }
+
+        private void PositionTiles()
+        {
             int initialPosX = 2334;
             int initialPosY = 915;
             for (int y = 0; y < 2; ++y)
@@ -306,11 +325,29 @@ namespace BeatEngine
                     {
                         // Draw it in screen space.
                         Vector2 position = new Vector2(initialPosX, initialPosY);
-                        spriteBatch.Draw(texture, position, Color.White);
+                        tiles[x, y].Position = position;
+
                     }
 
                     initialPosX += 0;
                     initialPosY -= 300;
+                }
+            }
+        }
+
+        private void CheckIfTileIsPressed(TouchCollection touchLocations)
+        {
+            foreach (Tile tile in tiles)
+            {
+                foreach (var touch in touchLocations)
+                {
+                    if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
+                    {
+                        if(tile.BoundingRectangle.Contains(touch.Position))
+                        {
+                            int a = 0;
+                        }
+                    }
                 }
             }
         }

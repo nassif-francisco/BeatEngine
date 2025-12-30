@@ -44,14 +44,12 @@ namespace BeatEngine
     {
         public Texture2D Texture;
         public TileCollision Collision; //will be used to define animation when pressed
-        public bool IsPressed
-        {
-            get { return isPressed; }
-        }
-        bool isPressed;
 
-        float Width = 80;
-        float Height = 80;
+        public Vector2 Position { get; set; }
+        public bool IsPressed { get; set; }
+
+        float Width = 260;
+        float Height = 260;
 
         public Vector2 Size = new Vector2();
 
@@ -63,7 +61,17 @@ namespace BeatEngine
             Texture = texture;
             Collision = collision;
             Size = new Vector2(Width, Height);
-            isPressed = false;
+        }
+
+        public Rectangle BoundingRectangle
+        {
+            get
+            {
+                //int left = (int)Math.Round(Position.X + Width);
+                //int top = (int)Math.Round(Position.Y  + Height);
+
+                return new Rectangle((int)Position.X, (int)Position.Y, (int)Width, (int)Height);
+            }
         }
     }
 }

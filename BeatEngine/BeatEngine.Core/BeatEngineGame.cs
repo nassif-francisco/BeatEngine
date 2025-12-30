@@ -152,7 +152,7 @@ namespace BeatEngine
 
             // update our level, passing down the GameTime along with all of our input states
             level.Update(gameTime, keyboardState, gamePadState, 
-                         accelerometerState, Window.CurrentOrientation);
+                         accelerometerState, touchState, Window.CurrentOrientation);
 
             base.Update(gameTime);
         }
