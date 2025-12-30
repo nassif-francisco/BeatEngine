@@ -7,15 +7,16 @@
 //-----------------------------------------------------------------------------
 #endregion
 
-using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Audio;
-using System.IO;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using MonoGame.Framework.Devices.Sensors;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace BeatEngine
 {
@@ -107,6 +108,7 @@ namespace BeatEngine
 
             // Load sounds.
             exitReachedSound = Content.Load<SoundEffect>("Sounds/ExitReached");
+            //Content.Load<Song>("Sounds/ElectricSunshine");
         }
 
         /// <summary>

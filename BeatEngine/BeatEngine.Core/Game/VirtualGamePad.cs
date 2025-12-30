@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Media;
 using System;
 using System.Diagnostics;
 using System.Reflection.Metadata;
+using Microsoft.Xna.Framework.Audio;
 
 namespace BeatEngine
 {
@@ -66,10 +67,12 @@ namespace BeatEngine
             {
                 if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
                 {
-                    if(!musicStarted)
+
+                    if (!musicStarted)
                     {
                         stopwatch = Stopwatch.StartNew();
-                        MediaPlayer.Play(Content.Load<Song>("Sounds/ElectricSunshine"));
+                        Song song = Content.Load<Song>("Sounds/ElectricSunshine");
+                        //MediaPlayer.Play(song);
                         musicStarted = true;
                     }
 
