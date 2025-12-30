@@ -35,6 +35,7 @@ namespace BeatEngine
         private const int EntityLayer = 2;
 
         Accelerometer accelerometer;
+        private Matrix globalTransformation;
 
         // Entities in the level.
         public Player Player
@@ -90,7 +91,7 @@ namespace BeatEngine
         /// <param name="fileStream">
         /// A stream containing the tile data.
         /// </param>
-        public Level(IServiceProvider serviceProvider, Stream fileStream, int levelIndex)
+        public Level(IServiceProvider serviceProvider, Stream fileStream, int levelIndex, Matrix globalTransformation)
         {
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");
@@ -110,6 +111,7 @@ namespace BeatEngine
 
             // Load sounds.
             exitReachedSound = Content.Load<SoundEffect>("Sounds/ExitReached");
+            this.globalTransformation = Matrix.Invert(globalTransformation);
             //Content.Load<Song>("Sounds/ElectricSunshine");
         }
 
@@ -341,9 +343,12 @@ namespace BeatEngine
             {
                 foreach (var touch in touchLocations)
                 {
+                    Vector2 pos = touch.Position;
+                    Vector2.Transform(ref pos, ref globalTransformation, out pos);
+
                     if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
                     {
-                        if(tile.BoundingRectangle.Contains(touch.Position))
+                        if(tile.BoundingRectangle.Contains(pos))
                         {
                             int a = 0;
                         }
