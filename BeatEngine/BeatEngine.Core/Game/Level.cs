@@ -312,7 +312,7 @@ namespace BeatEngine
 
                         if (tiles[x, y].IsPressed)
                         {
-                            tint = new Color(200, 200, 200);
+                            tint = Color.DarkOrchid; //Color.MonoGameOrange, Color.DarkOrange also good candidates
 
                         }
 
