@@ -7,6 +7,8 @@
 //-----------------------------------------------------------------------------
 #endregion
 
+using BeatEngine.Core.Game;
+using BeatEngine.Core.Game.GameScenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -22,7 +24,7 @@ using static System.Net.WebRequestMethods;
 
 namespace BeatEngine
 {
-    class StartGameScene : IDisposable
+    class StartGameScene : ISceneBase
     {
         private Tile[,] buttons;
         private Texture2D[] layers;
@@ -84,7 +86,7 @@ namespace BeatEngine
         /// <param name="fileStream">
         /// A stream containing the tile data.
         /// </param>
-        public StartGameScene(IServiceProvider serviceProvider, Stream fileStream, int levelIndex, Matrix globalTransformation)
+        public StartGameScene(IServiceProvider serviceProvider, Stream fileStream, int levelIndex, Matrix globalTransformation, GameState gameState)
         {
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");

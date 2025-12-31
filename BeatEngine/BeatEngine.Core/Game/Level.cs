@@ -7,6 +7,8 @@
 //-----------------------------------------------------------------------------
 #endregion
 
+using BeatEngine.Core.Game;
+using BeatEngine.Core.Game.GameScenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -27,7 +29,7 @@ namespace BeatEngine
     /// The level owns the player and controls the game's win and lose
     /// conditions as well as scoring.
     /// </summary>
-    class Level : IDisposable
+    class Level : ISceneBase
     {
         // Physical structure of the level.
         private Tile[,] tiles;
@@ -92,7 +94,7 @@ namespace BeatEngine
         /// <param name="fileStream">
         /// A stream containing the tile data.
         /// </param>
-        public Level(IServiceProvider serviceProvider, Stream fileStream, int levelIndex, Matrix globalTransformation)
+        public Level(IServiceProvider serviceProvider, Stream fileStream, int levelIndex, Matrix globalTransformation, GameState gameState)
         {
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");

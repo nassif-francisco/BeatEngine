@@ -7,6 +7,8 @@
 //-----------------------------------------------------------------------------
 #endregion
 
+using BeatEngine.Core.Game;
+using BeatEngine.Core.Game.GameScenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -30,6 +32,7 @@ namespace BeatEngine
         Vector2 baseScreenSize = new Vector2(2664, 1200);
         private Matrix globalTransformation;
         int backbufferWidth, backbufferHeight;
+        GameState GameState;
 
         // Global content.
         private SpriteFont hudFont;
@@ -38,9 +41,7 @@ namespace BeatEngine
         private Texture2D loseOverlay;
         private Texture2D diedOverlay;
 
-        // Meta-level game state.
-        private int levelIndex = 0;
-        private Level level;
+        private ISceneBase Scene;
         private bool wasContinuePressed;
 
         // When the time remaining is less than the warning time, it blinks on the hud
@@ -77,6 +78,7 @@ namespace BeatEngine
             graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
 
             Accelerometer2D.Initialize();
+            GameState = new GameState();
         }
 
         /// <summary>
@@ -116,8 +118,8 @@ namespace BeatEngine
                 }
                 catch { }
             }
-
-            LoadNextLevel();
+            LoadScene();
+            //LoadNextLevel();
         }
 
         public void ScalePresentationArea()
@@ -151,7 +153,7 @@ namespace BeatEngine
             HandleInput(gameTime);
 
             // update our level, passing down the GameTime along with all of our input states
-            level.Update(gameTime, keyboardState, gamePadState, 
+            Scene.Update(gameTime, keyboardState, gamePadState, 
                          accelerometerState, touchState, Window.CurrentOrientation);
 
             base.Update(gameTime);
@@ -182,19 +184,41 @@ namespace BeatEngine
             virtualGamePad.Update(gameTime);
         }
 
-        private void LoadNextLevel()
+        private void LoadLevel()
         {
-            // move to the next level
-            levelIndex = (levelIndex + 1);
+            //GameState.Level += 1; //or assign int ID according to song chosen by user
 
             // Unloads the content for the current level before loading the next one.
-            if (level != null)
-                level.Dispose();
+            if (Scene != null)
+                Scene.Dispose();
 
             // Load the level.
-            string levelPath = string.Format("Content/Levels/{0}.txt", levelIndex);
+            string levelPath = string.Format("Content/Levels/{0}.txt", GameState.Level);
             using (Stream fileStream = TitleContainer.OpenStream(levelPath))
-                level = new Level(Services, fileStream, levelIndex, globalTransformation);
+                Scene = new Level(Services, fileStream, GameState.Level, globalTransformation, GameState);
+        }
+
+        private void LoadStartScene()
+        {
+            if (Scene != null)
+                Scene.Dispose();
+
+            // Load the level.
+            string startScenePath = string.Format("Content/Scenes/StartScene.txt", GameState.Level);
+            using (Stream fileStream = TitleContainer.OpenStream(startScenePath))
+                Scene = new Level(Services, fileStream, GameState.Level, globalTransformation, GameState);
+        }
+
+        private void LoadScene()
+        {
+            if(GameState.Level == 0)
+            {
+                LoadStartScene();
+            }
+            else
+            {
+                LoadLevel();
+            }
         }
 
         /// <summary>
@@ -207,7 +231,7 @@ namespace BeatEngine
 
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null,null, globalTransformation);
 
-            level.Draw(gameTime, spriteBatch);
+            Scene.Draw(gameTime, spriteBatch);
 
             DrawHud();
 
