@@ -10,7 +10,7 @@ namespace BeatEngine.Core.Game
     {
         public GameState() 
         {
-            Level = 1;
+            Level = 0;
             Score = 0;
         }
         public int Level { get; set; }

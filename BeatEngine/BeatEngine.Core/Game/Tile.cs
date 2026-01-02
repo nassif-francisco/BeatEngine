@@ -70,8 +70,16 @@ namespace BeatEngine
                 //int left = (int)Math.Round(Position.X + Width);
                 //int top = (int)Math.Round(Position.Y  + Height);
 
-                return new Rectangle((int)Position.X, (int)Position.Y, (int)Width, (int)Height);
+                return new Rectangle((int)Position.X, (int)Position.Y, (int)Texture.Width, (int)Texture.Height);
             }
+        }
+
+        public Rectangle GetBoundingRectangle(Matrix globalTransformation)
+        {
+            Vector2 pos = new Vector2((int)Position.X, (int)Position.Y);
+            Vector2.Transform(ref pos, ref globalTransformation, out pos);
+
+            return new Rectangle((int)pos.X, (int)pos.Y, (int)Texture.Width, (int)Texture.Height);
         }
     }
 }

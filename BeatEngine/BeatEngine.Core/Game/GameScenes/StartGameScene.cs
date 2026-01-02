@@ -92,7 +92,7 @@ namespace BeatEngine
             content = new ContentManager(serviceProvider, "Content");
 
             LoadButtons(fileStream);
-            PositionTiles();
+            PositionButtons();
 
             // Load background layer textures. For now, all levels must
             // use the same backgrounds and only use the left-most part of them.
@@ -277,16 +277,17 @@ namespace BeatEngine
 
                         }
 
-                        spriteBatch.Draw(texture, buttons[x, y].Position, tint);
+                       spriteBatch.Draw(texture, buttons[x, y].Position, tint);
+                       //spriteBatch.Draw(texture, buttons[x, y].Position, null, tint, -MathHelper.PiOver2, new Vector2(0, 0), 1, SpriteEffects.None, 0);
                     }
                 }
             }
         }
 
-        private void PositionTiles()
+        private void PositionButtons()
         {
             int initialPosX = 1334;
-            int initialPosY = 415;
+            int initialPosY = 100;
 
             for (int y = 0; y < Height; ++y)
             {
@@ -304,7 +305,7 @@ namespace BeatEngine
                     initialPosY -= 300;
 
                 }
-                initialPosY = 415;
+                initialPosY = 100;
                 initialPosX -= 300;
             }
 

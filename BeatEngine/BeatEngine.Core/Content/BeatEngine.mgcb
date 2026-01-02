@@ -67,6 +67,9 @@
 #begin Levels/2.txt
 /copy:Levels/2.txt
 
+#begin Scenes/StartScene.txt
+/copy:Scenes/StartScene.txt
+
 
 #begin Overlays/you_lose.png
 /importer:TextureImporter

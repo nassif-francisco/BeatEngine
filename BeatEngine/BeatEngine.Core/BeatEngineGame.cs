@@ -206,7 +206,7 @@ namespace BeatEngine
             // Load the level.
             string startScenePath = string.Format("Content/Scenes/StartScene.txt", GameState.Level);
             using (Stream fileStream = TitleContainer.OpenStream(startScenePath))
-                Scene = new Level(Services, fileStream, GameState.Level, globalTransformation, GameState);
+                Scene = new StartGameScene(Services, fileStream, GameState.Level, globalTransformation, GameState);
         }
 
         private void LoadScene()
