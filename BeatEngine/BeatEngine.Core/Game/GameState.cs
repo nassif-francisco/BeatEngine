@@ -12,9 +12,12 @@ namespace BeatEngine.Core.Game
         {
             Level = 0;
             Score = 0;
+            DirtyScene = false;
         }
         public int Level { get; set; }
 
         public int Score { get; set; }
+
+        public bool DirtyScene { get; set; }
     }
 }

@@ -30,6 +30,7 @@ namespace BeatEngine
         private Texture2D[] layers;
         // The layer which entities are drawn on top of.
         private const int EntityLayer = 2;
+        public List<Tile> Pressedtiles = new List<Tile>();
 
         private Matrix globalTransformation;
 
@@ -39,6 +40,8 @@ namespace BeatEngine
             get { return player; }
         }
         Player player;
+
+        GameState GameState;
 
         // Key locations in the level.        
         private Vector2 start;
@@ -90,6 +93,7 @@ namespace BeatEngine
         {
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");
+            GameState = gameState;
 
             LoadButtons(fileStream);
             PositionButtons();
@@ -171,10 +175,14 @@ namespace BeatEngine
             switch (tileType)
             {
                 case 'S':
-                    return LoadButton("Start_button", TileCollision.Platform);
+                    Tile startTile = LoadButton("Start_button", TileCollision.Platform);
+                    startTile.Tag = "START";
+                    return startTile;
 
                 case 'E':
-                    return LoadButton("Exit_button", TileCollision.Platform);
+                    Tile exitTile = LoadButton("Exit_button", TileCollision.Platform);
+                    exitTile.Tag = "EXIT";
+                    return exitTile;
 
                 // Unknown tile type character
                 default:
@@ -233,6 +241,7 @@ namespace BeatEngine
             DisplayOrientation orientation)
         {
             CheckIfTileIsPressed(touchCollection);
+            TraversePressedButtons();
 
         }
 
@@ -314,6 +323,8 @@ namespace BeatEngine
 
         private void CheckIfTileIsPressed(TouchCollection touchLocations)
         {
+            //Pressedtiles.Clear();
+
             for (int y = 0; y < Height; ++y)
             {
                 for (int x = 0; x < Width; ++x)
@@ -330,6 +341,13 @@ namespace BeatEngine
                             if (buttons[x, y].BoundingRectangle.Contains(pos))
                             {
                                 buttons[x, y].IsPressed = true;
+
+                                if(!Pressedtiles.Contains(buttons[x, y]))
+                                {
+                                    Pressedtiles.Add(buttons[x, y]);
+                                }
+                                
+
                             }
                         }
 
@@ -337,6 +355,18 @@ namespace BeatEngine
 
                 }
             }
+        }
+
+        private void TraversePressedButtons()
+        {
+           foreach(Tile tile in Pressedtiles)
+           {
+                if(tile.Tag == "START")
+                {
+                    GameState.Level = 1;
+                    GameState.DirtyScene = true;
+                }
+           }
         }
 
         #endregion

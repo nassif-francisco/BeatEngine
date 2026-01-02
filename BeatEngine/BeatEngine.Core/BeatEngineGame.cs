@@ -174,6 +174,11 @@ namespace BeatEngine
                     Exit();
             }
 
+            if(GameState.DirtyScene)
+            {
+                LoadScene();
+            }
+
             bool continuePressed =
                 keyboardState.IsKeyDown(Keys.Space) ||
                 gamePadState.IsButtonDown(Buttons.A) ||
@@ -219,6 +224,8 @@ namespace BeatEngine
             {
                 LoadLevel();
             }
+
+            GameState.DirtyScene = false;
         }
 
         /// <summary>

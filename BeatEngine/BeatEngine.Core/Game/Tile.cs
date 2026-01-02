@@ -51,6 +51,8 @@ namespace BeatEngine
         float Width = 260;
         float Height = 260;
 
+        public string Tag { get; set; }
+
         public Vector2 Size = new Vector2();
 
         /// <summary>
