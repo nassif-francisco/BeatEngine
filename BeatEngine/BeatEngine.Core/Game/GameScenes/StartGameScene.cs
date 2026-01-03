@@ -295,8 +295,8 @@ namespace BeatEngine
 
         private void PositionButtons()
         {
-            int initialPosX = 1334;
-            int initialPosY = 100;
+            int initialPosY = 1334;
+            int initialPosX = 100;
 
             for (int y = 0; y < Height; ++y)
             {
@@ -311,11 +311,11 @@ namespace BeatEngine
                         buttons[x, y].Position = position;
 
                     }
-                    initialPosY -= 300;
+                    initialPosX -= 300;
 
                 }
-                initialPosY = 100;
-                initialPosX -= 300;
+                initialPosX = 100;
+                initialPosY -= 300;
             }
 
 

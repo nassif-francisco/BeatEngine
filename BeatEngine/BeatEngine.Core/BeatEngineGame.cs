@@ -29,7 +29,7 @@ namespace BeatEngine
         // Resources for drawing.
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        Vector2 baseScreenSize = new Vector2(2664, 1200);
+        Vector2 baseScreenSize = new Vector2(1200, 2664);
         private Matrix globalTransformation;
         int backbufferWidth, backbufferHeight;
         GameState GameState;
@@ -75,7 +75,7 @@ namespace BeatEngine
 
             graphics.PreferredBackBufferWidth = 2664;
             graphics.PreferredBackBufferHeight = 1200;
-            graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
+            graphics.SupportedOrientations = DisplayOrientation.Portrait;
 
             Accelerometer2D.Initialize();
             GameState = new GameState();

@@ -20,6 +20,7 @@ using MonoGame.Framework.Devices.Sensors;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection.Emit;
 using static System.Net.WebRequestMethods;
 
 namespace BeatEngine
@@ -51,6 +52,8 @@ namespace BeatEngine
         private Vector2 start;
         private Point exit = InvalidPosition;
         private static readonly Point InvalidPosition = new Point(-1, -1);
+
+        private SpriteFont hudFont;
 
         // Level game state.
         private Random random = new Random(354668); // Arbitrary, but constant seed
@@ -115,6 +118,8 @@ namespace BeatEngine
             // Load sounds.
             exitReachedSound = Content.Load<SoundEffect>("Sounds/ExitReached");
             this.globalTransformation = Matrix.Invert(globalTransformation);
+
+            hudFont = Content.Load<SpriteFont>("Fonts/Hud");
             //Content.Load<Song>("Sounds/ElectricSunshine");
         }
 
@@ -294,6 +299,13 @@ namespace BeatEngine
 
             for (int i = EntityLayer + 1; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
+            DrawShadowedString(hudFont, "SCORE: ", new Vector2(500, 300), Color.DarkMagenta, spriteBatch);
+        }
+
+        private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
+        {
+            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 5, SpriteEffects.None, 1);
+            //spriteBatch.DrawString(font, value, position, color);
         }
 
         /// <summary>
@@ -326,8 +338,8 @@ namespace BeatEngine
 
         private void PositionTiles()
         {
-            int initialPosX = 2334;
-            int initialPosY = 915;
+            int initialPosY = 2334;
+            int initialPosX = 915;
 
             //for (int y = 0; y < Height; ++y)
             //{
@@ -382,11 +394,11 @@ namespace BeatEngine
                         tiles[x, y].Position = position;
 
                     }
-                    initialPosY -= 300;
+                    initialPosX -= 300;
 
                 }
-                initialPosY = 915;
-                initialPosX -= 300;
+                initialPosX = 915;
+                initialPosY -= 300;
             }
 
 
