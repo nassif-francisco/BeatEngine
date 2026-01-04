@@ -15,7 +15,7 @@ namespace BeatEngine
     /// <summary>
     /// Represents a 2D circle.
     /// </summary>
-    struct Circle
+    public struct Circle
     {
         /// <summary>
         /// Center position of the circle.

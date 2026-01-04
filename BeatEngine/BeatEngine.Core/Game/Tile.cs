@@ -8,7 +8,9 @@
 #endregion
 
 using System;
+using BeatEngine.Core.Game;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BeatEngine
@@ -36,52 +38,46 @@ namespace BeatEngine
         /// </summary>
         Platform = 2,
     }
-
-    /// <summary>
-    /// Stores the appearance and collision behavior of a tile.
-    /// </summary>
     struct Tile
     {
         public Texture2D Texture;
         public TileCollision Collision; //will be used to define animation when pressed
 
-        public Vector2 Position { get; set; }
-        public bool IsPressed { get; set; }
+        private Vector2 _position;
 
-        float Width = 260;
-        float Height = 260;
+        public Vector2 Position
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                Hit.Position = value + new Vector2(100, 0); //place a little bit to the right
+            }
+        }
+        public bool IsPressed { get; set; }
+        public Hit Hit { get; set; }
+
+        public float Width = 260;
+        public float Height = 260;
 
         public string Tag { get; set; }
 
         public Vector2 Size = new Vector2();
 
-        /// <summary>
-        /// Constructs a new tile.
-        /// </summary>
-        public Tile(Texture2D texture, TileCollision collision)
+        public Tile(Texture2D texture, TileCollision collision, ContentManager contentManager)
         {
             Texture = texture;
             Collision = collision;
             Size = new Vector2(Width, Height);
+            Hit = new Hit(new Vector2(0,0), contentManager);
         }
 
         public Rectangle BoundingRectangle
         {
             get
             {
-                //int left = (int)Math.Round(Position.X + Width);
-                //int top = (int)Math.Round(Position.Y  + Height);
-
                 return new Rectangle((int)Position.X, (int)Position.Y, (int)Texture.Width, (int)Texture.Height);
             }
-        }
-
-        public Rectangle GetBoundingRectangle(Matrix globalTransformation)
-        {
-            Vector2 pos = new Vector2((int)Position.X, (int)Position.Y);
-            Vector2.Transform(ref pos, ref globalTransformation, out pos);
-
-            return new Rectangle((int)pos.X, (int)pos.Y, (int)Texture.Width, (int)Texture.Height);
         }
     }
 }

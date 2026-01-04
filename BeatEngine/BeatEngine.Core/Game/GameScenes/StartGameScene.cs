@@ -203,7 +203,7 @@ namespace BeatEngine
         /// <returns>The new tile.</returns>
         private Tile LoadButton(string name, TileCollision collision)
         {
-            return new Tile(Content.Load<Texture2D>("UI/Buttons/" + name), collision);
+            return new Tile(Content.Load<Texture2D>("UI/Buttons/" + name), collision, Content);
         }
 
 

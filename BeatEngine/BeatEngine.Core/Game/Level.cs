@@ -208,7 +208,7 @@ namespace BeatEngine
         /// <returns>The new tile.</returns>
         private Tile LoadTile(string name, TileCollision collision)
         {
-            return new Tile(Content.Load<Texture2D>("Tiles/" + name), collision);
+            return new Tile(Content.Load<Texture2D>("Tiles/" + name), collision, Content);
         }
 
 
@@ -304,7 +304,7 @@ namespace BeatEngine
 
         private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 5, SpriteEffects.None, 1);
+            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 4, SpriteEffects.None, 1);
             //spriteBatch.DrawString(font, value, position, color);
         }
 
@@ -327,6 +327,7 @@ namespace BeatEngine
                         if (tiles[x, y].IsPressed)
                         {
                             tint = Color.DarkOrchid; //Color.MonoGameOrange, Color.DarkOrange also good candidates
+                            tiles[x, y].Hit.Draw(spriteBatch);
 
                         }
 
@@ -340,46 +341,6 @@ namespace BeatEngine
         {
             int initialPosY = 2334;
             int initialPosX = 915;
-
-            //for (int y = 0; y < Height; ++y)
-            //{
-            //    for (int x = 0; x < Width; ++x)
-            //    {
-            //        // If there is a visible tile in that position
-            //        Texture2D texture = tiles[x, y].Texture;
-            //        if (texture != null)
-            //        {
-            //            // Draw it in screen space.
-            //            Vector2 position = new Vector2(initialPosX, initialPosY);
-            //            tiles[x, y].Position = position;
-
-            //        }
-            //        initialPosX -= 300;
-
-            //    }
-            //    initialPosY -= 300;
-            //}
-
-
-            //for (int x = 0; x < Width; ++x)
-            //{
-            //    for (int y = 0; y < Height; ++y)
-            //    {
-            //        //If there is a visible tile in that position
-            //        Texture2D texture = tiles[x, y].Texture;
-            //        if (texture != null)
-            //        {
-            //            //Draw it in screen space.
-            //            Vector2 position = new Vector2(initialPosX, initialPosY);
-            //            tiles[x, y].Position = position;
-
-            //        }
-            //        initialPosY -= 300;
-
-            //    }
-            //    initialPosY = 915;
-            //    initialPosX -= 300;
-            //}
 
             for (int y = 0; y < Height; ++y)
             {
@@ -400,29 +361,10 @@ namespace BeatEngine
                 initialPosX = 915;
                 initialPosY -= 300;
             }
-
-
         }
 
         private void CheckIfTileIsPressed(TouchCollection touchLocations)
         {
-            //for (int k = 0; k < 3; k++)
-            //{
-            //    foreach (var touch in touchLocations)
-            //    {
-            //        Vector2 pos = touch.Position;
-            //        Vector2.Transform(ref pos, ref globalTransformation, out pos);
-
-            //        if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
-            //        {
-            //            if (tiles[k, 1].BoundingRectangle.Contains(pos))
-            //            {
-            //                tiles[k, 1].IsPressed = true;
-            //            }
-            //        }
-            //    }
-            //}
-
             for (int y = 0; y < Height; ++y)
             {
                 for (int x = 0; x < Width; ++x)
@@ -446,22 +388,6 @@ namespace BeatEngine
 
                 }
             }
-            //foreach (Tile tile in tiles)
-            //{
-            //    foreach (var touch in touchLocations)
-            //    {
-            //        Vector2 pos = touch.Position;
-            //        Vector2.Transform(ref pos, ref globalTransformation, out pos);
-
-            //        if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
-            //        {
-            //            if(tile.BoundingRectangle.Contains(pos))
-            //            {
-            //                tile.IsPressed = true;
-            //            }
-            //        }
-            //    }
-            //}
         }
 
         #endregion
