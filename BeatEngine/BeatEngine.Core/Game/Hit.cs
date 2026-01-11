@@ -24,9 +24,11 @@ namespace BeatEngine.Core.Game
         public bool IsAnimationStillPlaying { get; set; }
         public float Time;
         public float DefaultAnimationDuration = 0.3f;
+        public float DefaultUpwardMovementRate = 0.3f;
 
         // The gem is animated from a base position along the Y axis.
         private Vector2 basePosition;
+        public Vector2 originalPosition { get; set; }
         private float bounce;
 
         public Vector2 Position
@@ -70,16 +72,22 @@ namespace BeatEngine.Core.Game
 
         public void Update(GameTime gameTime)
         {
-            Time -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if(Time < 0)
+            if(IsAnimationStillPlaying)
             {
-                IsAnimationStillPlaying = false;
+                Time -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                Position = new Vector2(Position.X, Position.Y - 100 * (float)gameTime.ElapsedGameTime.TotalSeconds);
+
+                if (Time < 0)
+                {
+                    IsAnimationStillPlaying = false;
+                    Position = originalPosition;
+                }
             }
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             //spriteBatch.Draw(texture, Position, null, Color, 0.0f, origin, 5.0f, SpriteEffects.None, 0.0f);
+
             sprite.PlayAnimation(starAnimation);
             sprite.Draw(gameTime, spriteBatch, Position, SpriteEffects.None);
         }

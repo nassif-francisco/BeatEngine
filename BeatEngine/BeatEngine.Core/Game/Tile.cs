@@ -52,6 +52,7 @@ namespace BeatEngine
             {
                 _position = value;
                 Hit.Position = value + new Vector2(100, 0); //place a little bit to the right
+                Hit.originalPosition = value + new Vector2(100, 0);
             }
         }
         public bool IsPressed { get; set; }
