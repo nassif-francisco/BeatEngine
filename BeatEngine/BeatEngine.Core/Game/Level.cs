@@ -348,6 +348,16 @@ namespace BeatEngine
                     {
                         if (tiles[x, y].IsPressed)
                         {
+                            tiles[x, y].Hit.BeginAnimation();
+                        }
+
+                        else
+                        {
+                            tiles[x, y].Hit.Update(gameTime);
+                        }
+
+                        if (tiles[x, y].Hit.IsAnimationStillPlaying)
+                        {
                             tiles[x, y].Hit.Draw(gameTime, spriteBatch);
                         }
                     }

@@ -21,6 +21,10 @@ namespace BeatEngine.Core.Game
         private Animation starAnimation;
         private AnimationPlayer sprite;
 
+        public bool IsAnimationStillPlaying { get; set; }
+        public float Time;
+        public float DefaultAnimationDuration = 0.3f;
+
         // The gem is animated from a base position along the Y axis.
         private Vector2 basePosition;
         private float bounce;
@@ -57,17 +61,21 @@ namespace BeatEngine.Core.Game
             origin = new Vector2(texture.Width / 2.0f, texture.Height / 2.0f);
         }
 
+        public void BeginAnimation()
+        {
+            Time = DefaultAnimationDuration;
+            IsAnimationStillPlaying = true;
+            sprite.PlayAnimation(starAnimation);
+        }
+
         public void Update(GameTime gameTime)
         {
-            // Bounce control constants
-            const float BounceHeight = 0.18f;
-            const float BounceRate = 3.0f;
-            const float BounceSync = -0.75f;
+            Time -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            // Bounce along a sine curve over time.
-            // Include the X coordinate so that neighboring gems bounce in a nice wave pattern.            
-            double t = gameTime.TotalGameTime.TotalSeconds * BounceRate + Position.X * BounceSync;
-            bounce = (float)Math.Sin(t) * BounceHeight * texture.Height;
+            if(Time < 0)
+            {
+                IsAnimationStillPlaying = false;
+            }
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
