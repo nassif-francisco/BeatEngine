@@ -18,6 +18,9 @@ namespace BeatEngine.Core.Game
         public readonly int PointValue = 30;
         public readonly Color Color = Color.Yellow;
 
+        private Animation starAnimation;
+        private AnimationPlayer sprite;
+
         // The gem is animated from a base position along the Y axis.
         private Vector2 basePosition;
         private float bounce;
@@ -50,6 +53,7 @@ namespace BeatEngine.Core.Game
         public void LoadContent()
         {
             texture = content.Load<Texture2D>("Sprites/Star");
+            starAnimation = new Animation(content.Load<Texture2D>("Sprites/Star"), 0.1f, true);
             origin = new Vector2(texture.Width / 2.0f, texture.Height / 2.0f);
         }
 
@@ -65,9 +69,11 @@ namespace BeatEngine.Core.Game
             double t = gameTime.TotalGameTime.TotalSeconds * BounceRate + Position.X * BounceSync;
             bounce = (float)Math.Sin(t) * BounceHeight * texture.Height;
         }
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(texture, Position, null, Color, 0.0f, origin, 1.0f, SpriteEffects.None, 0.0f);
+            //spriteBatch.Draw(texture, Position, null, Color, 0.0f, origin, 5.0f, SpriteEffects.None, 0.0f);
+            sprite.PlayAnimation(starAnimation);
+            sprite.Draw(gameTime, spriteBatch, Position, SpriteEffects.None);
         }
     }
 }

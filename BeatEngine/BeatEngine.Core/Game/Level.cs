@@ -295,7 +295,8 @@ namespace BeatEngine
             for (int i = 0; i <= EntityLayer; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
 
-            DrawTiles(spriteBatch);
+            DrawTiles(gameTime, spriteBatch);
+            DrawFX(gameTime, spriteBatch);
 
             for (int i = EntityLayer + 1; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
@@ -311,7 +312,7 @@ namespace BeatEngine
         /// <summary>
         /// Draws each tile in the level.
         /// </summary>
-        private void DrawTiles(SpriteBatch spriteBatch)
+        private void DrawTiles(GameTime gameTime, SpriteBatch spriteBatch)
         {
             for (int y = 0; y < Height; ++y)
             {
@@ -327,11 +328,28 @@ namespace BeatEngine
                         if (tiles[x, y].IsPressed)
                         {
                             tint = Color.DarkOrchid; //Color.MonoGameOrange, Color.DarkOrange also good candidates
-                            tiles[x, y].Hit.Draw(spriteBatch);
-
                         }
 
                         spriteBatch.Draw(texture, tiles[x, y].Position, tint);
+                    }
+                }
+            }
+        }
+
+        private void DrawFX(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    // If there is a visible tile in that position
+                    Texture2D texture = tiles[x, y].Texture;
+                    if (texture != null)
+                    {
+                        if (tiles[x, y].IsPressed)
+                        {
+                            tiles[x, y].Hit.Draw(gameTime, spriteBatch);
+                        }
                     }
                 }
             }
