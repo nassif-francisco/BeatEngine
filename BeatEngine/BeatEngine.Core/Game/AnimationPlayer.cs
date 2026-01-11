@@ -64,6 +64,12 @@ namespace BeatEngine
             this.time = 0.0f;
         }
 
+        public void Reset()
+        {
+            frameIndex = 0;
+            time = 0.0f;
+        }
+
         /// <summary>
         /// Advances the time position and draws the current frame of the animation.
         /// </summary>

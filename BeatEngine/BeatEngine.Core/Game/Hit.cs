@@ -70,24 +70,40 @@ namespace BeatEngine.Core.Game
             sprite.PlayAnimation(starAnimation);
         }
 
+        public void UpdatePosition(GameTime gameTime)
+        {
+            Position = new Vector2(Position.X, Position.Y - 100 * (float)gameTime.ElapsedGameTime.TotalSeconds);
+
+            if(Position.Y < originalPosition.Y - 100)
+            {
+                ResetAnimation();
+            }
+        }
+
+        public void ResetAnimation()
+        {
+            Position = originalPosition;
+            sprite.Reset();
+        }
+
         public void Update(GameTime gameTime)
         {
             if(IsAnimationStillPlaying)
             {
                 Time -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-                Position = new Vector2(Position.X, Position.Y - 100 * (float)gameTime.ElapsedGameTime.TotalSeconds);
+                UpdatePosition(gameTime);
 
                 if (Time < 0)
                 {
                     IsAnimationStillPlaying = false;
-                    Position = originalPosition;
+                    ResetAnimation();
                 }
             }
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             //spriteBatch.Draw(texture, Position, null, Color, 0.0f, origin, 5.0f, SpriteEffects.None, 0.0f);
-
+            UpdatePosition(gameTime);
             sprite.PlayAnimation(starAnimation);
             sprite.Draw(gameTime, spriteBatch, Position, SpriteEffects.None);
         }
