@@ -34,6 +34,9 @@ namespace BeatEngine
     {
         // Physical structure of the level.
         private Tile[,] tiles;
+
+        private Tile[,] mirrorTiles;
+
         private Texture2D[] layers;
         // The layer which entities are drawn on top of.
         private const int EntityLayer = 2;
@@ -104,6 +107,7 @@ namespace BeatEngine
 
             LoadTiles(fileStream);
             PositionTiles();
+            PositionMirrorTiles();
 
             // Load background layer textures. For now, all levels must
             // use the same backgrounds and only use the left-most part of them.
@@ -151,6 +155,7 @@ namespace BeatEngine
 
             // Allocate the tile grid.
             tiles = new Tile[width, lines.Count];
+            mirrorTiles = new Tile[width, lines.Count];
 
             // Loop over every tile position,
             for (int y = 0; y < Height; ++y)
@@ -160,6 +165,7 @@ namespace BeatEngine
                     // to load each tile.
                     char tileType = lines[y][x];
                     tiles[x, y] = LoadTile(tileType, x, y);
+                    mirrorTiles[x, y] = LoadTile(tileType, x, y);
                 }
             }
 
@@ -296,11 +302,13 @@ namespace BeatEngine
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
 
             DrawTiles(gameTime, spriteBatch);
+            DrawMirrorTiles(gameTime, spriteBatch);
             DrawFX(gameTime, spriteBatch);
 
             for (int i = EntityLayer + 1; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
-            DrawShadowedString(hudFont, "SCORE: ", new Vector2(500, 300), Color.DarkMagenta, spriteBatch);
+
+            DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.DarkMagenta, spriteBatch);
         }
 
         private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
@@ -331,6 +339,30 @@ namespace BeatEngine
                         }
 
                         spriteBatch.Draw(texture, tiles[x, y].Position, tint);
+                    }
+                }
+            }
+        }
+
+        private void DrawMirrorTiles(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    // If there is a visible tile in that position
+                    Texture2D texture = tiles[x, y].Texture;
+                    if (texture != null)
+                    {
+                        // Draw it in screen space.
+                        Color tint = Color.White * 0.4f;
+
+                        if (mirrorTiles[x, y].IsPressed)
+                        {
+                            tint = Color.DarkOrchid; //Color.MonoGameOrange, Color.DarkOrange also good candidates
+                        }
+
+                        spriteBatch.Draw(texture, mirrorTiles[x, y].Position, tint);
                     }
                 }
             }
@@ -381,6 +413,32 @@ namespace BeatEngine
                         //Draw it in screen space.
                         Vector2 position = new Vector2(initialPosX, initialPosY);
                         tiles[x, y].Position = position;
+
+                    }
+                    initialPosX -= 300;
+
+                }
+                initialPosX = 915;
+                initialPosY -= 300;
+            }
+        }
+
+        private void PositionMirrorTiles()
+        {
+            int initialPosY = 1034;
+            int initialPosX = 915;
+
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    //If there is a visible tile in that position
+                    Texture2D texture = tiles[x, y].Texture;
+                    if (texture != null)
+                    {
+                        //Draw it in screen space.
+                        Vector2 position = new Vector2(initialPosX, initialPosY);
+                        mirrorTiles[x, y].Position = position;
 
                     }
                     initialPosX -= 300;
