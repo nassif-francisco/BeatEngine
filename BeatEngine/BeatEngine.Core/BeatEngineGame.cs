@@ -236,7 +236,7 @@ namespace BeatEngine
         {
             graphics.GraphicsDevice.Clear(Color.Black);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null,null, globalTransformation);
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null,null, globalTransformation);
 
             Scene.Draw(gameTime, spriteBatch);
 

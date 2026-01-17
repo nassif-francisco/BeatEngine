@@ -20,6 +20,7 @@ using MonoGame.Framework.Devices.Sensors;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection.Emit;
 using static System.Net.WebRequestMethods;
 
@@ -43,6 +44,15 @@ namespace BeatEngine
 
         Accelerometer accelerometer;
         private Matrix globalTransformation;
+
+        private List<Mode> Modes = new List<Mode>();
+        public bool IsGetReadyMessageStillPlaying = true;
+        public float Time;
+        public float DefaultAnimationDuration = 3f;
+
+        public Tile GetReadyTile;
+
+        private Mode CurrentMode { get; set; }
 
         // Entities in the level.
         public Player Player
@@ -106,6 +116,7 @@ namespace BeatEngine
             content = new ContentManager(serviceProvider, "Content");
 
             LoadTiles(fileStream);
+            LoadGetReadyTile("GetReady", TileCollision.Passable);
             PositionTiles();
             PositionMirrorTiles();
 
@@ -124,7 +135,18 @@ namespace BeatEngine
             this.globalTransformation = Matrix.Invert(globalTransformation);
 
             hudFont = Content.Load<SpriteFont>("Fonts/Hud");
+
+            AddModes();
+
+            Time = DefaultAnimationDuration;
+            CurrentMode = Modes.Where(m => m.Tag == "Countdown").FirstOrDefault();
             //Content.Load<Song>("Sounds/ElectricSunshine");
+        }
+
+        private void AddModes()
+        {
+            Modes.Add(new Mode() { Tag = "Countdown", NextModeTag = "Practice" });
+            Modes.Add(new Mode() { Tag = "Practice", NextModeTag = "Practice" });
         }
 
         /// <summary>
@@ -135,6 +157,7 @@ namespace BeatEngine
         /// <param name="fileStream">
         /// A stream containing the tile data.
         /// </param>
+        /// 
         private void LoadTiles(Stream fileStream)
         {
             // Load the level and ensure all of the lines are the same length.
@@ -217,6 +240,11 @@ namespace BeatEngine
             return new Tile(Content.Load<Texture2D>("Tiles/" + name), collision, Content);
         }
 
+        private Tile LoadGetReadyTile(string name, TileCollision collision)
+        {
+            return new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
+        }
+
 
         /// <summary>
         /// Unloads the level content.
@@ -285,6 +313,7 @@ namespace BeatEngine
             DisplayOrientation orientation)
         {
             CheckIfTileIsPressed(touchCollection);
+            HandleModeTransition();
 
         }
 
@@ -293,28 +322,77 @@ namespace BeatEngine
 
         #region Draw
 
+        public void ToNextMode()
+        {
+
+            string nextModeTag = CurrentMode.ToNextMode();
+            CurrentMode = Modes.Where(m => m.Tag == nextModeTag).FirstOrDefault();
+        }
+
+        public void HandleModeTransition()
+        {
+            switch (CurrentMode.Tag)
+            {
+                case "Countdown":
+                    
+                    if(IsGetReadyMessageStillPlaying == false)
+                    {
+                        ToNextMode();
+                    }
+                    break;
+                case "Practice":
+                    // Nothing to do here yet
+                    break;
+            }
+
+        }
+
         /// <summary>
         /// Draw everything in the level from background to foreground.
         /// </summary>
+        /// 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            for (int i = 0; i <= EntityLayer; ++i)
+            for (int i = 0; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
-
-            DrawTiles(gameTime, spriteBatch);
-            DrawMirrorTiles(gameTime, spriteBatch);
-            DrawFX(gameTime, spriteBatch);
-
-            for (int i = EntityLayer + 1; i < layers.Length; ++i)
-                spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
-
-            DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.DarkMagenta, spriteBatch);
+            
+            switch (CurrentMode.Tag)
+            {
+                case "Countdown":
+                    DrawTiles(gameTime, spriteBatch);
+                    DrawMirrorTiles(gameTime, spriteBatch);
+                    DrawFX(gameTime, spriteBatch);
+                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.DarkMagenta, spriteBatch);
+                    DrawGetReady(gameTime, spriteBatch);
+                    break;
+                case "Practice":
+                    DrawTiles(gameTime, spriteBatch);
+                    DrawMirrorTiles(gameTime, spriteBatch);
+                    DrawFX(gameTime, spriteBatch);
+                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.DarkMagenta, spriteBatch);
+                    break;
+            }
         }
+
+        private void DrawGetReady(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            Time -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Texture2D texture = GetReadyTile.Texture;
+
+            spriteBatch.Draw(texture, GetReadyTile.Position, Color.White);
+
+            if (Time < 0)
+            {
+                IsGetReadyMessageStillPlaying = false;
+            }
+        }
+
 
         private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
         {
             spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 4, SpriteEffects.None, 1);
-            //spriteBatch.DrawString(font, value, position, color);
+            //sriteBatch.DrawString(font, value, position, color);
         }
 
         /// <summary>
