@@ -50,6 +50,14 @@ namespace BeatEngine
         public float Time;
         public float DefaultAnimationDuration = 2f;
 
+
+
+        private float getReadyTimer = 0f;
+
+        private float offscreenLeftX;
+        private float offscreenRightX;
+        private float centerX;
+
         public Tile GetReadyTile;
 
         private Mode CurrentMode { get; set; }
@@ -243,7 +251,12 @@ namespace BeatEngine
         private Tile LoadGetReadyTile(string name, TileCollision collision)
         {
             GetReadyTile =  new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
-            GetReadyTile.Position = new Vector2(-150, 800);  
+            GetReadyTile.Position = new Vector2(-150, 800);
+
+            offscreenLeftX = -80000;
+            offscreenRightX = 1200;
+            centerX = (1200 - GetReadyTile.Texture.Width) / 2f;
+
             return GetReadyTile;
         }
 
@@ -376,18 +389,66 @@ namespace BeatEngine
             }
         }
 
+        //private void DrawGetReady(GameTime gameTime, SpriteBatch spriteBatch)
+        //{
+        //    Time -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+        //    Texture2D texture = GetReadyTile.Texture;
+
+        //    spriteBatch.Draw(texture, GetReadyTile.Position, Color.White);
+
+        //    if (Time < 0)
+        //    {
+        //        IsGetReadyMessageStillPlaying = false;
+        //    }
+        //}
+
         private void DrawGetReady(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            Time -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+            getReadyTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            Texture2D texture = GetReadyTile.Texture;
+            float t = MathHelper.Clamp(getReadyTimer / DefaultAnimationDuration, 0f, 1f);
+            float x;
 
-            spriteBatch.Draw(texture, GetReadyTile.Position, Color.White);
+            if (t < 0.4f)
+            {
+                // Phase 1: Enter & slow down (ease-out)
+                float p = t / 0.4f;
+                p = EaseOutCubic(p);
+                x = MathHelper.Lerp(offscreenLeftX, centerX, p);
+            }
+            else if (t < 0.6f)
+            {
+                // Phase 2: Stay in center
+                x = centerX;
+            }
+            else
+            {
+                // Phase 3: Accelerate out (ease-in)
+                float p = (t - 0.6f) / 0.4f;
+                p = EaseIPowerNine(p);
+                x = MathHelper.Lerp(centerX, offscreenRightX, p);
+            }
 
-            if (Time < 0)
+            GetReadyTile.Position = new Vector2(x, GetReadyTile.Position.Y);
+
+            spriteBatch.Draw(GetReadyTile.Texture, GetReadyTile.Position, Color.White);
+
+            if (t >= 1f)
             {
                 IsGetReadyMessageStillPlaying = false;
+                getReadyTimer = 0f;
             }
+        }
+
+        private float EaseOutCubic(float t)
+        {
+            return 1f - MathF.Pow(1f - t, 5f);
+        }
+
+        private float EaseIPowerNine(float t)
+        {
+            return MathF.Pow(t, 9f);
         }
 
 
