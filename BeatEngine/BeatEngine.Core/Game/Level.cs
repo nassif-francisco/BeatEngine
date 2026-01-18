@@ -48,7 +48,7 @@ namespace BeatEngine
         private List<Mode> Modes = new List<Mode>();
         public bool IsGetReadyMessageStillPlaying = true;
         public float Time;
-        public float DefaultAnimationDuration = 3f;
+        public float DefaultAnimationDuration = 2f;
 
         public Tile GetReadyTile;
 
@@ -242,7 +242,9 @@ namespace BeatEngine
 
         private Tile LoadGetReadyTile(string name, TileCollision collision)
         {
-            return new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
+            GetReadyTile =  new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
+            GetReadyTile.Position = new Vector2(-150, 800);  
+            return GetReadyTile;
         }
 
 
