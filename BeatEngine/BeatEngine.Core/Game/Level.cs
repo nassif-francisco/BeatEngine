@@ -414,7 +414,7 @@ namespace BeatEngine
             {
                 // Phase 1: Enter & slow down (ease-out)
                 float p = t / 0.4f;
-                p = EaseOutCubic(p);
+                p = EaseOutPowerFive(p);
                 x = MathHelper.Lerp(offscreenLeftX, centerX, p);
             }
             else if (t < 0.6f)
@@ -436,12 +436,19 @@ namespace BeatEngine
 
             if (t >= 1f)
             {
-                IsGetReadyMessageStillPlaying = false;
-                getReadyTimer = 0f;
+                StartPlayingSong(); 
             }
         }
 
-        private float EaseOutCubic(float t)
+        private void StartPlayingSong()
+        {
+            IsGetReadyMessageStillPlaying = false;
+            getReadyTimer = 0f;
+            Song song = Content.Load<Song>("Sounds/BeatMeUp");
+            MediaPlayer.Play(song);
+        }
+
+        private float EaseOutPowerFive(float t)
         {
             return 1f - MathF.Pow(1f - t, 5f);
         }

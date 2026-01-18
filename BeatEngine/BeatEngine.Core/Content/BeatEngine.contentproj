@@ -96,6 +96,11 @@
       <Importer>WmaImporter</Importer>
       <Processor>SongProcessor</Processor>
     </Compile>
+    <Compile Include="Sounds\BeatMeUp.mp3">
+      <Name>BeatMeUp</Name>
+      <Importer>WmaImporter</Importer>
+      <Processor>SongProcessor</Processor>
+    </Compile>
     <Compile Include="Tiles\magenta.png">
       <Name>Platform</Name>
       <Importer>TextureImporter</Importer>

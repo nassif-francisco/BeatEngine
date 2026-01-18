@@ -71,7 +71,7 @@ namespace BeatEngine
                     if (!musicStarted)
                     {
                         stopwatch = Stopwatch.StartNew();
-                        Song song = Content.Load<Song>("Sounds/ElectricSunshine");
+                        Song song = Content.Load<Song>("Sounds/BeatMeUp");
                         //MediaPlayer.Play(song);
                         musicStarted = true;
                     }
