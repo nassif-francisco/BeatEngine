@@ -96,8 +96,8 @@
       <Importer>WmaImporter</Importer>
       <Processor>SongProcessor</Processor>
     </Compile>
-    <Compile Include="Sounds\BeatMeUp.mp3">
-      <Name>BeatMeUp</Name>
+    <Compile Include="Sounds\StarlitPulse.mp3">
+      <Name>StarlitPulse</Name>
       <Importer>WmaImporter</Importer>
       <Processor>SongProcessor</Processor>
     </Compile>

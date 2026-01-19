@@ -107,11 +107,11 @@
 /processorParam:Quality=Best
 /build:Sounds/ElectricSunshine.mp3
 
-#begin Sounds/BeatMeUp.mp3
+#begin Sounds/StarlitPulse.mp3
 /importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
-/build:Sounds/BeatMeUp.mp3
+/build:Sounds/StarlitPulse.mp3
 
 #begin Sounds/GemCollected.wav
 /importer:WavImporter

@@ -9,6 +9,7 @@
 
 using BeatEngine.Core.Game;
 using BeatEngine.Core.Game.GameScenes;
+using Microsoft.VisualBasic.FileIO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -20,6 +21,7 @@ using MonoGame.Framework.Devices.Sensors;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Reflection.Emit;
 using static System.Net.WebRequestMethods;
@@ -47,6 +49,9 @@ namespace BeatEngine
 
         private List<Mode> Modes = new List<Mode>();
         public bool IsGetReadyMessageStillPlaying = true;
+        Song Song = null;
+        public bool IsSongStarted = false;
+        public bool IsSongSaved = false;
         public float Time;
         public float DefaultAnimationDuration = 2f;
 
@@ -105,6 +110,8 @@ namespace BeatEngine
         }
         ContentManager content;
 
+        public List<Hit> Hits = new List<Hit>();
+
         private SoundEffect exitReachedSound;
 
         #region Loading
@@ -148,6 +155,7 @@ namespace BeatEngine
 
             Time = DefaultAnimationDuration;
             CurrentMode = Modes.Where(m => m.Tag == "Countdown").FirstOrDefault();
+            Song = Content.Load<Song>("Sounds/StarlitPulse");
             //Content.Load<Song>("Sounds/ElectricSunshine");
         }
 
@@ -330,6 +338,12 @@ namespace BeatEngine
             CheckIfTileIsPressed(touchCollection);
             HandleModeTransition();
 
+            if (MediaPlayer.State == MediaState.Stopped && IsSongStarted && !IsSongSaved)
+            {
+                SaveGame(Hits);
+                IsSongSaved = true;
+            }
+
         }
 
 
@@ -444,8 +458,8 @@ namespace BeatEngine
         {
             IsGetReadyMessageStillPlaying = false;
             getReadyTimer = 0f;
-            Song song = Content.Load<Song>("Sounds/BeatMeUp");
-            MediaPlayer.Play(song);
+            IsSongStarted = true;
+            MediaPlayer.Play(Song);
         }
 
         private float EaseOutPowerFive(float t)
@@ -615,6 +629,10 @@ namespace BeatEngine
                             if (tiles[x, y].BoundingRectangle.Contains(pos))
                             {
                                 tiles[x, y].IsPressed = true;
+
+                                TimeSpan songTime = MediaPlayer.PlayPosition;
+                                double songSeconds = songTime.TotalSeconds;
+                                AddHit(x, y, songSeconds);
                             }
                         }
 
@@ -623,6 +641,40 @@ namespace BeatEngine
                 }
             }
         }
+
+        public void AddHit(int x, int y, double time)
+        {
+            Hits.Add(new Hit(x, y, time));
+        }
+
+        public void SaveGame(List<Hit> hits)
+        {
+            string filePath = GetSavePath();
+            string data = "";
+
+            foreach (Hit hit in hits)
+            {
+                data += $"{hit.X},{hit.Y},{hit.Time} \n";
+            }
+            var lines = System.IO.File.ReadLines(filePath); // Or use BinaryWriter for better efficiency
+            System.IO.File.WriteAllText(filePath, data); // Or use BinaryWriter for better efficiency
+        }
+
+        public string GetSavePath()
+        {
+            // Gets /storage/emulated/0/Android/data/[your.package.name]/files/
+            var basePath = Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData
+                );
+
+            Directory.CreateDirectory(basePath);
+
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            return Path.Combine(path, "savegame.sav");
+
+        }
+
+
 
         #endregion
     }

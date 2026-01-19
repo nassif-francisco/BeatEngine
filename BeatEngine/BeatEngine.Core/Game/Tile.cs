@@ -56,7 +56,7 @@ namespace BeatEngine
             }
         }
         public bool IsPressed { get; set; }
-        public Hit Hit { get; set; }
+        public HitAnimation Hit { get; set; }
 
         public float Width = 260;
         public float Height = 260;
@@ -70,7 +70,7 @@ namespace BeatEngine
             Texture = texture;
             Collision = collision;
             Size = new Vector2(Width, Height);
-            Hit = new Hit(new Vector2(0,0), contentManager);
+            Hit = new HitAnimation(new Vector2(0,0), contentManager);
         }
 
         public Rectangle BoundingRectangle
