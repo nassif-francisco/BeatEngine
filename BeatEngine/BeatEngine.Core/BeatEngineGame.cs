@@ -135,7 +135,7 @@ namespace BeatEngine
             System.Diagnostics.Debug.WriteLine("Screen Size - Width[" + GraphicsDevice.PresentationParameters.BackBufferWidth + "] Height [" + GraphicsDevice.PresentationParameters.BackBufferHeight + "]");
         }
 
-        
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -153,7 +153,7 @@ namespace BeatEngine
             HandleInput(gameTime);
 
             // update our level, passing down the GameTime along with all of our input states
-            Scene.Update(gameTime, keyboardState, gamePadState, 
+            Scene.Update(gameTime, keyboardState, gamePadState,
                          accelerometerState, touchState, Window.CurrentOrientation);
 
             base.Update(gameTime);
@@ -174,7 +174,7 @@ namespace BeatEngine
                     Exit();
             }
 
-            if(GameState.DirtyScene)
+            if (GameState.DirtyScene)
             {
                 LoadScene();
             }
@@ -216,7 +216,7 @@ namespace BeatEngine
 
         private void LoadScene()
         {
-            if(GameState.Level == 0)
+            if (GameState.Level == 0)
             {
                 LoadStartScene();
             }
@@ -236,7 +236,7 @@ namespace BeatEngine
         {
             graphics.GraphicsDevice.Clear(Color.Black);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null,null, globalTransformation);
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, globalTransformation);
 
             Scene.Draw(gameTime, spriteBatch);
 
@@ -249,7 +249,7 @@ namespace BeatEngine
 
         private void DrawHud()
         {
-           
+
             if (touchState.IsConnected)
                 virtualGamePad.Draw(spriteBatch);
         }
@@ -259,5 +259,10 @@ namespace BeatEngine
             spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), Color.Black);
             spriteBatch.DrawString(font, value, position, color);
         }
+    }
+
+    public static class GameMode
+    {
+        public static bool IsRecordingMode { get; set; }
     }
 }

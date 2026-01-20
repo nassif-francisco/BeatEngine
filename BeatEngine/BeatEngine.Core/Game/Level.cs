@@ -20,10 +20,12 @@ using Microsoft.Xna.Framework.Media;
 using MonoGame.Framework.Devices.Sensors;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using static System.Net.WebRequestMethods;
 
 namespace BeatEngine
@@ -157,6 +159,11 @@ namespace BeatEngine
             CurrentMode = Modes.Where(m => m.Tag == "Countdown").FirstOrDefault();
             Song = Content.Load<Song>("Sounds/StarlitPulse");
             //Content.Load<Song>("Sounds/ElectricSunshine");
+
+            if (!GameMode.IsRecordingMode)
+            {
+                ReadHitsFromFile();
+            }
         }
 
         private void AddModes()
@@ -338,12 +345,16 @@ namespace BeatEngine
             CheckIfTileIsPressed(touchCollection);
             HandleModeTransition();
 
-            if (MediaPlayer.State == MediaState.Stopped && IsSongStarted && !IsSongSaved)
+            if (MediaPlayer.State == MediaState.Stopped && IsSongStarted && !IsSongSaved && GameMode.IsRecordingMode)
             {
                 SaveGame(Hits);
                 IsSongSaved = true;
             }
 
+            if(!GameMode.IsRecordingMode)
+            {
+                TurnOnTiles();
+            }
         }
 
 
@@ -521,7 +532,7 @@ namespace BeatEngine
 
                         if (mirrorTiles[x, y].IsPressed)
                         {
-                            tint = Color.DarkOrchid; //Color.MonoGameOrange, Color.DarkOrange also good candidates
+                            tint = Color.White;//Color.MonoGameOrange, Color.DarkOrange also good candidates
                         }
 
                         spriteBatch.Draw(texture, mirrorTiles[x, y].Position, tint);
@@ -611,6 +622,79 @@ namespace BeatEngine
             }
         }
 
+        private void ReadHitsFromFile()
+        {
+            string filePath = GetSavePath();
+            BuildHitListFromSaveFile(filePath);
+        }
+
+        //private void TurnOnTiles()
+        //{
+        //    foreach (Hit hit in Hits)
+        //    {
+        //        //tiles[hit.X, hit.Y].IsPressed = true;
+        //        mirrorTiles[hit.X, hit.Y].IsPressed = true;
+        //    }
+
+        //    for (int y = 0; y < Height; ++y)
+        //    {
+        //        for (int x = 0; x < Width; ++x)
+        //        {
+        //            tiles[x, y].IsPressed = false;
+
+        //            double songTime = MediaPlayer.PlayPosition.TotalSeconds;
+
+        //            List<Hit> futureHits = Hits
+        //                .Where(h => h.Time > songTime)
+        //                .ToList();
+
+        //            List<Hit> currentHits = futureHits.Where(h => h.X == x && h.Y == y).ToList();
+
+        //            foreach (Hit hit in currentHits)
+        //            {
+        //                tiles[x, y].IsPressed = true;
+        //            }
+        //        }
+        //    }
+        //}
+        private const double HIT_WINDOW = 0.05; // seconds
+
+        private void TurnOnTiles()
+        {
+            double songTime = MediaPlayer.PlayPosition.TotalSeconds;
+
+            // Clear all tiles
+            for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
+                    mirrorTiles[x, y].IsPressed = false;
+
+            foreach (Hit hit in Hits)
+            {
+                double delta = Math.Abs(hit.Time - songTime);
+
+                if (delta <= HIT_WINDOW)
+                {
+                    //tiles[hit.X, hit.Y].IsPressed = true;
+                    mirrorTiles[hit.X, hit.Y].IsPressed = true;
+                }
+            }
+        }
+        private void BuildHitListFromSaveFile(string filePath)
+        {
+            var lines = System.IO.File.ReadLines(filePath);
+            foreach (var line in lines)
+            {
+                var parts = line.Split(',');
+                if (parts.Length == 3)
+                {
+                    int x = int.Parse(parts[0]);
+                    int y = int.Parse(parts[1]);
+                    double time = double.Parse(parts[2]);
+                    Hits.Add(new Hit(x, y, time));
+                }
+            }
+        }
+
         private void CheckIfTileIsPressed(TouchCollection touchLocations)
         {
             for (int y = 0; y < Height; ++y)
@@ -656,8 +740,20 @@ namespace BeatEngine
             {
                 data += $"{hit.X},{hit.Y},{hit.Time} \n";
             }
-            var lines = System.IO.File.ReadLines(filePath); // Or use BinaryWriter for better efficiency
-            System.IO.File.WriteAllText(filePath, data); // Or use BinaryWriter for better efficiency
+            //var lines = System.IO.File.ReadLines(filePath); // Or use BinaryWriter for better efficiency
+            //System.IO.File.WriteAllText(filePath, data); // Or use BinaryWriter for better efficiency
+
+            using (var writer = new StreamWriter(filePath, false))
+            {
+                foreach (var hit in hits)
+                {
+                    writer.Write(hit.X);
+                    writer.Write(',');
+                    writer.Write(hit.Y);
+                    writer.Write(',');
+                    writer.WriteLine(hit.Time.ToString(CultureInfo.InvariantCulture));
+                }
+            } // ← file is CLOSED here
         }
 
         public string GetSavePath()

@@ -28,6 +28,8 @@ namespace BeatEngine.Android
             _game = new BeatEngineGame();
             _view = _game.Services.GetService(typeof(View)) as View;
 
+            GameMode.IsRecordingMode = false; // Enable recording mode for Android
+
             SetContentView(_view);
             _game.Run();
         }
