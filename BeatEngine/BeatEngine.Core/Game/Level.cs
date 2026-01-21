@@ -578,25 +578,13 @@ namespace BeatEngine
 
                     double songTime = MediaPlayer.PlayPosition.TotalSeconds;
 
-                    var st = Steps.Where(s => s.Key < songTime).LastOrDefault();
-
-                    Step step = Steps.Where(s => s.Key < songTime).Select(s => s.Value).LastOrDefault()?[x, y];
-
-                    if (step == null)
+                    if (texture != null)
                     {
-                        continue;
-                    }
-
-                    if (texture != null && step?.Intensity != 0)
-                    {
-                        float intensityColor = (step?.Intensity ?? 0f) * 100f / 4f;
-                        intensityColor = intensityColor / 100f;
-                        // Draw it in screen space.
-                        Color tint = Color.White * intensityColor;
+                        Color tint = Color.White;
 
                         if (tiles[x, y].IsPressed)
                         {
-                            tint = Color.DarkOrchid; //Color.MonoGameOrange, Color.DarkOrange also good candidates
+                            tint = Color.HotPink; //check also darkseagreen
                         }
 
                         spriteBatch.Draw(texture, tiles[x, y].Position, tint);
@@ -614,21 +602,10 @@ namespace BeatEngine
                     // If there is a visible tile in that position
                     Texture2D texture = mirrorTiles[x, y].Texture;
 
-                    double songTime = MediaPlayer.PlayPosition.TotalSeconds;
-
-                    var st = Steps.Where(s => s.Key < songTime).LastOrDefault();
-
-                    Step step = Steps.Where(s => s.Key < songTime).Select(s => s.Value).LastOrDefault()?[x, y];
-
-                    if(step == null)
-                    {
-                        continue;
-                    }
-
-                    if (texture != null && step?.Intensity != 0)
+                    if (texture != null)
                     {
                         // Draw it in screen space.
-                        Color tint = Color.White * 0.4f;
+                        Color tint = Color.White;
 
                         if (mirrorTiles[x, y].IsPressed)
                         {
@@ -673,7 +650,7 @@ namespace BeatEngine
         private void PositionTiles()
         {
             int initialPosY = 2334;
-            int initialPosX = 915;
+            int initialPosX = 975;
 
             for (int y = 0; y < Height; ++y)
             {
@@ -691,7 +668,7 @@ namespace BeatEngine
                     initialPosX -= 300;
 
                 }
-                initialPosX = 915;
+                initialPosX = 975;
                 initialPosY -= 300;
             }
         }
@@ -699,7 +676,7 @@ namespace BeatEngine
         private void PositionMirrorTiles()
         {
             int initialPosY = 1034;
-            int initialPosX = 915;
+            int initialPosX = 975;
 
             for (int y = 0; y < Height; ++y)
             {
@@ -717,7 +694,7 @@ namespace BeatEngine
                     initialPosX -= 300;
 
                 }
-                initialPosX = 915;
+                initialPosX = 975;
                 initialPosY -= 300;
             }
         }

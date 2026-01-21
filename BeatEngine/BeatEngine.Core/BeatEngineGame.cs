@@ -71,10 +71,10 @@ namespace BeatEngine
 #if WINDOWS_PHONE
             TargetElapsedTime = TimeSpan.FromTicks(333333);
 #endif
-            graphics.IsFullScreen = false;
+            graphics.IsFullScreen = true;
 
-            graphics.PreferredBackBufferWidth = 2664;
-            graphics.PreferredBackBufferHeight = 1200;
+            //graphics.PreferredBackBufferWidth = 1200;
+            //graphics.PreferredBackBufferHeight = 2664;
             graphics.SupportedOrientations = DisplayOrientation.Portrait;
 
             Accelerometer2D.Initialize();
@@ -100,6 +100,7 @@ namespace BeatEngine
             loseOverlay = Content.Load<Texture2D>("Overlays/you_lose");
 
             ScalePresentationArea();
+            FixViewport();
 
             virtualGamePad = new VirtualGamePad(baseScreenSize, globalTransformation);
 
@@ -124,16 +125,67 @@ namespace BeatEngine
 
         public void ScalePresentationArea()
         {
-            //Work out how much we need to scale our graphics to fill the screen
-            backbufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
-            backbufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
-            float horScaling = backbufferWidth / baseScreenSize.X;
-            float verScaling = backbufferHeight / baseScreenSize.Y;
-            Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
-            globalTransformation = Matrix.CreateScale(screenScalingFactor);
-            var vp = GraphicsDevice.Viewport;
-            System.Diagnostics.Debug.WriteLine("Screen Size - Width[" + GraphicsDevice.PresentationParameters.BackBufferWidth + "] Height [" + GraphicsDevice.PresentationParameters.BackBufferHeight + "]");
+            backbufferWidth = GraphicsDevice.Viewport.Width;
+            backbufferHeight = GraphicsDevice.Viewport.Height;
+
+            float scaleX = backbufferWidth / baseScreenSize.X;
+            float scaleY = backbufferHeight / baseScreenSize.Y;
+
+            float scale = Math.Max(scaleX, scaleY);
+
+            globalTransformation = Matrix.CreateScale(scale);
+
+            Debug.WriteLine(
+                $"BACKBUFFER {GraphicsDevice.PresentationParameters.BackBufferWidth}x{GraphicsDevice.PresentationParameters.BackBufferHeight}"
+            );
+            Debug.WriteLine(
+                $"VIEWPORT {GraphicsDevice.Viewport.Width}x{GraphicsDevice.Viewport.Height}"
+            );
         }
+
+        //public void ScalePresentationArea()
+        //{
+        //    backbufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
+        //    backbufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
+
+        //    float scaleX = backbufferWidth / baseScreenSize.X;
+        //    float scaleY = backbufferHeight / baseScreenSize.Y;
+
+        //    // IMPORTANT: use MAX to FILL the screen
+        //    float scale = Math.Max(scaleX, scaleY);
+
+        //    globalTransformation = Matrix.CreateScale(scale);
+
+        //    Debug.WriteLine(
+        //        $"Screen: {backbufferWidth}x{backbufferHeight}  Scale: {scale}"
+        //    );
+        //}
+
+        private void FixViewport()
+        {
+            var pp = GraphicsDevice.PresentationParameters;
+
+            GraphicsDevice.Viewport = new Viewport(
+                0,
+                0,
+                1200,
+                2664
+            );
+        }
+
+        //public void ScalePresentationArea()
+        //{
+        //    //Work out how much we need to scale our graphics to fill the screen
+        //    backbufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
+        //    backbufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
+        //    float horScaling = backbufferWidth / baseScreenSize.X;
+        //    float verScaling = backbufferHeight / baseScreenSize.Y;
+        //    Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
+        //    globalTransformation = Matrix.CreateScale(screenScalingFactor);
+        //    var vp = GraphicsDevice.Viewport;
+
+        //    System.Diagnostics.Debug.WriteLine("Screen Size - Width[" + GraphicsDevice.PresentationParameters.BackBufferWidth + "] Height [" + GraphicsDevice.PresentationParameters.BackBufferHeight + "]");
+        //}
 
 
         /// <summary>
@@ -148,7 +200,10 @@ namespace BeatEngine
                 backbufferWidth != GraphicsDevice.PresentationParameters.BackBufferWidth)
             {
                 ScalePresentationArea();
+                FixViewport();
             }
+
+            FixViewport();//calling this here fixes the issue of the user chaning apps and the viewport getting messed up
             // Handle polling for our input and handling high-level input
             HandleInput(gameTime);
 
@@ -234,7 +289,7 @@ namespace BeatEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            graphics.GraphicsDevice.Clear(Color.Black);
+            graphics.GraphicsDevice.Clear(Color.White);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, globalTransformation);
 
