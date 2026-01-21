@@ -26,6 +26,7 @@ using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using static System.Formats.Asn1.AsnWriter;
 using static System.Net.WebRequestMethods;
 
 namespace BeatEngine
@@ -41,6 +42,8 @@ namespace BeatEngine
         private Tile[,] tiles;
 
         private Tile[,] mirrorTiles;
+
+        private Dictionary<double, Step[,]> Steps;
 
         private Texture2D[] layers;
         // The layer which entities are drawn on top of.
@@ -133,6 +136,12 @@ namespace BeatEngine
             content = new ContentManager(serviceProvider, "Content");
 
             LoadTiles(fileStream);
+
+            string stepPath = string.Format("Content/Levels/{0}_steps.txt", gameState.Level);
+            using (Stream stepStream = TitleContainer.OpenStream(stepPath))
+                LoadSteps(stepStream);
+
+
             LoadGetReadyTile("GetReady", TileCollision.Passable);
             PositionTiles();
             PositionMirrorTiles();
@@ -215,6 +224,62 @@ namespace BeatEngine
                 }
             }
 
+        }
+
+        private void LoadSteps(Stream fileStream)
+        {
+            Steps = new Dictionary<double, Step[,]>();
+
+            using (StreamReader reader = new StreamReader(fileStream))
+            {
+                string line;
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    line = line.Trim();
+
+                    // Skip empty lines
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    // Parse time value
+                    if (!double.TryParse(line, out double time))
+                        throw new Exception($"Invalid time value: {line}");
+
+                    Step[,] grid = new Step[4, 4];
+
+                    // Read the next 4 lines for the 4x4 grid
+                    for (int row = 0; row < 4; row++)
+                    {
+                        string rowLine = reader.ReadLine();
+
+                        if (rowLine == null)
+                            throw new Exception($"Unexpected end of file reading grid for time {time}");
+
+                        rowLine = rowLine.Trim();
+
+                        if (rowLine.Length != 4)
+                            throw new Exception($"Invalid row length at time {time}: {rowLine}");
+
+                        for (int col = 0; col < 4; col++)
+                        {
+                            char c = rowLine[col];
+
+                            if (!char.IsDigit(c))
+                                throw new Exception($"Invalid tile value '{c}' at time {time}");
+
+                            int value = c - '0';
+
+                            grid[col, row] = new Step
+                            {
+                                Intensity = value
+                            };
+                        }
+                    }
+
+                    Steps.Add(time, grid);
+                }
+            }
         }
 
         /// <summary>
@@ -410,6 +475,7 @@ namespace BeatEngine
                     DrawMirrorTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.DarkMagenta, spriteBatch);
+                    DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.DarkMagenta, spriteBatch);
                     break;
             }
         }
@@ -490,6 +556,14 @@ namespace BeatEngine
             //sriteBatch.DrawString(font, value, position, color);
         }
 
+        private void DrawTimeElapsed(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
+        {
+            double songTime = MediaPlayer.PlayPosition.TotalSeconds;
+            value += songTime.ToString("F2");
+            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 4, SpriteEffects.None, 1);
+            //sriteBatch.DrawString(font, value, position, color);
+        }
+
         /// <summary>
         /// Draws each tile in the level.
         /// </summary>
@@ -501,10 +575,24 @@ namespace BeatEngine
                 {
                     // If there is a visible tile in that position
                     Texture2D texture = tiles[x, y].Texture;
-                    if (texture != null)
+
+                    double songTime = MediaPlayer.PlayPosition.TotalSeconds;
+
+                    var st = Steps.Where(s => s.Key < songTime).LastOrDefault();
+
+                    Step step = Steps.Where(s => s.Key < songTime).Select(s => s.Value).LastOrDefault()?[x, y];
+
+                    if (step == null)
                     {
+                        continue;
+                    }
+
+                    if (texture != null && step?.Intensity != 0)
+                    {
+                        float intensityColor = (step?.Intensity ?? 0f) * 100f / 4f;
+                        intensityColor = intensityColor / 100f;
                         // Draw it in screen space.
-                        Color tint = Color.White;
+                        Color tint = Color.White * intensityColor;
 
                         if (tiles[x, y].IsPressed)
                         {
@@ -524,8 +612,20 @@ namespace BeatEngine
                 for (int x = 0; x < Width; ++x)
                 {
                     // If there is a visible tile in that position
-                    Texture2D texture = tiles[x, y].Texture;
-                    if (texture != null)
+                    Texture2D texture = mirrorTiles[x, y].Texture;
+
+                    double songTime = MediaPlayer.PlayPosition.TotalSeconds;
+
+                    var st = Steps.Where(s => s.Key < songTime).LastOrDefault();
+
+                    Step step = Steps.Where(s => s.Key < songTime).Select(s => s.Value).LastOrDefault()?[x, y];
+
+                    if(step == null)
+                    {
+                        continue;
+                    }
+
+                    if (texture != null && step?.Intensity != 0)
                     {
                         // Draw it in screen space.
                         Color tint = Color.White * 0.4f;

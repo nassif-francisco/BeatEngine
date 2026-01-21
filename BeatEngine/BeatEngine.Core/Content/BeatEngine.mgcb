@@ -67,6 +67,9 @@
 #begin Levels/2.txt
 /copy:Levels/2.txt
 
+#begin Levels/1_steps.txt
+/copy:Levels/1_steps.txt
+
 #begin Scenes/StartScene.txt
 /copy:Scenes/StartScene.txt
 
