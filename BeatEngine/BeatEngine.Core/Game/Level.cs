@@ -117,7 +117,7 @@ namespace BeatEngine
 
         public List<Hit> Hits = new List<Hit>();
 
-        private SoundEffect exitReachedSound;
+        private SoundEffect clickSound;
 
         #region Loading
 
@@ -157,7 +157,7 @@ namespace BeatEngine
             }
 
             // Load sounds.
-            exitReachedSound = Content.Load<SoundEffect>("Sounds/ExitReached");
+            clickSound = Content.Load<SoundEffect>("Sounds/Click");
             this.globalTransformation = Matrix.Invert(globalTransformation);
 
             hudFont = Content.Load<SpriteFont>("Fonts/Hud");
@@ -407,7 +407,8 @@ namespace BeatEngine
             TouchCollection touchCollection,
             DisplayOrientation orientation)
         {
-            CheckIfTileIsPressed(touchCollection);
+            CheckIfTileIsPressed(touchCollection, gameTime);
+            CheckFinishedSFX(gameTime);
             HandleModeTransition();
 
             if (MediaPlayer.State == MediaState.Stopped && IsSongStarted && !IsSongSaved && GameMode.IsRecordingMode)
@@ -585,6 +586,7 @@ namespace BeatEngine
                         if (tiles[x, y].IsPressed)
                         {
                             tint = Color.HotPink; //check also darkseagreen
+
                         }
 
                         spriteBatch.Draw(texture, tiles[x, y].Position, tint);
@@ -771,8 +773,28 @@ namespace BeatEngine
                 }
             }
         }
+        private void CheckFinishedSFX(GameTime gameTime)
+        {
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    if (tiles[x, y].IsPlayingSound)
+                    {
+                        double currentTime = gameTime.TotalGameTime.TotalSeconds;
 
-        private void CheckIfTileIsPressed(TouchCollection touchLocations)
+                        double elapsedTime = tiles[x, y].InitialTime + tiles[x, y].SoundDuration;
+
+                        if (currentTime >= elapsedTime)
+                        {
+                            tiles[x, y].IsPlayingSound = false;
+                        }
+                    }
+                }
+            }   
+        }
+
+        private void CheckIfTileIsPressed(TouchCollection touchLocations, GameTime gameTime)
         {
             for (int y = 0; y < Height; ++y)
             {
@@ -791,9 +813,15 @@ namespace BeatEngine
                             {
                                 tiles[x, y].IsPressed = true;
 
-                                TimeSpan songTime = MediaPlayer.PlayPosition;
-                                double songSeconds = songTime.TotalSeconds;
-                                AddHit(x, y, songSeconds);
+                                if(!tiles[x, y].IsPlayingSound)
+                                {
+                                    tiles[x, y].IsPlayingSound = true;
+                                    tiles[x, y].SoundDuration = clickSound.Duration.TotalSeconds * 0.5;
+                                    tiles[x, y].InitialTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                                    clickSound.Play();
+                                }
+
+                               
                             }
                         }
 

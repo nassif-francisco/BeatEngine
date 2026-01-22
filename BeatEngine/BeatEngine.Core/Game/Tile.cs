@@ -56,6 +56,12 @@ namespace BeatEngine
             }
         }
         public bool IsPressed { get; set; }
+
+        public bool IsPlayingSound { get; set; }
+
+        public double SoundDuration { get; set; }
+
+        public double InitialTime { get; set; }
         public HitAnimation Hit { get; set; }
 
         public float Width = 260;
