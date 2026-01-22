@@ -39,7 +39,7 @@ namespace BeatEngine
     class Level : ISceneBase
     {
         // Physical structure of the level.
-        private Tile[,] tiles;
+        public Tile[,] tiles;
 
         private Tile[,] mirrorTiles;
 
@@ -136,15 +136,11 @@ namespace BeatEngine
             content = new ContentManager(serviceProvider, "Content");
 
             LoadTiles(fileStream);
-
-            string stepPath = string.Format("Content/Levels/{0}_steps.txt", gameState.Level);
-            using (Stream stepStream = TitleContainer.OpenStream(stepPath))
-                LoadSteps(stepStream);
-
-
             LoadGetReadyTile("GetReady", TileCollision.Passable);
             PositionTiles();
             PositionMirrorTiles();
+
+            //SequenceManager.InitiateSequence(new GameTime(), tiles);
 
             // Load background layer textures. For now, all levels must
             // use the same backgrounds and only use the left-most part of them.
@@ -165,20 +161,16 @@ namespace BeatEngine
             AddModes();
 
             Time = DefaultAnimationDuration;
-            CurrentMode = Modes.Where(m => m.Tag == "Countdown").FirstOrDefault();
+            CurrentMode = Modes.Where(m => m.Tag == "Intro").FirstOrDefault();
             Song = Content.Load<Song>("Sounds/StarlitPulse");
-            //Content.Load<Song>("Sounds/ElectricSunshine");
 
-            if (!GameMode.IsRecordingMode)
-            {
-                ReadHitsFromFile();
-            }
         }
 
         private void AddModes()
         {
-            Modes.Add(new Mode() { Tag = "Countdown", NextModeTag = "Practice" });
-            Modes.Add(new Mode() { Tag = "Practice", NextModeTag = "Practice" });
+            Modes.Add(new Mode() { Tag = "Intro", NextModeTag = "Show" });
+            Modes.Add(new Mode() { Tag = "Play", NextModeTag = "Show" });
+            Modes.Add(new Mode() { Tag = "Show", NextModeTag = "Play" });
         }
 
         /// <summary>
@@ -226,60 +218,107 @@ namespace BeatEngine
 
         }
 
-        private void LoadSteps(Stream fileStream)
+        private int NumberOfSteps = 3;
+
+       
+
+
+        public static class SequenceManager
         {
-            Steps = new Dictionary<double, Step[,]>();
+            public static List<(int X, int Y)> Steps { get; set; }
 
-            using (StreamReader reader = new StreamReader(fileStream))
+            public static float LstTimeStepShown { get; set; }
+
+            public static float Initialtime { get; set; }
+
+            public static float DefaultTimeBetweenSteps = 1f;
+
+            public static int InitialNumberOfSteps = 3;
+
+            public static int CurrentNumberOfSteps = 3;
+
+            public static bool IsSequenceCompletelyShown = false;
+
+            public static bool IsShowingSequence = false;
+
+            public static int CurrentTileInSequence { get; set; }
+
+            public static void CreateSequence(GameTime gameTime, Tile[,] tiles)
             {
-                string line;
-
-                while ((line = reader.ReadLine()) != null)
-                {
-                    line = line.Trim();
-
-                    // Skip empty lines
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue;
-
-                    // Parse time value
-                    if (!double.TryParse(line, out double time))
-                        throw new Exception($"Invalid time value: {line}");
-
-                    Step[,] grid = new Step[4, 4];
-
-                    // Read the next 4 lines for the 4x4 grid
-                    for (int row = 0; row < 4; row++)
-                    {
-                        string rowLine = reader.ReadLine();
-
-                        if (rowLine == null)
-                            throw new Exception($"Unexpected end of file reading grid for time {time}");
-
-                        rowLine = rowLine.Trim();
-
-                        if (rowLine.Length != 4)
-                            throw new Exception($"Invalid row length at time {time}: {rowLine}");
-
-                        for (int col = 0; col < 4; col++)
-                        {
-                            char c = rowLine[col];
-
-                            if (!char.IsDigit(c))
-                                throw new Exception($"Invalid tile value '{c}' at time {time}");
-
-                            int value = c - '0';
-
-                            grid[col, row] = new Step
-                            {
-                                Intensity = value
-                            };
-                        }
-                    }
-
-                    Steps.Add(time, grid);
-                }
+                Steps = GetRandomPositions(tiles, CurrentNumberOfSteps);
+                Initialtime = (float)gameTime.TotalGameTime.TotalSeconds +4;
+                IsSequenceCompletelyShown = false;
+                IsShowingSequence = true;
+                CurrentTileInSequence = 0;
             }
+
+            public static (int X, int Y) ProvideTileToShowInSequence(GameTime gameTime)
+            {
+                if(CurrentTileInSequence < Steps.Count())
+                {
+                    CurrentTileInSequence++;
+                    Initialtime = (float)gameTime.TotalGameTime.TotalSeconds;
+                    return Steps[CurrentTileInSequence - 1];
+                }
+                else 
+                {
+                    Initialtime = (float)gameTime.TotalGameTime.TotalSeconds;
+                    IsShowingSequence = false ;
+                    IsSequenceCompletelyShown = true;
+                    return Steps[CurrentTileInSequence -1];
+                }       
+            }
+
+            public static bool IsTimeToShowNextTile(GameTime gameTime)
+            {
+                var isTime = (float)gameTime.TotalGameTime.TotalSeconds > Initialtime + DefaultTimeBetweenSteps;
+                return isTime;
+            }
+
+            public static void AdvanceLevel(GameTime gameTime, Tile[,] tiles)
+            {
+                CurrentNumberOfSteps++;
+                CreateSequence(gameTime, tiles);   
+            }
+
+            public static void InitiateSequence(GameTime gameTime, Tile[,] tiles)
+            {
+                CurrentNumberOfSteps = InitialNumberOfSteps;
+                CreateSequence(gameTime, tiles);
+            }
+
+            public static List<(int X, int Y)> GetRandomPositions(
+                    Tile[,] tiles,
+                    int count)
+            {
+                int width = tiles.GetLength(0);
+                int height = tiles.GetLength(1);
+
+                int totalPositions = width * height;
+                if (count > totalPositions)
+                    throw new ArgumentException("Requested more positions than available tiles.");
+
+                Random random = new Random();
+
+                // Create all possible positions
+                var allPositions = new List<(int X, int Y)>();
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        allPositions.Add((x, y));
+                    }
+                }
+
+                // Shuffle positions
+                var shuffled = allPositions
+                    .OrderBy(_ => random.Next())
+                    .Take(count)
+                    .ToList();
+
+                return shuffled;
+            }
+
         }
 
         /// <summary>
@@ -409,20 +448,43 @@ namespace BeatEngine
         {
             CheckIfTileIsPressed(touchCollection, gameTime);
             CheckFinishedSFX(gameTime);
-            HandleModeTransition();
+            CheckSequence(gameTime);
+            CheckModeTransition();
+        }
 
-            if (MediaPlayer.State == MediaState.Stopped && IsSongStarted && !IsSongSaved && GameMode.IsRecordingMode)
+        public void TurnOffMirrorTiles()
+        {
+            for (int y = 0; y < Height; ++y)
             {
-                SaveGame(Hits);
-                IsSongSaved = true;
-            }
-
-            if(!GameMode.IsRecordingMode)
-            {
-                TurnOnTiles();
+                for (int x = 0; x < Width; ++x)
+                {
+                    mirrorTiles[x, y].IsPressed = false;
+                }
             }
         }
 
+        public void CheckSequence(GameTime gameTime)
+        {
+
+            bool isSequenceShowing = SequenceManager.IsShowingSequence;
+
+            if (isSequenceShowing)
+            {
+                if (SequenceManager.IsTimeToShowNextTile(gameTime))
+                {
+                    TurnOffMirrorTiles();
+
+                    (int, int) tile = SequenceManager.ProvideTileToShowInSequence(gameTime);
+                    mirrorTiles[tile.Item1, tile.Item2].IsPressed = true;
+                }
+            }
+            else
+            {
+                TurnOffMirrorTiles();
+            }
+            
+
+        }
 
         #endregion
 
@@ -435,18 +497,26 @@ namespace BeatEngine
             CurrentMode = Modes.Where(m => m.Tag == nextModeTag).FirstOrDefault();
         }
 
-        public void HandleModeTransition()
+        public void CheckModeTransition()
         {
             switch (CurrentMode.Tag)
             {
-                case "Countdown":
+                case "Intro":
                     
                     if(IsGetReadyMessageStillPlaying == false)
+                    {
+                        SequenceManager.InitiateSequence(new GameTime(), tiles);
+                        ToNextMode();
+                    }
+                    break;
+                case "Show":
+
+                    if (SequenceManager.IsSequenceCompletelyShown == true)
                     {
                         ToNextMode();
                     }
                     break;
-                case "Practice":
+                case "Play":
                     // Nothing to do here yet
                     break;
             }
@@ -464,19 +534,26 @@ namespace BeatEngine
             
             switch (CurrentMode.Tag)
             {
-                case "Countdown":
+                case "Intro":
                     DrawTiles(gameTime, spriteBatch);
                     DrawMirrorTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.DarkMagenta, spriteBatch);
+                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
                     DrawGetReady(gameTime, spriteBatch);
                     break;
-                case "Practice":
+                case "Show":
                     DrawTiles(gameTime, spriteBatch);
                     DrawMirrorTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.DarkMagenta, spriteBatch);
-                    DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.DarkMagenta, spriteBatch);
+                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
+                    DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
+                    break;
+                case "Play":
+                    DrawTiles(gameTime, spriteBatch);
+                    DrawMirrorTiles(gameTime, spriteBatch);
+                    DrawFX(gameTime, spriteBatch);
+                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
+                    DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
             }
         }
@@ -577,8 +654,6 @@ namespace BeatEngine
                     // If there is a visible tile in that position
                     Texture2D texture = tiles[x, y].Texture;
 
-                    double songTime = MediaPlayer.PlayPosition.TotalSeconds;
-
                     if (texture != null)
                     {
                         Color tint = Color.White;
@@ -607,11 +682,11 @@ namespace BeatEngine
                     if (texture != null)
                     {
                         // Draw it in screen space.
-                        Color tint = Color.White;
+                        Color tint = Color.White * 0.8f;
 
                         if (mirrorTiles[x, y].IsPressed)
                         {
-                            tint = Color.White;//Color.MonoGameOrange, Color.DarkOrange also good candidates
+                            tint = Color.DarkSeaGreen;//Color.MonoGameOrange, Color.DarkOrange also good candidates
                         }
 
                         spriteBatch.Draw(texture, mirrorTiles[x, y].Position, tint);
