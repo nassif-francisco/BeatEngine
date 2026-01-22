@@ -335,7 +335,7 @@ namespace BeatEngine
 
             offscreenLeftX = -80000;
             offscreenRightX = 1200;
-            centerX = (1200 - GetReadyTile.Texture.Width) / 2f;
+            centerX = (1300 - GetReadyTile.Texture.Width) / 2f;
 
             return GetReadyTile;
         }
@@ -816,7 +816,7 @@ namespace BeatEngine
                                 if(!tiles[x, y].IsPlayingSound)
                                 {
                                     tiles[x, y].IsPlayingSound = true;
-                                    tiles[x, y].SoundDuration = clickSound.Duration.TotalSeconds * 0.5;
+                                    tiles[x, y].SoundDuration = clickSound.Duration.TotalSeconds * 0.5; // this is to allow overlapping sounds, because sound have a long end
                                     tiles[x, y].InitialTime = (float)gameTime.TotalGameTime.TotalSeconds;
                                     clickSound.Play();
                                 }
