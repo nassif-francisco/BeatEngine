@@ -296,7 +296,7 @@ namespace BeatEngine
         private void PositionButtons()
         {
             int initialPosY = 1134;
-            int initialPosX = 125;
+            int initialPosX = 70;
 
             for (int y = 0; y < Height; ++y)
             {
@@ -313,7 +313,7 @@ namespace BeatEngine
                     }
 
                 }
-                initialPosX = 125;
+                initialPosX = 70;
                 initialPosY -= 350;
             }
 

@@ -727,7 +727,7 @@ namespace BeatEngine
         private void PositionTiles()
         {
             int initialPosY = 2334;
-            int initialPosX = 975;
+            int initialPosX = 920;
 
             for (int y = 0; y < Height; ++y)
             {
@@ -745,7 +745,7 @@ namespace BeatEngine
                     initialPosX -= 300;
 
                 }
-                initialPosX = 975;
+                initialPosX = 920;
                 initialPosY -= 300;
             }
         }
@@ -753,7 +753,7 @@ namespace BeatEngine
         private void PositionMirrorTiles()
         {
             int initialPosY = 1034;
-            int initialPosX = 975;
+            int initialPosX = 920;
 
             for (int y = 0; y < Height; ++y)
             {
@@ -771,7 +771,7 @@ namespace BeatEngine
                     initialPosX -= 300;
 
                 }
-                initialPosX = 975;
+                initialPosX = 920;
                 initialPosY -= 300;
             }
         }

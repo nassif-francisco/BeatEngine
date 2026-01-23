@@ -73,8 +73,8 @@ namespace BeatEngine
 #endif
             graphics.IsFullScreen = true;
 
-            //graphics.PreferredBackBufferWidth = 1200;
-            //graphics.PreferredBackBufferHeight = 2664;
+            //graphics.PreferredBackBufferWidth = GraphicsDevice.Viewport.Width;
+            //graphics.PreferredBackBufferHeight = GraphicsDevice.Viewport.Width;
             graphics.SupportedOrientations = DisplayOrientation.Portrait;
 
             Accelerometer2D.Initialize();
@@ -125,15 +125,22 @@ namespace BeatEngine
 
         public void ScalePresentationArea()
         {
-            backbufferWidth = GraphicsDevice.Viewport.Width;
-            backbufferHeight = GraphicsDevice.Viewport.Height;
+            backbufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            backbufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+
+            var a = GraphicsDevice.Viewport.Width;
+            var b = GraphicsDevice.Viewport.Height;
+
+            //graphics.PreferredBackBufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
+            //graphics.PreferredBackBufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
 
             float scaleX = backbufferWidth / baseScreenSize.X;
             float scaleY = backbufferHeight / baseScreenSize.Y;
+            float horScaling = backbufferWidth / baseScreenSize.X;
+            float verScaling = backbufferHeight / baseScreenSize.Y;
 
-            float scale = Math.Max(scaleX, scaleY);
-
-            globalTransformation = Matrix.CreateScale(scale);
+            Vector3 screenScalingFactor = new Vector3(horScaling, verScaling, 1);
+            globalTransformation = Matrix.CreateScale(screenScalingFactor);
 
             Debug.WriteLine(
                 $"BACKBUFFER {GraphicsDevice.PresentationParameters.BackBufferWidth}x{GraphicsDevice.PresentationParameters.BackBufferHeight}"
@@ -163,14 +170,29 @@ namespace BeatEngine
 
         private void FixViewport()
         {
-            var pp = GraphicsDevice.PresentationParameters;
+            //var pp = GraphicsDevice.PresentationParameters;
 
-            GraphicsDevice.Viewport = new Viewport(
-                0,
-                0,
-                1200,
-                2664
-            );
+            //int width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            //int height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+
+            //graphics.PreferredBackBufferWidth = pp.BackBufferWidth;
+            //graphics.PreferredBackBufferHeight = pp.BackBufferHeight;
+            //graphics.ApplyChanges();
+
+            //GraphicsDevice.Viewport = new Viewport(
+            //    0,
+            //    0,
+            //    width,
+            //    height
+            //);
+
+            graphics.IsFullScreen = true;
+            graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            graphics.SupportedOrientations = DisplayOrientation.Portrait;//if your game does NOT support for anything else but portrait mode
+            graphics.ApplyChanges();
+
+
         }
 
         //public void ScalePresentationArea()
@@ -203,7 +225,12 @@ namespace BeatEngine
                 FixViewport();
             }
 
-            FixViewport();//calling this here fixes the issue of the user chaning apps and the viewport getting messed up
+            //graphics.PreferredBackBufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
+            //graphics.PreferredBackBufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
+            //graphics.PreferredBackBufferWidth = 2000;
+            //graphics.PreferredBackBufferHeight = 4500;
+
+            //FixViewport();//calling this here fixes the issue of the user chaning apps and the viewport getting messed up
             // Handle polling for our input and handling high-level input
             HandleInput(gameTime);
 

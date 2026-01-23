@@ -27,6 +27,7 @@ namespace BeatEngine.Android
 
             _game = new BeatEngineGame();
             _view = _game.Services.GetService(typeof(View)) as View;
+            //_view.SystemUiVisibility = (StatusBarVisibility)(SystemUiFlags.LayoutStable | SystemUiFlags.LayoutHideNavigation | SystemUiFlags.LayoutFullscreen | SystemUiFlags.HideNavigation | SystemUiFlags.Fullscreen | SystemUiFlags.ImmersiveSticky);
 
             GameMode.IsRecordingMode = false; // Enable recording mode for Android
 
