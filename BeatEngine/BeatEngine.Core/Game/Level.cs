@@ -1052,9 +1052,14 @@ namespace BeatEngine
 
         public bool CheckTileInHand(int x, int y)
         {
-            if(CurrentTileInHand >= SequenceManager.Steps.Count())
+            if (CurrentTileInHand > SequenceManager.Steps.Count() - 1)
             {
-                return false; 
+                return false;
+            }
+
+            if (CurrentTileInHand == SequenceManager.Steps.Count() -1)
+            {
+                UserPlayedHand = true;
             }
             
             (int a, int b) currentStep = SequenceManager.Steps[CurrentTileInHand];
