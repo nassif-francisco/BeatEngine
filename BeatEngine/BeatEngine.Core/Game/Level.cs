@@ -41,6 +41,8 @@ namespace BeatEngine
         // Physical structure of the level.
         public Tile[,] tiles;
 
+        public static List<(int X, int Y)> PressedTiles = new List<(int X, int Y)> ();
+
         private Tile[,] mirrorTiles;
 
         private Dictionary<double, Step[,]> Steps;
@@ -61,6 +63,7 @@ namespace BeatEngine
         public float DefaultAnimationDuration = 2f;
 
         public bool UserPlayedHand = false;
+        public int CurrentTileInHand = 0;
 
         private float getReadyTimer = 0f;
 
@@ -220,6 +223,7 @@ namespace BeatEngine
 
             // Allocate the tile grid.
             tiles = new Tile[width, lines.Count];
+            SequenceManager.followtiles = new Tile[width, lines.Count];
             mirrorTiles = new Tile[width, lines.Count];
 
             // Loop over every tile position,
@@ -244,6 +248,8 @@ namespace BeatEngine
         public static class SequenceManager
         {
             public static List<(int X, int Y)> Steps { get; set; }
+
+            public static Tile[,] followtiles;
 
             public static float LstTimeStepShown { get; set; }
 
@@ -299,7 +305,22 @@ namespace BeatEngine
             {
                 var isTime = (float)gameTime.TotalGameTime.TotalSeconds > EndShowSequencetime + DefaultTimeBetweenSteps*0.2;
                 if (IsShowingSequence == false && isTime)
-                     IsSequenceCompletelyShown = true;
+                {
+                    IsSequenceCompletelyShown = true;
+                    SequenceManager.TurnOffFollowTiles();
+                }
+                     
+            }
+
+            public static void TurnOffFollowTiles()
+            {
+                for (int y = 0; y < SequenceManager.followtiles.GetLength(0); ++y)
+                {
+                    for (int x = 0; x < SequenceManager.followtiles.GetLength(1); ++x)
+                    {
+                        SequenceManager.followtiles[x, y].IsPressed = false;
+                    }
+                }
             }
 
             public static void AdvanceLevel(GameTime gameTime, Tile[,] tiles)
@@ -521,7 +542,7 @@ namespace BeatEngine
             }
         }
 
-        public void TurnOffMirrorTiles()
+        public void TurnOffTiles()
         {
             for (int y = 0; y < Height; ++y)
             {
@@ -532,6 +553,17 @@ namespace BeatEngine
             }
         }
 
+        //public void TurnOffFollowTiles()
+        //{
+        //    for (int y = 0; y < Height; ++y)
+        //    {
+        //        for (int x = 0; x < Width; ++x)
+        //        {
+        //            SequenceManager.followtiles[x, y].IsPressed = false;
+        //        }
+        //    }
+        //}
+
         public void CheckSequence(GameTime gameTime)
         {
 
@@ -541,15 +573,16 @@ namespace BeatEngine
             {
                 if (SequenceManager.IsTimeToShowNextTile(gameTime))
                 {
-                    TurnOffMirrorTiles();
+                    TurnOffTiles();
 
                     (int, int) tile = SequenceManager.ProvideTileToShowInSequence(gameTime);
                     tiles[tile.Item1, tile.Item2].IsPressed = true;
+                    SequenceManager.followtiles[tile.Item1, tile.Item2].IsPressed = true;
                 }
             }
             else
             {
-                TurnOffMirrorTiles();
+                TurnOffTiles();
             }
             
 
@@ -582,6 +615,7 @@ namespace BeatEngine
 
                     if (SequenceManager.IsSequenceCompletelyShown == true  )
                     {
+                        CurrentTileInHand = -1;
                         ToNextMode();
                     }
                     break;
@@ -848,7 +882,7 @@ namespace BeatEngine
                     Texture2D texture = tiles[x, y].Texture;
                     if (texture != null)
                     {
-                        if (tiles[x, y].IsPressed)
+                        if (tiles[x, y].IsHit)
                         {
                             tiles[x, y].Hit.BeginAnimation();
                         }
@@ -862,6 +896,10 @@ namespace BeatEngine
                         {
                             tiles[x, y].Hit.Draw(gameTime, spriteBatch);
                         }
+                        //else 
+                        //{
+                        //    tiles[x, y].IsHit = false;
+                        //}
                     }
                 }
             }
@@ -1012,6 +1050,23 @@ namespace BeatEngine
             }   
         }
 
+        public bool CheckTileInHand(int x, int y)
+        {
+            if(CurrentTileInHand >= SequenceManager.Steps.Count())
+            {
+                return false; 
+            }
+            
+            (int a, int b) currentStep = SequenceManager.Steps[CurrentTileInHand];
+
+            if(currentStep.a == x && currentStep.b == y)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private void CheckIfTileIsPressed(TouchCollection touchLocations, GameTime gameTime)
         {
             for (int y = 0; y < Height; ++y)
@@ -1019,6 +1074,7 @@ namespace BeatEngine
                 for (int x = 0; x < Width; ++x)
                 {
                     tiles[x, y].IsPressed = false;
+                    tiles[x, y].IsHit = false;
 
                     foreach (var touch in touchLocations)
                     {
@@ -1029,18 +1085,26 @@ namespace BeatEngine
                         {
                             if (tiles[x, y].BoundingRectangle.Contains(pos))
                             {
-                                tiles[x, y].IsPressed = true;
 
-                                if(!tiles[x, y].IsPlayingSound)
+                                if (!PressedTiles.Contains((x, y)))
+                                {
+                                    PressedTiles.Add((x, y));
+                                    CurrentTileInHand++;
+                                }
+
+                                tiles[x, y].IsPressed = true;
+                                tiles[x, y].IsHit = CheckTileInHand(x, y);
+
+                                if (!tiles[x, y].IsPlayingSound)
                                 {
                                     tiles[x, y].IsPlayingSound = true;
                                     tiles[x, y].SoundDuration = clickSound.Duration.TotalSeconds * 0.5; // this is to allow overlapping sounds, because sound have a long end
                                     tiles[x, y].InitialTime = (float)gameTime.TotalGameTime.TotalSeconds;
                                     clickSound.Play();
+                                    
                                 }
-
-                               
                             }
+
                         }
 
                     }

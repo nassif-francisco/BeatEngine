@@ -57,6 +57,8 @@ namespace BeatEngine
         }
         public bool IsPressed { get; set; }
 
+        public bool IsHit { get; set; }
+
         public bool IsPlayingSound { get; set; }
 
         public double SoundDuration { get; set; }
