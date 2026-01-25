@@ -231,6 +231,8 @@ namespace BeatEngine
 
             public static float Initialtime { get; set; }
 
+            public static float EndShowSequencetime { get; set; }
+
             public static float DefaultTimeBetweenSteps = 1f;
 
             public static int InitialNumberOfSteps = 3;
@@ -262,9 +264,9 @@ namespace BeatEngine
                 }
                 else 
                 {
+                    IsShowingSequence = false;
                     Initialtime = (float)gameTime.TotalGameTime.TotalSeconds;
-                    IsShowingSequence = false ;
-                    IsSequenceCompletelyShown = true;
+                    EndShowSequencetime = (float)gameTime.TotalGameTime.TotalSeconds;
                     return Steps[CurrentTileInSequence -1];
                 }       
             }
@@ -273,6 +275,13 @@ namespace BeatEngine
             {
                 var isTime = (float)gameTime.TotalGameTime.TotalSeconds > Initialtime + DefaultTimeBetweenSteps;
                 return isTime;
+            }
+
+            public static void CheckIsTimeToQuitShowMode(GameTime gameTime)
+            {
+                var isTime = (float)gameTime.TotalGameTime.TotalSeconds > EndShowSequencetime + DefaultTimeBetweenSteps;
+                if (IsShowingSequence == false && isTime)
+                     IsSequenceCompletelyShown = true;
             }
 
             public static void AdvanceLevel(GameTime gameTime, Tile[,] tiles)
@@ -446,10 +455,28 @@ namespace BeatEngine
             TouchCollection touchCollection,
             DisplayOrientation orientation)
         {
-            CheckIfTileIsPressed(touchCollection, gameTime);
-            CheckFinishedSFX(gameTime);
-            CheckSequence(gameTime);
-            CheckModeTransition();
+            switch (CurrentMode.Tag)
+            {
+                case "Intro":
+                    //CheckIfTileIsPressed(touchCollection, gameTime);
+                    //CheckFinishedSFX(gameTime);
+                    //CheckSequence(gameTime);
+                    CheckModeTransition();
+                    break;
+                case "Show":
+                    //CheckIfTileIsPressed(touchCollection, gameTime);
+                    //CheckFinishedSFX(gameTime);
+                    CheckSequence(gameTime);
+                    SequenceManager.CheckIsTimeToQuitShowMode(gameTime);
+                    CheckModeTransition();
+                    
+                    break;
+                case "Play":
+                    CheckIfTileIsPressed(touchCollection, gameTime);
+                    CheckFinishedSFX(gameTime);
+                    CheckModeTransition();
+                    break;
+            }
         }
 
         public void TurnOffMirrorTiles()
@@ -458,7 +485,7 @@ namespace BeatEngine
             {
                 for (int x = 0; x < Width; ++x)
                 {
-                    mirrorTiles[x, y].IsPressed = false;
+                    tiles[x, y].IsPressed = false;
                 }
             }
         }
@@ -475,7 +502,7 @@ namespace BeatEngine
                     TurnOffMirrorTiles();
 
                     (int, int) tile = SequenceManager.ProvideTileToShowInSequence(gameTime);
-                    mirrorTiles[tile.Item1, tile.Item2].IsPressed = true;
+                    tiles[tile.Item1, tile.Item2].IsPressed = true;
                 }
             }
             else
@@ -511,7 +538,7 @@ namespace BeatEngine
                     break;
                 case "Show":
 
-                    if (SequenceManager.IsSequenceCompletelyShown == true)
+                    if (SequenceManager.IsSequenceCompletelyShown == true  )
                     {
                         ToNextMode();
                     }
@@ -536,21 +563,21 @@ namespace BeatEngine
             {
                 case "Intro":
                     DrawTiles(gameTime, spriteBatch);
-                    DrawMirrorTiles(gameTime, spriteBatch);
-                    DrawFX(gameTime, spriteBatch);
+                    //DrawMirrorTiles(gameTime, spriteBatch);
+                    //DrawFX(gameTime, spriteBatch);
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
                     DrawGetReady(gameTime, spriteBatch);
                     break;
                 case "Show":
                     DrawTiles(gameTime, spriteBatch);
-                    DrawMirrorTiles(gameTime, spriteBatch);
-                    DrawFX(gameTime, spriteBatch);
+                    //DrawMirrorTiles(gameTime, spriteBatch);
+                    //DrawFX(gameTime, spriteBatch);
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
                     DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
                 case "Play":
                     DrawTiles(gameTime, spriteBatch);
-                    DrawMirrorTiles(gameTime, spriteBatch);
+                    //DrawMirrorTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
                     DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
@@ -726,7 +753,7 @@ namespace BeatEngine
 
         private void PositionTiles()
         {
-            int initialPosY = 2334;
+            int initialPosY = 1534;
             int initialPosX = 920;
 
             for (int y = 0; y < Height; ++y)
