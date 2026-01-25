@@ -297,7 +297,7 @@ namespace BeatEngine
 
             public static void CheckIsTimeToQuitShowMode(GameTime gameTime)
             {
-                var isTime = (float)gameTime.TotalGameTime.TotalSeconds > EndShowSequencetime + DefaultTimeBetweenSteps;
+                var isTime = (float)gameTime.TotalGameTime.TotalSeconds > EndShowSequencetime + DefaultTimeBetweenSteps*0.2;
                 if (IsShowingSequence == false && isTime)
                      IsSequenceCompletelyShown = true;
             }
@@ -423,7 +423,7 @@ namespace BeatEngine
             RepeatCat = new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
             RepeatCat.Position = new Vector2(-150, 1700);
 
-            rcoffscreenLeftX = 5000;
+            rcoffscreenLeftX = 3000;
             //rcoffscreenRightX = 1200;
             rccenterX = 1700;
 
