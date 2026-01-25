@@ -164,6 +164,30 @@
 /processorParam:TextureFormat=Color
 /build:UI/Environment/GetReady.png
 
+#begin UI/Environment/WatchCat.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/Environment/WatchCat.png
+
+#begin UI/Environment/RepeatCat.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UI/Environment/RepeatCat.png
+
 #begin UI/Buttons/Start_button.png
 /importer:TextureImporter
 /processor:TextureProcessor

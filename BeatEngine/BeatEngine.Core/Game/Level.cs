@@ -68,7 +68,19 @@ namespace BeatEngine
         private float offscreenRightX;
         private float centerX;
 
+        private float wcoffscreenLeftX;
+        private float wcoffscreenRightX;
+        private float wccenterX;
+
+        private float rcoffscreenLeftX;
+        private float rcoffscreenRightX;
+        private float rccenterX;
+
         public Tile GetReadyTile;
+
+        public Tile WatchCat;
+
+        public Tile RepeatCat;
 
         private Mode CurrentMode { get; set; }
 
@@ -137,6 +149,8 @@ namespace BeatEngine
 
             LoadTiles(fileStream);
             LoadGetReadyTile("GetReady", TileCollision.Passable);
+            LoadWatchCat("WatchCat", TileCollision.Passable);
+            LoadRepeatCat("RepeatCat", TileCollision.Passable);
             PositionTiles();
             PositionMirrorTiles();
 
@@ -388,6 +402,30 @@ namespace BeatEngine
             return GetReadyTile;
         }
 
+        private Tile LoadWatchCat(string name, TileCollision collision)
+        {
+            WatchCat = new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
+            WatchCat.Position = new Vector2(-150, 1700);
+
+            wcoffscreenLeftX = 5000;
+            //wcoffscreenRightX = 1200;
+            wccenterX = 1700;
+
+            return WatchCat;
+        }
+
+        private Tile LoadRepeatCat(string name, TileCollision collision)
+        {
+            RepeatCat = new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
+            RepeatCat.Position = new Vector2(-150, 800);
+
+            rcoffscreenLeftX = -80000;
+            rcoffscreenRightX = 1200;
+            rccenterX = (1300 - RepeatCat.Texture.Width) / 2f;
+
+            return RepeatCat;
+        }
+
 
         /// <summary>
         /// Unloads the level content.
@@ -570,6 +608,7 @@ namespace BeatEngine
                     break;
                 case "Show":
                     DrawTiles(gameTime, spriteBatch);
+                    DrawWatchCat(gameTime, spriteBatch);
                     //DrawMirrorTiles(gameTime, spriteBatch);
                     //DrawFX(gameTime, spriteBatch);
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
@@ -577,6 +616,7 @@ namespace BeatEngine
                     break;
                 case "Play":
                     DrawTiles(gameTime, spriteBatch);
+                    DrawRepeatCat(gameTime, spriteBatch);
                     //DrawMirrorTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
@@ -598,6 +638,70 @@ namespace BeatEngine
         //        IsGetReadyMessageStillPlaying = false;
         //    }
         //}
+
+        public void DrawWatchCat(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            getReadyTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            float t = MathHelper.Clamp(getReadyTimer / DefaultAnimationDuration, 0f, 1f);
+            float x;
+
+            if (t < 0.4f)
+            {
+                // Phase 1: Enter & slow down (ease-out)
+                float p = t / 0.4f;
+                p = EaseOutPowerFive(p);
+                x = MathHelper.Lerp(wcoffscreenLeftX, wccenterX, p);
+            }
+            else if (t < 0.6f)
+            {
+                // Phase 2: Stay in center
+                x = wccenterX;
+            }
+            else
+            {
+                // Phase 3: Accelerate out (ease-in)
+                float p = (t - 0.6f) / 0.4f;
+                p = EaseIPowerNine(p);
+                x = MathHelper.Lerp(wccenterX, wcoffscreenLeftX, p);
+            }
+
+            WatchCat.Position = new Vector2(WatchCat.Position.X, x);
+
+            spriteBatch.Draw(WatchCat.Texture, WatchCat.Position, Color.White);
+        }
+
+        public void DrawRepeatCat(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            getReadyTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            float t = MathHelper.Clamp(getReadyTimer / DefaultAnimationDuration, 0f, 1f);
+            float x;
+
+            if (t < 0.4f)
+            {
+                // Phase 1: Enter & slow down (ease-out)
+                float p = t / 0.4f;
+                p = EaseOutPowerFive(p);
+                x = MathHelper.Lerp(rcoffscreenLeftX, centerX, p);
+            }
+            else if (t < 0.6f)
+            {
+                // Phase 2: Stay in center
+                x = centerX;
+            }
+            else
+            {
+                // Phase 3: Accelerate out (ease-in)
+                float p = (t - 0.6f) / 0.4f;
+                p = EaseIPowerNine(p);
+                x = MathHelper.Lerp(rccenterX, rcoffscreenRightX, p);
+            }
+
+            RepeatCat.Position = new Vector2(200, 1700);
+
+            spriteBatch.Draw(RepeatCat.Texture, RepeatCat.Position, Color.White);
+        }
 
         private void DrawGetReady(GameTime gameTime, SpriteBatch spriteBatch)
         {
