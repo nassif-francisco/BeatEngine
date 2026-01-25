@@ -60,9 +60,13 @@ namespace BeatEngine
         public float Time;
         public float DefaultAnimationDuration = 2f;
 
-
+        public bool UserPlayedHand = false;
 
         private float getReadyTimer = 0f;
+
+        private float wcgetReadyTimer = 0f;
+
+        private float rcgetReadyTimer = 0f;
 
         private float offscreenLeftX;
         private float offscreenRightX;
@@ -417,11 +421,11 @@ namespace BeatEngine
         private Tile LoadRepeatCat(string name, TileCollision collision)
         {
             RepeatCat = new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
-            RepeatCat.Position = new Vector2(-150, 800);
+            RepeatCat.Position = new Vector2(-150, 1700);
 
-            rcoffscreenLeftX = -80000;
-            rcoffscreenRightX = 1200;
-            rccenterX = (1300 - RepeatCat.Texture.Width) / 2f;
+            rcoffscreenLeftX = 5000;
+            //rcoffscreenRightX = 1200;
+            rccenterX = 1700;
 
             return RepeatCat;
         }
@@ -641,9 +645,9 @@ namespace BeatEngine
 
         public void DrawWatchCat(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            getReadyTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            wcgetReadyTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            float t = MathHelper.Clamp(getReadyTimer / DefaultAnimationDuration, 0f, 1f);
+            float t = MathHelper.Clamp(wcgetReadyTimer / DefaultAnimationDuration, 0f, 1f);
             float x;
 
             if (t < 0.4f)
@@ -673,9 +677,9 @@ namespace BeatEngine
 
         public void DrawRepeatCat(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            getReadyTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            rcgetReadyTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            float t = MathHelper.Clamp(getReadyTimer / DefaultAnimationDuration, 0f, 1f);
+            float t = MathHelper.Clamp(rcgetReadyTimer / DefaultAnimationDuration, 0f, 1f);
             float x;
 
             if (t < 0.4f)
@@ -683,22 +687,30 @@ namespace BeatEngine
                 // Phase 1: Enter & slow down (ease-out)
                 float p = t / 0.4f;
                 p = EaseOutPowerFive(p);
-                x = MathHelper.Lerp(rcoffscreenLeftX, centerX, p);
+                x = MathHelper.Lerp(rcoffscreenLeftX, rccenterX, p);
             }
             else if (t < 0.6f)
             {
                 // Phase 2: Stay in center
-                x = centerX;
+                x = rccenterX;
             }
             else
             {
                 // Phase 3: Accelerate out (ease-in)
-                float p = (t - 0.6f) / 0.4f;
-                p = EaseIPowerNine(p);
-                x = MathHelper.Lerp(rccenterX, rcoffscreenRightX, p);
+                if(!UserPlayedHand)
+                {
+                    x = rccenterX; 
+                }
+                else
+                {
+                    float p = (t - 0.6f) / 0.4f;
+                    p = EaseIPowerNine(p);
+                    x = MathHelper.Lerp(rccenterX, rcoffscreenLeftX, p);
+                }
+
             }
 
-            RepeatCat.Position = new Vector2(200, 1700);
+            RepeatCat.Position = new Vector2(RepeatCat.Position.X, x);
 
             spriteBatch.Draw(RepeatCat.Texture, RepeatCat.Position, Color.White);
         }
