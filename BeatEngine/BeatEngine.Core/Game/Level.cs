@@ -293,13 +293,23 @@ namespace BeatEngine
 
             public static bool IsBackFlipping = false;
 
-            public static int InitialSequencetime = 4;
+            public static int InitialSequencetime = 3;
 
             public static int CurrentTileInSequence { get; set; }
 
             public static void CreateSequence(GameTime gameTime, Tile[,] tiles)
             {
                 Steps = GetRandomPositions(tiles, CurrentNumberOfSteps);
+
+                if(Steps.Count == InitialNumberOfSteps)
+                {
+                    InitialSequencetime = 3;//the first time takes a little more
+                }
+                else
+                {
+                    InitialSequencetime = 1;
+                }
+
                 Initialtime = (float)gameTime.TotalGameTime.TotalSeconds + InitialSequencetime;
                 IsSequenceCompletelyShown = false;
                 IsShowingSequence = true;
