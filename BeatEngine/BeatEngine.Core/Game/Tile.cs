@@ -42,6 +42,8 @@ namespace BeatEngine
     {
         public Texture2D Texture;
         public Texture2D FlipTexture;
+        public Texture2D InterchangeTexture;
+
         public TileCollision Collision; //will be used to define animation when pressed
 
         private Vector2 _position;
@@ -68,7 +70,9 @@ namespace BeatEngine
         public float flipProgress = 0f;   // 0 → 1
         public float flipDuration = 0.5f; // seconds
         public bool isFlipping = false;
+        public bool isBackFlipping = false;
         public bool isTotallyFlip = false;
+        public double flipEndedInTime { get; set; }
 
         public double InitialTime { get; set; }
         public HitAnimation Hit { get; set; }

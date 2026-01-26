@@ -282,6 +282,8 @@ namespace BeatEngine
 
             public static bool IsShowingSequence = false;
 
+            public static bool IsBackFlipping = false;
+
             public static int CurrentTileInSequence { get; set; }
 
             public static void CreateSequence(GameTime gameTime, Tile[,] tiles)
@@ -322,6 +324,7 @@ namespace BeatEngine
                 if (IsShowingSequence == false && isTime)
                 {
                     IsSequenceCompletelyShown = true;
+                    IsBackFlipping = true;
                     SequenceManager.TurnOffFollowTiles();
                 }
                      
@@ -550,6 +553,8 @@ namespace BeatEngine
                     CheckSequence(gameTime);
                     SequenceManager.CheckIsTimeToQuitShowMode(gameTime);
                     UpdateFlipAnimation(gameTime);
+                    CheckIfBackFlipShouldStart(gameTime);
+                    UpdateBackFlipAnimation(gameTime);
                     CheckModeTransition();
                     
                     break;
@@ -557,6 +562,8 @@ namespace BeatEngine
                     CheckIfTileIsPressed(touchCollection, gameTime);
                     UpdateFlipAnimation(gameTime);
                     CheckFinishedSFX(gameTime);
+                    CheckIfBackFlipShouldStart(gameTime);
+                    UpdateBackFlipAnimation(gameTime);
                     CheckModeTransition();
                     break;
             }
@@ -581,6 +588,12 @@ namespace BeatEngine
                         tiles[x, y].flipProgress = 1f;
                         tiles[x, y].isFlipping = false;
                         tiles[x, y].isTotallyFlip = true;
+
+                        tiles[x, y].flipEndedInTime = (float)gameTime.TotalGameTime.TotalSeconds;
+
+                        //tiles[x, y].InterchangeTexture = tiles[x, y].Texture;
+                        //tiles[x, y].Texture = tiles[x, y].FlipTexture;
+                        //tiles[x, y].FlipTexture = tiles[x, y].InterchangeTexture;
                     }
 
                     // Swap texture at halfway point
@@ -597,6 +610,50 @@ namespace BeatEngine
 
 
             
+        }
+
+        public void UpdateBackFlipAnimation(GameTime gameTime)
+        {
+
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    if (tiles[x, y].isBackFlipping == false)
+                    {
+                        continue;
+                    }
+
+                    tiles[x, y].flipProgress += (float)gameTime.ElapsedGameTime.TotalSeconds / tiles[x, y].flipDuration;
+
+                    if (tiles[x, y].flipProgress >= 1f)
+                    {
+                        tiles[x, y].flipProgress = 1f;
+                        tiles[x, y].isFlipping = false;
+                        //tiles[x, y].isBackFlipping = false;
+                        tiles[x, y].isTotallyFlip = true;
+
+                        tiles[x, y].flipEndedInTime = (float)gameTime.TotalGameTime.TotalSeconds;
+
+                        //tiles[x, y].InterchangeTexture = tiles[x, y].Texture;
+                        //tiles[x, y].Texture = tiles[x, y].FlipTexture;
+                        //tiles[x, y].FlipTexture = tiles[x, y].InterchangeTexture;
+                    }
+
+                    // Swap texture at halfway point
+                    if (tiles[x, y].flipProgress >= 0.5f && !tiles[x, y].showingFront)
+                    {
+                        tiles[x, y].showingFront = true;
+                    }
+                    else if (tiles[x, y].flipProgress >= 0.5f && !tiles[x, y].showingFront)
+                    {
+                        // optional if you want double flip logic
+                    }
+                }
+            }
+
+
+
         }
 
         public void TurnOffTiles()
@@ -636,7 +693,7 @@ namespace BeatEngine
                     tiles[tile.Item1, tile.Item2].IsPressed = true;
 
                     tiles[tile.Item1, tile.Item2].isFlipping = true;
-                    tiles[tile.Item1, tile.Item2].flipProgress = 0f;
+                    //tiles[tile.Item1, tile.Item2].flipProgress = 0f;
 
                     SequenceManager.followtiles[tile.Item1, tile.Item2].IsPressed = true;
                 }
@@ -900,10 +957,18 @@ namespace BeatEngine
                     {
                         Color tint = Color.White;
 
-                        if (tiles[x, y].IsPressed || tiles[x, y].isFlipping || tiles[x, y].isTotallyFlip)
-                        {
-                            tint = Color.HotPink; //check also darkseagreen
-                            DrawTileFlip(spriteBatch, texture, tiles[x, y], tint);
+                        if (tiles[x, y].IsPressed || tiles[x, y].isFlipping || tiles[x, y].isTotallyFlip || tiles[x, y].isBackFlipping)
+                        {                           
+                            if(tiles[x, y].IsPressed || tiles[x, y].isFlipping || tiles[x, y].isTotallyFlip && tiles[x, y].isBackFlipping == false)
+                            {
+                                tint = Color.HotPink; //check also darkseagreen
+                                DrawTileFlip(spriteBatch, texture, tiles[x, y], tint);
+                            }
+                            else
+                            {
+                                DrawTileBackFlip(spriteBatch, texture, tiles[x, y], tint);
+                            }
+                                
                         }
 
                         else
@@ -926,6 +991,36 @@ namespace BeatEngine
                 scaleX = MathHelper.Lerp(0f, 1f, (tile.flipProgress - 0.5f) * 2f);
 
             Texture2D currentTexture = tile.showingFront ? texture : tile.FlipTexture;
+
+            Vector2 origin = new Vector2(
+                currentTexture.Width / 2f,
+                currentTexture.Height / 2f
+            );
+
+            spriteBatch.Draw(
+                currentTexture,
+                tile.Position + origin,
+                null,
+                tint,
+                0f,                         // no Z rotation
+                origin,
+                new Vector2(scaleX, 1f),    // fake Y-axis flip
+                SpriteEffects.None,
+                0f
+            );
+        }
+
+        public void DrawTileBackFlip(SpriteBatch spriteBatch, Texture2D texture, Tile tile, Color tint)
+        {
+            float scaleX;
+
+            // Shrink then expand
+            if (tile.flipProgress < 0.5f)
+                scaleX = MathHelper.Lerp(1f, 0f, tile.flipProgress * 2f);
+            else
+                scaleX = MathHelper.Lerp(0f, 1f, (tile.flipProgress - 0.5f) * 2f);
+
+            Texture2D currentTexture = !tile.showingFront ? tile.FlipTexture : tile.Texture;
 
             Vector2 origin = new Vector2(
                 currentTexture.Width / 2f,
@@ -1146,6 +1241,33 @@ namespace BeatEngine
                     }
                 }
             }   
+        }
+
+        private void CheckIfBackFlipShouldStart(GameTime gameTime)
+        {
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    if (SequenceManager.IsBackFlipping && tiles[x, y].isBackFlipping == false && tiles[x, y].isTotallyFlip)
+                    {
+                        tiles[x, y].isBackFlipping = true;
+                        tiles[x, y].flipProgress = 0f;
+                        tiles[x, y].isFlipping = false;
+
+                        //double currentTime = gameTime.TotalGameTime.TotalSeconds;
+
+                        //double elapsedTime = tiles[x, y].flipEndedInTime + tiles[x, y].flipDuration;
+
+                        //if (currentTime >= elapsedTime && tiles[x, y].isBackFlipping == false)
+                        //{
+                        //    tiles[x, y].isBackFlipping = true;
+                        //    tiles[x, y].flipProgress = 0f;
+                        //    tiles[x, y].isFlipping = false;
+                        //}
+                    }
+                }
+            }
         }
 
         public bool CheckTileInHand(int x, int y)
