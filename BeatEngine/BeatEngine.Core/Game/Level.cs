@@ -26,6 +26,7 @@ using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using static System.Formats.Asn1.AsnWriter;
 using static System.Net.WebRequestMethods;
 
@@ -88,6 +89,11 @@ namespace BeatEngine
         public Tile WatchCat;
 
         public Tile RepeatCat;
+
+        //public bool showingFront = true;
+        //public float flipProgress = 0f;   // 0 → 1
+        //public float flipDuration = 0.4f; // seconds
+        //public bool isFlipping = false;
 
         private Mode CurrentMode { get; set; }
 
@@ -186,6 +192,15 @@ namespace BeatEngine
             Song = Content.Load<Song>("Sounds/StarlitPulse");
 
         }
+
+        //public void StartFlip(Tile tile)
+        //{
+        //    if (!tile.isFlipping)
+        //    {
+        //        tile.isFlipping = true;
+        //        tile.flipProgress = 0f;
+        //    }
+        //}
 
         private void AddModes()
         {
@@ -412,7 +427,10 @@ namespace BeatEngine
         /// <returns>The new tile.</returns>
         private Tile LoadTile(string name, TileCollision collision)
         {
-            return new Tile(Content.Load<Texture2D>("Tiles/" + name), collision, Content);
+            Tile tile = new Tile(Content.Load<Texture2D>("Tiles/" + name), collision, Content);
+            tile.SetFlipTexture(Content.Load<Texture2D>("Tiles/front"));
+
+            return tile;
         }
 
         private Tile LoadGetReadyTile(string name, TileCollision collision)
@@ -536,10 +554,48 @@ namespace BeatEngine
                     break;
                 case "Play":
                     CheckIfTileIsPressed(touchCollection, gameTime);
+                    UpdateFlipAnimation(gameTime);
                     CheckFinishedSFX(gameTime);
                     CheckModeTransition();
                     break;
             }
+        }
+
+        public void UpdateFlipAnimation(GameTime gameTime)
+        {
+
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    if (tiles[x, y].isFlipping == false)
+                    {
+                        continue;
+                    }
+                        
+                    tiles[x, y].flipProgress += (float)gameTime.ElapsedGameTime.TotalSeconds / tiles[x, y].flipDuration;
+
+                    if (tiles[x, y].flipProgress >= 1f)
+                    {
+                        tiles[x, y].flipProgress = 1f;
+                        tiles[x, y].isFlipping = false;
+                        tiles[x, y].isTotallyFlip = true;
+                    }
+
+                    // Swap texture at halfway point
+                    if (tiles[x, y].flipProgress >= 0.5f && tiles[x, y].showingFront)
+                    {
+                        tiles[x, y].showingFront = false;
+                    }
+                    else if (tiles[x, y].flipProgress >= 0.5f && !tiles[x, y].showingFront)
+                    {
+                        // optional if you want double flip logic
+                    }
+                }
+            }
+
+
+            
         }
 
         public void TurnOffTiles()
@@ -730,17 +786,21 @@ namespace BeatEngine
             }
             else
             {
-                // Phase 3: Accelerate out (ease-in)
-                if(!UserPlayedHand)
-                {
-                    x = rccenterX; 
-                }
-                else
-                {
-                    float p = (t - 0.6f) / 0.4f;
-                    p = EaseIPowerNine(p);
-                    x = MathHelper.Lerp(rccenterX, rcoffscreenLeftX, p);
-                }
+                //// Phase 3: Accelerate out (ease-in)
+                //if(!UserPlayedHand)
+                //{
+                //    x = rccenterX; 
+                //}
+                //else
+                //{
+                //    float p = (t - 0.6f) / 0.4f;
+                //    p = EaseIPowerNine(p);
+                //    x = MathHelper.Lerp(rccenterX, rcoffscreenLeftX, p);
+                //}
+
+                float p = (t - 0.6f) / 0.4f;
+                p = EaseIPowerNine(p);
+                x = MathHelper.Lerp(rccenterX, rcoffscreenLeftX, p);
 
             }
 
@@ -835,16 +895,49 @@ namespace BeatEngine
                     {
                         Color tint = Color.White;
 
-                        if (tiles[x, y].IsPressed)
+                        if (tiles[x, y].IsPressed || tiles[x, y].isFlipping || tiles[x, y].isTotallyFlip)
                         {
                             tint = Color.HotPink; //check also darkseagreen
-
+                            DrawTileFlip(spriteBatch, texture, tiles[x, y], tint);
                         }
 
-                        spriteBatch.Draw(texture, tiles[x, y].Position, tint);
+                        else
+                        {
+                            spriteBatch.Draw(texture, tiles[x, y].Position, tint);
+                        }
                     }
                 }
             }
+        }
+
+        public void DrawTileFlip(SpriteBatch spriteBatch, Texture2D texture, Tile tile, Color tint)
+        {
+            float scaleX;
+
+            // Shrink then expand
+            if (tile.flipProgress < 0.5f)
+                scaleX = MathHelper.Lerp(1f, 0f, tile.flipProgress * 2f);
+            else
+                scaleX = MathHelper.Lerp(0f, 1f, (tile.flipProgress - 0.5f) * 2f);
+
+            Texture2D currentTexture = tile.showingFront ? texture : tile.FlipTexture;
+
+            Vector2 origin = new Vector2(
+                currentTexture.Width / 2f,
+                currentTexture.Height / 2f
+            );
+
+            spriteBatch.Draw(
+                currentTexture,
+                tile.Position + origin,
+                null,
+                tint,
+                0f,                         // no Z rotation
+                origin,
+                new Vector2(scaleX, 1f),    // fake Y-axis flip
+                SpriteEffects.None,
+                0f
+            );
         }
 
         private void DrawMirrorTiles(GameTime gameTime, SpriteBatch spriteBatch)
@@ -1095,6 +1188,11 @@ namespace BeatEngine
                                 {
                                     PressedTiles.Add((x, y));
                                     CurrentTileInHand++;
+
+                                    tiles[x, y].isFlipping = true;
+                                    tiles[x, y].flipProgress = 0f;
+                                    //StartFlip(tiles[x, y]);
+                                    //int a = 0;
                                 }
 
                                 tiles[x, y].IsPressed = true;

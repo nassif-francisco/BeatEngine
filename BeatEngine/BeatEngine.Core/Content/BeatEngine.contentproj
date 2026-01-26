@@ -110,6 +110,11 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
+    <Compile Include="Tiles\front.png">
+      <Name>Platform</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
     <Compile Include="UI\Environment\GetReady.png">
       <Name>Platform</Name>
       <Importer>TextureImporter</Importer>
