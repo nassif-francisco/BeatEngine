@@ -293,12 +293,23 @@ namespace BeatEngine
 
             public static bool IsBackFlipping = false;
 
+            public static int InitialSequencetime = 4;
+
             public static int CurrentTileInSequence { get; set; }
 
             public static void CreateSequence(GameTime gameTime, Tile[,] tiles)
             {
                 Steps = GetRandomPositions(tiles, CurrentNumberOfSteps);
-                Initialtime = (float)gameTime.TotalGameTime.TotalSeconds +4;
+                Initialtime = (float)gameTime.TotalGameTime.TotalSeconds + InitialSequencetime;
+                IsSequenceCompletelyShown = false;
+                IsShowingSequence = true;
+                CurrentTileInSequence = 0;
+            }
+
+            public static void RepeatSequence(GameTime gameTime, Tile[,] tiles)
+            {
+                //Steps = GetRandomPositions(tiles, CurrentNumberOfSteps);
+                Initialtime = (float)gameTime.TotalGameTime.TotalSeconds + InitialSequencetime;
                 IsSequenceCompletelyShown = false;
                 IsShowingSequence = true;
                 CurrentTileInSequence = 0;
@@ -473,6 +484,25 @@ namespace BeatEngine
             wccenterX = 1700;
 
             return WatchCat;
+        }
+
+        public void InitWatchCat()
+        {
+            WatchCat.Position = new Vector2(-150, 1700);
+
+            wcoffscreenLeftX = 5000;
+            wccenterX = 1700;
+            wcgetReadyTimer = 0;
+        }
+
+        public void InitRepeatCat()
+        {
+            RepeatCat.Position = new Vector2(-150, 1700);
+
+            rcoffscreenLeftX = 3000;
+            //rcoffscreenRightX = 1200;
+            rccenterX = 1700;
+            rcgetReadyTimer = 0;
         }
 
         private Tile LoadRepeatCat(string name, TileCollision collision)
@@ -846,9 +876,12 @@ namespace BeatEngine
             SequenceManager.IsSequenceCompletelyShown = false;
             SequenceManager.IsShowingSequence = true;
             IsInitScoreManager = false;
+            SequenceManager.InitialSequencetime = 1;
             //ScoreManager.Score = 0;
             //ScoreManager.TargetScore = 0;
             //SequenceManager.EndShowSequencetime = 0;
+            InitWatchCat();
+            InitRepeatCat();
 
         }
 
@@ -873,7 +906,7 @@ namespace BeatEngine
                 }
                 else
                 {
-                    SequenceManager.CreateSequence(gameTime, tiles);
+                    SequenceManager.RepeatSequence(gameTime, tiles);
                     UserPlayedHandAndFinalScoreCalculated = true;
                     UserPlayedHand = false;
                 }
