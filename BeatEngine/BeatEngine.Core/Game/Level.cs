@@ -120,6 +120,7 @@ namespace BeatEngine
         }
         int score;
 
+        public bool IsInitFlipBackFlip = false;
         public bool ReachedExit
         {
             get { return reachedExit; }
@@ -565,11 +566,12 @@ namespace BeatEngine
                     
                     break;
                 case "Play":
+                    InitFlipBackFlipSequence();
                     CheckIfTileIsPressed(touchCollection, gameTime);
                     UpdateFlipAnimation(gameTime);
                     CheckFinishedSFX(gameTime);
-                    //CheckIfBackFlipShouldStart(gameTime);
-                    //UpdateBackFlipAnimation(gameTime);
+                    CheckIfBackFlipShouldStartInPlayMode(gameTime);
+                    UpdateBackFlipAnimationInPlayMode(gameTime);
                     CheckModeTransition();
                     break;
             }
@@ -616,6 +618,46 @@ namespace BeatEngine
 
 
             
+        }
+
+        public void UpdateBackFlipAnimationInPlayMode(GameTime gameTime)
+        {
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    if (tiles[x, y].isBackFlipping == false)
+                    {
+                        continue;
+                    }
+
+                    tiles[x, y].flipProgress += (float)gameTime.ElapsedGameTime.TotalSeconds / tiles[x, y].flipDuration;
+
+                    if (tiles[x, y].flipProgress >= 1f)
+                    {
+                        tiles[x, y].flipProgress = 1f;
+                        tiles[x, y].isFlipping = false;
+                        //tiles[x, y].isBackFlipping = false;
+                        tiles[x, y].isTotallyFlip = true;
+
+                        tiles[x, y].flipEndedInTime = (float)gameTime.TotalGameTime.TotalSeconds;
+
+                        //tiles[x, y].InterchangeTexture = tiles[x, y].Texture;
+                        //tiles[x, y].Texture = tiles[x, y].FlipTexture;
+                        //tiles[x, y].FlipTexture = tiles[x, y].InterchangeTexture;
+                    }
+
+                    // Swap texture at halfway point
+                    if (tiles[x, y].flipProgress >= 0.5f && !tiles[x, y].showingFront)
+                    {
+                        tiles[x, y].showingFront = true;
+                    }
+                    else if (tiles[x, y].flipProgress >= 0.5f && !tiles[x, y].showingFront)
+                    {
+                        // optional if you want double flip logic
+                    }
+                }
+            }
         }
 
         public void UpdateBackFlipAnimation(GameTime gameTime)
@@ -1247,6 +1289,44 @@ namespace BeatEngine
                     }
                 }
             }   
+        }
+
+        private void InitFlipBackFlipSequence()
+        {
+            if(IsInitFlipBackFlip == false)
+            {
+                for (int y = 0; y < Height; ++y)
+                {
+                    for (int x = 0; x < Width; ++x)
+                    {
+                        tiles[x, y].showingFront = true;
+                        tiles[x, y].flipProgress = 0f;   // 0 → 1
+                        tiles[x, y].flipDuration = 0.5f; // seconds
+                        tiles[x, y].isFlipping = false;
+                        tiles[x, y].isBackFlipping = false;
+                        tiles[x, y].isTotallyFlip = false;
+                    }
+                }
+                IsInitFlipBackFlip = true;
+
+            } 
+            
+        }
+
+        private void CheckIfBackFlipShouldStartInPlayMode(GameTime gameTime)
+        {
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    if (UserPlayedHand &&  tiles[x, y].isBackFlipping == false && tiles[x, y].isTotallyFlip)
+                    {
+                        tiles[x, y].isBackFlipping = true;
+                        tiles[x, y].flipProgress = 0f;
+                        tiles[x, y].isFlipping = false;
+                    }
+                }
+            }
         }
 
         private void CheckIfBackFlipShouldStart(GameTime gameTime)
