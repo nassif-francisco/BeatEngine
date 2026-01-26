@@ -320,14 +320,20 @@ namespace BeatEngine
 
             public static void CheckIsTimeToQuitShowMode(GameTime gameTime)
             {
-                var isTime = (float)gameTime.TotalGameTime.TotalSeconds > EndShowSequencetime + DefaultTimeBetweenSteps*0.2;
+                var isTime = (float)gameTime.TotalGameTime.TotalSeconds > EndShowSequencetime + DefaultTimeBetweenSteps*0.5;
+                var isTimeToBackFlip = (float)gameTime.TotalGameTime.TotalSeconds > EndShowSequencetime + DefaultTimeBetweenSteps * 0.001;
                 if (IsShowingSequence == false && isTime)
                 {
                     IsSequenceCompletelyShown = true;
-                    IsBackFlipping = true;
+                    //IsBackFlipping = true;
                     SequenceManager.TurnOffFollowTiles();
                 }
-                     
+
+                if (IsShowingSequence == false && isTimeToBackFlip)
+                {
+                    IsBackFlipping = true;
+                }
+
             }
 
             public static void TurnOffFollowTiles()
@@ -562,8 +568,8 @@ namespace BeatEngine
                     CheckIfTileIsPressed(touchCollection, gameTime);
                     UpdateFlipAnimation(gameTime);
                     CheckFinishedSFX(gameTime);
-                    CheckIfBackFlipShouldStart(gameTime);
-                    UpdateBackFlipAnimation(gameTime);
+                    //CheckIfBackFlipShouldStart(gameTime);
+                    //UpdateBackFlipAnimation(gameTime);
                     CheckModeTransition();
                     break;
             }
