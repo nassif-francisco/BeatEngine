@@ -48,6 +48,8 @@ namespace BeatEngine
 
         private Dictionary<double, Step[,]> Steps;
 
+        public ScoreManager ScoreManager;
+
         private Texture2D[] layers;
         // The layer which entities are drawn on top of.
         private const int EntityLayer = 2;
@@ -64,6 +66,9 @@ namespace BeatEngine
         public float DefaultAnimationDuration = 2f;
 
         public bool UserPlayedHand = false;
+        public double UserEndedPlayingHandAtTime = 0;
+
+        public bool UserPlayedHandAndFinalScoreCalculated = false;
         public int CurrentTileInHand = 0;
 
         private float getReadyTimer = 0f;
@@ -121,6 +126,8 @@ namespace BeatEngine
         int score;
 
         public bool IsInitFlipBackFlip = false;
+
+        public bool IsInitScoreManager = false;
         public bool ReachedExit
         {
             get { return reachedExit; }
@@ -206,8 +213,9 @@ namespace BeatEngine
         private void AddModes()
         {
             Modes.Add(new Mode() { Tag = "Intro", NextModeTag = "Show" });
-            Modes.Add(new Mode() { Tag = "Play", NextModeTag = "Show" });
+            Modes.Add(new Mode() { Tag = "Play", NextModeTag = "Calculate" });
             Modes.Add(new Mode() { Tag = "Show", NextModeTag = "Play" });
+            Modes.Add(new Mode() { Tag = "Calculate", NextModeTag = "Show" });
         }
 
         /// <summary>
@@ -552,7 +560,7 @@ namespace BeatEngine
                     //CheckIfTileIsPressed(touchCollection, gameTime);
                     //CheckFinishedSFX(gameTime);
                     //CheckSequence(gameTime);
-                    CheckModeTransition();
+                    CheckModeTransition(gameTime);
                     break;
                 case "Show":
                     //CheckIfTileIsPressed(touchCollection, gameTime);
@@ -562,17 +570,22 @@ namespace BeatEngine
                     UpdateFlipAnimation(gameTime);
                     CheckIfBackFlipShouldStart(gameTime);
                     UpdateBackFlipAnimation(gameTime);
-                    CheckModeTransition();
+                    CheckModeTransition(gameTime);
                     
                     break;
                 case "Play":
                     InitFlipBackFlipSequence();
+                    InitScoreManager();
                     CheckIfTileIsPressed(touchCollection, gameTime);
                     UpdateFlipAnimation(gameTime);
                     CheckFinishedSFX(gameTime);
                     CheckIfBackFlipShouldStartInPlayMode(gameTime);
                     UpdateBackFlipAnimationInPlayMode(gameTime);
-                    CheckModeTransition();
+                    CheckModeTransition(gameTime);
+                    break;
+                case "Calculate":
+                    CheckFinalScore(gameTime);
+                    CheckModeTransition(gameTime);
                     break;
             }
         }
@@ -765,7 +778,7 @@ namespace BeatEngine
             CurrentMode = Modes.Where(m => m.Tag == nextModeTag).FirstOrDefault();
         }
 
-        public void CheckModeTransition()
+        public void CheckModeTransition(GameTime gameTime)
         {
             switch (CurrentMode.Tag)
             {
@@ -785,9 +798,85 @@ namespace BeatEngine
                         ToNextMode();
                     }
                     break;
+
                 case "Play":
-                    // Nothing to do here yet
+                    
+                    if(CheckIsTimeToEnterCalculateMode(gameTime))
+                    {
+                        ToNextMode();
+                    }
+
+
                     break;
+
+                case "Calculate":
+                    
+                    if (UserPlayedHandAndFinalScoreCalculated)
+                    {
+                        UserPlayedHandAndFinalScoreCalculated = false;
+                        ResetAllTileVariables();
+                        ToNextMode();
+                    }
+
+                    break;
+            }
+
+        }
+
+        public void ResetAllTileVariables()
+        {
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    tiles[x, y].IsPressed = false;
+                    tiles[x, y].flipProgress = 0;
+                    tiles[x, y].isBackFlipping = false;
+                    tiles[x, y].IsHit = false;
+                    tiles[x, y].isTotallyFlip = false;
+                    tiles[x, y].isFlipping = false;
+                }
+            }
+
+            IsInitFlipBackFlip = false;
+            SequenceManager.IsBackFlipping = false;
+            PressedTiles = new List<(int X, int Y)>();
+            UserPlayedHand = false;
+            UserPlayedHandAndFinalScoreCalculated = false;
+            SequenceManager.IsSequenceCompletelyShown = false;
+            SequenceManager.IsShowingSequence = true;
+            IsInitScoreManager = false;
+            //ScoreManager.Score = 0;
+            //ScoreManager.TargetScore = 0;
+            //SequenceManager.EndShowSequencetime = 0;
+
+        }
+
+        public bool CheckIsTimeToEnterCalculateMode(GameTime gameTime)
+        {
+            var isTime = (float)gameTime.TotalGameTime.TotalSeconds > UserEndedPlayingHandAtTime + 2;
+
+            return UserPlayedHand && isTime;
+
+        }
+
+        public void CheckFinalScore(GameTime gameTime)
+        {
+            if (UserPlayedHand)
+            {
+                var score = ScoreManager.GetScoredScore();
+                if (score == SequenceManager.CurrentNumberOfSteps)
+                {
+                    SequenceManager.AdvanceLevel(gameTime, tiles);
+                    UserPlayedHandAndFinalScoreCalculated = true;
+                    UserPlayedHand = false;
+                }
+                else
+                {
+                    SequenceManager.CreateSequence(gameTime, tiles);
+                    UserPlayedHandAndFinalScoreCalculated = true;
+                    UserPlayedHand = false;
+                }
             }
 
         }
@@ -822,6 +911,12 @@ namespace BeatEngine
                     DrawTiles(gameTime, spriteBatch);
                     DrawRepeatCat(gameTime, spriteBatch);
                     //DrawMirrorTiles(gameTime, spriteBatch);
+                    DrawFX(gameTime, spriteBatch);
+                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
+                    DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
+                    break;
+                case "Calculate":
+                    DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
                     DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
@@ -1291,6 +1386,20 @@ namespace BeatEngine
             }   
         }
 
+        private void InitScoreManager()
+        {
+            if (IsInitScoreManager == false)
+            {
+                int currentHitTarget = SequenceManager.CurrentNumberOfSteps;
+                SequenceManager.IsSequenceCompletelyShown = false;
+                
+                ScoreManager = new ScoreManager(currentHitTarget);
+                IsInitScoreManager = true;
+                UserPlayedHandAndFinalScoreCalculated = false;
+
+            }
+        }
+
         private void InitFlipBackFlipSequence()
         {
             if(IsInitFlipBackFlip == false)
@@ -1356,7 +1465,7 @@ namespace BeatEngine
             }
         }
 
-        public bool CheckTileInHand(int x, int y)
+        public bool CheckTileInHand(int x, int y, GameTime gameTime)
         {
             if (CurrentTileInHand > SequenceManager.Steps.Count() - 1)
             {
@@ -1366,6 +1475,7 @@ namespace BeatEngine
             if (CurrentTileInHand == SequenceManager.Steps.Count() -1)
             {
                 UserPlayedHand = true;
+                UserEndedPlayingHandAtTime = gameTime.TotalGameTime.TotalSeconds;
             }
             
             (int a, int b) currentStep = SequenceManager.Steps[CurrentTileInHand];
@@ -1396,10 +1506,11 @@ namespace BeatEngine
                         {
                             if (tiles[x, y].BoundingRectangle.Contains(pos))
                             {
-
+                                bool addedPress = false;
                                 if (!PressedTiles.Contains((x, y)))
                                 {
                                     PressedTiles.Add((x, y));
+                                    addedPress = true;
                                     CurrentTileInHand++;
 
                                     tiles[x, y].isFlipping = true;
@@ -1409,7 +1520,12 @@ namespace BeatEngine
                                 }
 
                                 tiles[x, y].IsPressed = true;
-                                tiles[x, y].IsHit = CheckTileInHand(x, y);
+                                tiles[x, y].IsHit = CheckTileInHand(x, y, gameTime);
+
+                                if(tiles[x, y].IsHit && addedPress)
+                                {
+                                    ScoreManager.UpdateScore();
+                                }
 
                                 if (!tiles[x, y].IsPlayingSound)
                                 {
