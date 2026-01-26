@@ -549,6 +549,7 @@ namespace BeatEngine
                     //CheckFinishedSFX(gameTime);
                     CheckSequence(gameTime);
                     SequenceManager.CheckIsTimeToQuitShowMode(gameTime);
+                    UpdateFlipAnimation(gameTime);
                     CheckModeTransition();
                     
                     break;
@@ -633,6 +634,10 @@ namespace BeatEngine
 
                     (int, int) tile = SequenceManager.ProvideTileToShowInSequence(gameTime);
                     tiles[tile.Item1, tile.Item2].IsPressed = true;
+
+                    tiles[tile.Item1, tile.Item2].isFlipping = true;
+                    tiles[tile.Item1, tile.Item2].flipProgress = 0f;
+
                     SequenceManager.followtiles[tile.Item1, tile.Item2].IsPressed = true;
                 }
             }
