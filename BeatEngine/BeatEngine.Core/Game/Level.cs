@@ -363,7 +363,7 @@ namespace BeatEngine
 
         private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 5, SpriteEffects.None, 1);
+            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 4, SpriteEffects.None, 1);
             //sriteBatch.DrawString(font, value, position, color);
         }
 
@@ -397,8 +397,20 @@ namespace BeatEngine
                         }
 
                         spriteBatch.Draw(texture, tiles[x, y].Position, tint);
-                        var silabaPosition = new Vector2(tiles[x, y].Position.X + 85, tiles[x, y].Position.Y + tiles[x, y].Height / 3.25f);
-                        DrawShadowedString(hudFont, "RE", silabaPosition, Color.Black, spriteBatch);
+                        var silabaPosition = new Vector2(tiles[x, y].Position.X + 90, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
+                        string text = string.Empty;
+                        if(x%2 == 1)
+                        {
+                            text = "TXV";
+                            silabaPosition = new Vector2(tiles[x, y].Position.X + 60, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
+                        }
+                        else
+                        {
+                            text = "RE";
+                            silabaPosition = new Vector2(tiles[x, y].Position.X + 90, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
+                        }
+
+                         DrawShadowedString(hudFont, text, silabaPosition, Color.Black, spriteBatch);
 
                     }
                 }
