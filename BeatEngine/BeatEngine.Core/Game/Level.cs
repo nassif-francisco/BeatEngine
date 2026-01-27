@@ -27,6 +27,7 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 using static System.Formats.Asn1.AsnWriter;
 using static System.Net.WebRequestMethods;
 
@@ -45,6 +46,8 @@ namespace BeatEngine
         public static List<(int X, int Y)> PressedTiles = new List<(int X, int Y)> ();
 
         private Tile[,] mirrorTiles;
+
+        private List<Tile> Panels = new List<Tile> ();
 
         private Dictionary<double, Step[,]> Steps;
 
@@ -116,7 +119,9 @@ namespace BeatEngine
             content = new ContentManager(serviceProvider, "Content");
 
             LoadTiles(fileStream);
+            LoadPanels();
             PositionTiles();
+            PositionPanels();
 
             //SequenceManager.InitiateSequence(new GameTime(), tiles);
 
@@ -150,6 +155,17 @@ namespace BeatEngine
             Modes.Add(new Mode() { Tag = "Play", NextModeTag = "Calculate" });
             Modes.Add(new Mode() { Tag = "Show", NextModeTag = "Play" });
             Modes.Add(new Mode() { Tag = "Calculate", NextModeTag = "Show" });
+        }
+
+        int DefaultPanelNumber = 3;
+
+        private void LoadPanels()
+        {
+            for(int k = 0; k< DefaultPanelNumber; k++)
+            {
+                var panel = new Tile(Content.Load<Texture2D>("UI/Environment/Panel"), TileCollision.Platform, Content);
+                Panels.Add(panel);  
+            }
         }
 
         private void LoadTiles(Stream fileStream)
@@ -346,6 +362,7 @@ namespace BeatEngine
                     DrawTiles(gameTime, spriteBatch);
                     break;
                 case "Play":
+                    DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
@@ -375,9 +392,6 @@ namespace BeatEngine
             //sriteBatch.DrawString(font, value, position, color);
         }
 
-        /// <summary>
-        /// Draws each tile in the level.
-        /// </summary>
         private void DrawTiles(GameTime gameTime, SpriteBatch spriteBatch)
         {
             for (int y = 0; y < Height; ++y)
@@ -414,6 +428,15 @@ namespace BeatEngine
 
                     }
                 }
+            }
+        }
+
+        private void DrawPanels(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            for(int k = 0; k < Panels.Count; k++)
+            {
+                Texture2D texture = Panels[k].Texture;
+                spriteBatch.Draw(texture, Panels[k].Position, Color.White * 0.7f);
             }
         }
 
@@ -472,6 +495,25 @@ namespace BeatEngine
 
                 }
                 initialPosX = 920;
+                initialPosY -= 300;
+            }
+        }
+
+        private void PositionPanels()
+        {
+            int initialPosY = 734;
+            int initialPosX = 10;
+
+            for (int y = 0; y < Panels.Count; ++y)
+            {
+                Texture2D texture = Panels[y].Texture;
+                if (texture != null)
+                {
+                    //Draw it in screen space.
+                    Vector2 position = new Vector2(initialPosX, initialPosY);
+                    Panels[y].Position = position;
+
+                }
                 initialPosY -= 300;
             }
         }
