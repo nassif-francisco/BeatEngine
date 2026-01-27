@@ -64,42 +64,7 @@ namespace BeatEngine
         public bool IsSongSaved = false;
         public float Time;
         public float DefaultAnimationDuration = 2f;
-
-        public bool UserPlayedHand = false;
-        public double UserEndedPlayingHandAtTime = 0;
-
-        public bool UserPlayedHandAndFinalScoreCalculated = false;
-        public int CurrentTileInHand = 0;
-
-        private float getReadyTimer = 0f;
-
-        private float wcgetReadyTimer = 0f;
-
-        private float rcgetReadyTimer = 0f;
-
-        private float offscreenLeftX;
-        private float offscreenRightX;
-        private float centerX;
-
-        private float wcoffscreenLeftX;
-        private float wcoffscreenRightX;
-        private float wccenterX;
-
-        private float rcoffscreenLeftX;
-        private float rcoffscreenRightX;
-        private float rccenterX;
-
-        public Tile GetReadyTile;
-
-        public Tile WatchCat;
-
-        public Tile RepeatCat;
-
-        //public bool showingFront = true;
-        //public float flipProgress = 0f;   // 0 → 1
-        //public float flipDuration = 0.4f; // seconds
-        //public bool isFlipping = false;
-
+        Tile draggedTile;
         private Mode CurrentMode { get; set; }
 
         // Entities in the level.
@@ -132,16 +97,7 @@ namespace BeatEngine
         {
             get { return reachedExit; }
         }
-        bool reachedExit;
-
-        //public TimeSpan TimeRemaining
-        //{
-        //    get { return timeRemaining; }
-        //}
-        //TimeSpan timeRemaining;
-
-
-        // Level content.        
+        bool reachedExit;      
         public ContentManager Content
         {
             get { return content; }
@@ -154,26 +110,13 @@ namespace BeatEngine
 
         #region Loading
 
-        /// <summary>
-        /// Constructs a new level.
-        /// </summary>
-        /// <param name="serviceProvider">
-        /// The service provider that will be used to construct a ContentManager.
-        /// </param>
-        /// <param name="fileStream">
-        /// A stream containing the tile data.
-        /// </param>
         public Level(IServiceProvider serviceProvider, Stream fileStream, int levelIndex, Matrix globalTransformation, GameState gameState)
         {
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");
 
             LoadTiles(fileStream);
-            LoadGetReadyTile("GetReady", TileCollision.Passable);
-            LoadWatchCat("WatchCat", TileCollision.Passable);
-            LoadRepeatCat("RepeatCat", TileCollision.Passable);
             PositionTiles();
-            PositionMirrorTiles();
 
             //SequenceManager.InitiateSequence(new GameTime(), tiles);
 
@@ -196,19 +139,10 @@ namespace BeatEngine
             AddModes();
 
             Time = DefaultAnimationDuration;
-            CurrentMode = Modes.Where(m => m.Tag == "Intro").FirstOrDefault();
+            CurrentMode = Modes.Where(m => m.Tag == "Play").FirstOrDefault();
             Song = Content.Load<Song>("Sounds/StarlitPulse");
 
         }
-
-        //public void StartFlip(Tile tile)
-        //{
-        //    if (!tile.isFlipping)
-        //    {
-        //        tile.isFlipping = true;
-        //        tile.flipProgress = 0f;
-        //    }
-        //}
 
         private void AddModes()
         {
@@ -218,15 +152,6 @@ namespace BeatEngine
             Modes.Add(new Mode() { Tag = "Calculate", NextModeTag = "Show" });
         }
 
-        /// <summary>
-        /// Iterates over every tile in the structure file and loads its
-        /// appearance and behavior. This method also validates that the
-        /// file is well-formed with a player start point, exit, etc.
-        /// </summary>
-        /// <param name="fileStream">
-        /// A stream containing the tile data.
-        /// </param>
-        /// 
         private void LoadTiles(Stream fileStream)
         {
             // Load the level and ensure all of the lines are the same length.
@@ -245,12 +170,8 @@ namespace BeatEngine
                 }
             }
 
-            // Allocate the tile grid.
             tiles = new Tile[width, lines.Count];
-            SequenceManager.followtiles = new Tile[width, lines.Count];
-            mirrorTiles = new Tile[width, lines.Count];
 
-            // Loop over every tile position,
             for (int y = 0; y < Height; ++y)
             {
                 for (int x = 0; x < Width; ++x)
@@ -258,185 +179,12 @@ namespace BeatEngine
                     // to load each tile.
                     char tileType = lines[y][x];
                     tiles[x, y] = LoadTile(tileType, x, y);
-                    mirrorTiles[x, y] = LoadTile(tileType, x, y);
                 }
             }
 
         }
 
-        private int NumberOfSteps = 3;
-
-       
-
-
-        public static class SequenceManager
-        {
-            public static List<(int X, int Y)> Steps { get; set; }
-
-            public static Tile[,] followtiles;
-
-            public static float LstTimeStepShown { get; set; }
-
-            public static float Initialtime { get; set; }
-
-            public static float EndShowSequencetime { get; set; }
-
-            public static float DefaultTimeBetweenSteps = 1f;
-
-            public static int InitialNumberOfSteps = 3;
-
-            public static int CurrentNumberOfSteps = 3;
-
-            public static bool IsSequenceCompletelyShown = false;
-
-            public static bool IsShowingSequence = false;
-
-            public static bool IsBackFlipping = false;
-
-            public static int InitialSequencetime = 3;
-
-            public static int CurrentTileInSequence { get; set; }
-
-            public static void CreateSequence(GameTime gameTime, Tile[,] tiles)
-            {
-                Steps = GetRandomPositions(tiles, CurrentNumberOfSteps);
-
-                if(Steps.Count == InitialNumberOfSteps)
-                {
-                    InitialSequencetime = 3;//the first time takes a little more
-                }
-                else
-                {
-                    InitialSequencetime = 1;
-                }
-
-                Initialtime = (float)gameTime.TotalGameTime.TotalSeconds + InitialSequencetime;
-                IsSequenceCompletelyShown = false;
-                IsShowingSequence = true;
-                CurrentTileInSequence = 0;
-            }
-
-            public static void RepeatSequence(GameTime gameTime, Tile[,] tiles)
-            {
-                //Steps = GetRandomPositions(tiles, CurrentNumberOfSteps);
-                Initialtime = (float)gameTime.TotalGameTime.TotalSeconds + InitialSequencetime;
-                IsSequenceCompletelyShown = false;
-                IsShowingSequence = true;
-                CurrentTileInSequence = 0;
-            }
-
-            public static (int X, int Y) ProvideTileToShowInSequence(GameTime gameTime)
-            {
-                if(CurrentTileInSequence < Steps.Count())
-                {
-                    CurrentTileInSequence++;
-                    Initialtime = (float)gameTime.TotalGameTime.TotalSeconds;
-                    return Steps[CurrentTileInSequence - 1];
-                }
-                else 
-                {
-                    IsShowingSequence = false;
-                    Initialtime = (float)gameTime.TotalGameTime.TotalSeconds;
-                    EndShowSequencetime = (float)gameTime.TotalGameTime.TotalSeconds;
-                    return Steps[CurrentTileInSequence -1];
-                }       
-            }
-
-            public static bool IsTimeToShowNextTile(GameTime gameTime)
-            {
-                var isTime = (float)gameTime.TotalGameTime.TotalSeconds > Initialtime + DefaultTimeBetweenSteps;
-                return isTime;
-            }
-
-            public static void CheckIsTimeToQuitShowMode(GameTime gameTime)
-            {
-                var isTime = (float)gameTime.TotalGameTime.TotalSeconds > EndShowSequencetime + DefaultTimeBetweenSteps*0.5;
-                var isTimeToBackFlip = (float)gameTime.TotalGameTime.TotalSeconds > EndShowSequencetime + DefaultTimeBetweenSteps * 0.001;
-                if (IsShowingSequence == false && isTime)
-                {
-                    IsSequenceCompletelyShown = true;
-                    //IsBackFlipping = true;
-                    SequenceManager.TurnOffFollowTiles();
-                }
-
-                if (IsShowingSequence == false && isTimeToBackFlip)
-                {
-                    IsBackFlipping = true;
-                }
-
-            }
-
-            public static void TurnOffFollowTiles()
-            {
-                for (int y = 0; y < SequenceManager.followtiles.GetLength(0); ++y)
-                {
-                    for (int x = 0; x < SequenceManager.followtiles.GetLength(1); ++x)
-                    {
-                        SequenceManager.followtiles[x, y].IsPressed = false;
-                    }
-                }
-            }
-
-            public static void AdvanceLevel(GameTime gameTime, Tile[,] tiles)
-            {
-                CurrentNumberOfSteps++;
-                CreateSequence(gameTime, tiles);   
-            }
-
-            public static void InitiateSequence(GameTime gameTime, Tile[,] tiles)
-            {
-                CurrentNumberOfSteps = InitialNumberOfSteps;
-                CreateSequence(gameTime, tiles);
-            }
-
-            public static List<(int X, int Y)> GetRandomPositions(
-                    Tile[,] tiles,
-                    int count)
-            {
-                int width = tiles.GetLength(0);
-                int height = tiles.GetLength(1);
-
-                int totalPositions = width * height;
-                if (count > totalPositions)
-                    throw new ArgumentException("Requested more positions than available tiles.");
-
-                Random random = new Random();
-
-                // Create all possible positions
-                var allPositions = new List<(int X, int Y)>();
-                for (int x = 0; x < width; x++)
-                {
-                    for (int y = 0; y < height; y++)
-                    {
-                        allPositions.Add((x, y));
-                    }
-                }
-
-                // Shuffle positions
-                var shuffled = allPositions
-                    .OrderBy(_ => random.Next())
-                    .Take(count)
-                    .ToList();
-
-                return shuffled;
-            }
-
-        }
-
-        /// <summary>
-        /// Loads an individual tile's appearance and behavior.
-        /// </summary>
-        /// <param name="tileType">
-        /// The character loaded from the structure file which
-        /// indicates what should be loaded.
-        /// </param>
-        /// <param name="x">
-        /// The X location of this tile in tile space.
-        /// </param>
-        /// <param name="y">
-        /// The Y location of this tile in tile space.
-        /// </param>
-        /// <returns>The loaded tile.</returns>
+      
         private Tile LoadTile(char tileType, int x, int y)
         {
             switch (tileType)
@@ -453,17 +201,6 @@ namespace BeatEngine
             }
         }
 
-        /// <summary>
-        /// Creates a new tile. The other tile loading methods typically chain to this
-        /// method after performing their special logic.
-        /// </summary>
-        /// <param name="name">
-        /// Path to a tile texture relative to the Content/Tiles directory.
-        /// </param>
-        /// <param name="collision">
-        /// The tile collision type for the new tile.
-        /// </param>
-        /// <returns>The new tile.</returns>
         private Tile LoadTile(string name, TileCollision collision)
         {
             Tile tile = new Tile(Content.Load<Texture2D>("Tiles/" + name), collision, Content);
@@ -472,65 +209,7 @@ namespace BeatEngine
             return tile;
         }
 
-        private Tile LoadGetReadyTile(string name, TileCollision collision)
-        {
-            GetReadyTile =  new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
-            GetReadyTile.Position = new Vector2(-150, 800);
-
-            offscreenLeftX = -80000;
-            offscreenRightX = 1200;
-            centerX = (1300 - GetReadyTile.Texture.Width) / 2f;
-
-            return GetReadyTile;
-        }
-
-        private Tile LoadWatchCat(string name, TileCollision collision)
-        {
-            WatchCat = new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
-            WatchCat.Position = new Vector2(-150, 1700);
-
-            wcoffscreenLeftX = 5000;
-            //wcoffscreenRightX = 1200;
-            wccenterX = 1700;
-
-            return WatchCat;
-        }
-
-        public void InitWatchCat()
-        {
-            WatchCat.Position = new Vector2(-150, 1700);
-
-            wcoffscreenLeftX = 5000;
-            wccenterX = 1700;
-            wcgetReadyTimer = 0;
-        }
-
-        public void InitRepeatCat()
-        {
-            RepeatCat.Position = new Vector2(-150, 1700);
-
-            rcoffscreenLeftX = 3000;
-            //rcoffscreenRightX = 1200;
-            rccenterX = 1700;
-            rcgetReadyTimer = 0;
-        }
-
-        private Tile LoadRepeatCat(string name, TileCollision collision)
-        {
-            RepeatCat = new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
-            RepeatCat.Position = new Vector2(-150, 1700);
-
-            rcoffscreenLeftX = 3000;
-            //rcoffscreenRightX = 1200;
-            rccenterX = 1700;
-
-            return RepeatCat;
-        }
-
-
-        /// <summary>
-        /// Unloads the level content.
-        /// </summary>
+      
         public void Dispose()
         {
             Content.Unload();
@@ -596,217 +275,17 @@ namespace BeatEngine
         {
             switch (CurrentMode.Tag)
             {
-                case "Intro":
-                    //CheckIfTileIsPressed(touchCollection, gameTime);
-                    //CheckFinishedSFX(gameTime);
-                    //CheckSequence(gameTime);
-                    CheckModeTransition(gameTime);
-                    break;
-                case "Show":
-                    //CheckIfTileIsPressed(touchCollection, gameTime);
-                    //CheckFinishedSFX(gameTime);
-                    CheckSequence(gameTime);
-                    SequenceManager.CheckIsTimeToQuitShowMode(gameTime);
-                    UpdateFlipAnimation(gameTime);
-                    CheckIfBackFlipShouldStart(gameTime);
-                    UpdateBackFlipAnimation(gameTime);
-                    CheckModeTransition(gameTime);
-                    
-                    break;
                 case "Play":
-                    InitFlipBackFlipSequence();
-                    InitScoreManager();
-                    CheckIfTileIsPressed(touchCollection, gameTime);
-                    UpdateFlipAnimation(gameTime);
-                    CheckFinishedSFX(gameTime);
-                    CheckIfBackFlipShouldStartInPlayMode(gameTime);
-                    UpdateBackFlipAnimationInPlayMode(gameTime);
                     CheckModeTransition(gameTime);
+                    CheckIfTileIsPressed(touchCollection, gameTime);
                     break;
                 case "Calculate":
-                    CheckFinalScore(gameTime);
                     CheckModeTransition(gameTime);
                     break;
             }
         }
 
-        public void UpdateFlipAnimation(GameTime gameTime)
-        {
-
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    if (tiles[x, y].isFlipping == false)
-                    {
-                        continue;
-                    }
-                        
-                    tiles[x, y].flipProgress += (float)gameTime.ElapsedGameTime.TotalSeconds / tiles[x, y].flipDuration;
-
-                    if (tiles[x, y].flipProgress >= 1f)
-                    {
-                        tiles[x, y].flipProgress = 1f;
-                        tiles[x, y].isFlipping = false;
-                        tiles[x, y].isTotallyFlip = true;
-
-                        tiles[x, y].flipEndedInTime = (float)gameTime.TotalGameTime.TotalSeconds;
-
-                        //tiles[x, y].InterchangeTexture = tiles[x, y].Texture;
-                        //tiles[x, y].Texture = tiles[x, y].FlipTexture;
-                        //tiles[x, y].FlipTexture = tiles[x, y].InterchangeTexture;
-                    }
-
-                    // Swap texture at halfway point
-                    if (tiles[x, y].flipProgress >= 0.5f && tiles[x, y].showingFront)
-                    {
-                        tiles[x, y].showingFront = false;
-                    }
-                    else if (tiles[x, y].flipProgress >= 0.5f && !tiles[x, y].showingFront)
-                    {
-                        // optional if you want double flip logic
-                    }
-                }
-            }
-
-
-            
-        }
-
-        public void UpdateBackFlipAnimationInPlayMode(GameTime gameTime)
-        {
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    if (tiles[x, y].isBackFlipping == false)
-                    {
-                        continue;
-                    }
-
-                    tiles[x, y].flipProgress += (float)gameTime.ElapsedGameTime.TotalSeconds / tiles[x, y].flipDuration;
-
-                    if (tiles[x, y].flipProgress >= 1f)
-                    {
-                        tiles[x, y].flipProgress = 1f;
-                        tiles[x, y].isFlipping = false;
-                        //tiles[x, y].isBackFlipping = false;
-                        tiles[x, y].isTotallyFlip = true;
-
-                        tiles[x, y].flipEndedInTime = (float)gameTime.TotalGameTime.TotalSeconds;
-
-                        //tiles[x, y].InterchangeTexture = tiles[x, y].Texture;
-                        //tiles[x, y].Texture = tiles[x, y].FlipTexture;
-                        //tiles[x, y].FlipTexture = tiles[x, y].InterchangeTexture;
-                    }
-
-                    // Swap texture at halfway point
-                    if (tiles[x, y].flipProgress >= 0.5f && !tiles[x, y].showingFront)
-                    {
-                        tiles[x, y].showingFront = true;
-                    }
-                    else if (tiles[x, y].flipProgress >= 0.5f && !tiles[x, y].showingFront)
-                    {
-                        // optional if you want double flip logic
-                    }
-                }
-            }
-        }
-
-        public void UpdateBackFlipAnimation(GameTime gameTime)
-        {
-
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    if (tiles[x, y].isBackFlipping == false)
-                    {
-                        continue;
-                    }
-
-                    tiles[x, y].flipProgress += (float)gameTime.ElapsedGameTime.TotalSeconds / tiles[x, y].flipDuration;
-
-                    if (tiles[x, y].flipProgress >= 1f)
-                    {
-                        tiles[x, y].flipProgress = 1f;
-                        tiles[x, y].isFlipping = false;
-                        //tiles[x, y].isBackFlipping = false;
-                        tiles[x, y].isTotallyFlip = true;
-
-                        tiles[x, y].flipEndedInTime = (float)gameTime.TotalGameTime.TotalSeconds;
-
-                        //tiles[x, y].InterchangeTexture = tiles[x, y].Texture;
-                        //tiles[x, y].Texture = tiles[x, y].FlipTexture;
-                        //tiles[x, y].FlipTexture = tiles[x, y].InterchangeTexture;
-                    }
-
-                    // Swap texture at halfway point
-                    if (tiles[x, y].flipProgress >= 0.5f && !tiles[x, y].showingFront)
-                    {
-                        tiles[x, y].showingFront = true;
-                    }
-                    else if (tiles[x, y].flipProgress >= 0.5f && !tiles[x, y].showingFront)
-                    {
-                        // optional if you want double flip logic
-                    }
-                }
-            }
-
-
-
-        }
-
-        public void TurnOffTiles()
-        {
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    tiles[x, y].IsPressed = false;
-                }
-            }
-        }
-
-        //public void TurnOffFollowTiles()
-        //{
-        //    for (int y = 0; y < Height; ++y)
-        //    {
-        //        for (int x = 0; x < Width; ++x)
-        //        {
-        //            SequenceManager.followtiles[x, y].IsPressed = false;
-        //        }
-        //    }
-        //}
-
-        public void CheckSequence(GameTime gameTime)
-        {
-
-            bool isSequenceShowing = SequenceManager.IsShowingSequence;
-
-            if (isSequenceShowing)
-            {
-                if (SequenceManager.IsTimeToShowNextTile(gameTime))
-                {
-                    TurnOffTiles();
-
-                    (int, int) tile = SequenceManager.ProvideTileToShowInSequence(gameTime);
-                    tiles[tile.Item1, tile.Item2].IsPressed = true;
-
-                    tiles[tile.Item1, tile.Item2].isFlipping = true;
-                    //tiles[tile.Item1, tile.Item2].flipProgress = 0f;
-
-                    SequenceManager.followtiles[tile.Item1, tile.Item2].IsPressed = true;
-                }
-            }
-            else
-            {
-                TurnOffTiles();
-            }
-            
-
-        }
-
+       
         #endregion
 
         #region Draw
@@ -824,105 +303,29 @@ namespace BeatEngine
             {
                 case "Intro":
                     
-                    if(IsGetReadyMessageStillPlaying == false)
-                    {
-                        SequenceManager.InitiateSequence(new GameTime(), tiles);
-                        ToNextMode();
-                    }
+                   
                     break;
                 case "Show":
 
-                    if (SequenceManager.IsSequenceCompletelyShown == true  )
-                    {
-                        CurrentTileInHand = -1;
-                        ToNextMode();
-                    }
+                   
                     break;
 
                 case "Play":
                     
-                    if(CheckIsTimeToEnterCalculateMode(gameTime))
-                    {
-                        ToNextMode();
-                    }
-
+                   
 
                     break;
 
                 case "Calculate":
                     
-                    if (UserPlayedHandAndFinalScoreCalculated)
-                    {
-                        UserPlayedHandAndFinalScoreCalculated = false;
-                        ResetAllTileVariables();
-                        ToNextMode();
-                    }
+                   
 
                     break;
             }
 
         }
 
-        public void ResetAllTileVariables()
-        {
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    tiles[x, y].IsPressed = false;
-                    tiles[x, y].flipProgress = 0;
-                    tiles[x, y].isBackFlipping = false;
-                    tiles[x, y].IsHit = false;
-                    tiles[x, y].isTotallyFlip = false;
-                    tiles[x, y].isFlipping = false;
-                }
-            }
-
-            IsInitFlipBackFlip = false;
-            SequenceManager.IsBackFlipping = false;
-            PressedTiles = new List<(int X, int Y)>();
-            UserPlayedHand = false;
-            UserPlayedHandAndFinalScoreCalculated = false;
-            SequenceManager.IsSequenceCompletelyShown = false;
-            SequenceManager.IsShowingSequence = true;
-            IsInitScoreManager = false;
-            SequenceManager.InitialSequencetime = 1;
-            //ScoreManager.Score = 0;
-            //ScoreManager.TargetScore = 0;
-            //SequenceManager.EndShowSequencetime = 0;
-            InitWatchCat();
-            InitRepeatCat();
-
-        }
-
-        public bool CheckIsTimeToEnterCalculateMode(GameTime gameTime)
-        {
-            var isTime = (float)gameTime.TotalGameTime.TotalSeconds > UserEndedPlayingHandAtTime + 2;
-
-            return UserPlayedHand && isTime;
-
-        }
-
-        public void CheckFinalScore(GameTime gameTime)
-        {
-            if (UserPlayedHand)
-            {
-                var score = ScoreManager.GetScoredScore();
-                if (score == SequenceManager.CurrentNumberOfSteps)
-                {
-                    SequenceManager.AdvanceLevel(gameTime, tiles);
-                    UserPlayedHandAndFinalScoreCalculated = true;
-                    UserPlayedHand = false;
-                }
-                else
-                {
-                    SequenceManager.RepeatSequence(gameTime, tiles);
-                    UserPlayedHandAndFinalScoreCalculated = true;
-                    UserPlayedHand = false;
-                }
-            }
-
-        }
+       
 
         /// <summary>
         /// Draw everything in the level from background to foreground.
@@ -937,23 +340,13 @@ namespace BeatEngine
             {
                 case "Intro":
                     DrawTiles(gameTime, spriteBatch);
-                    //DrawMirrorTiles(gameTime, spriteBatch);
-                    //DrawFX(gameTime, spriteBatch);
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
-                    DrawGetReady(gameTime, spriteBatch);
                     break;
                 case "Show":
                     DrawTiles(gameTime, spriteBatch);
-                    DrawWatchCat(gameTime, spriteBatch);
-                    //DrawMirrorTiles(gameTime, spriteBatch);
-                    //DrawFX(gameTime, spriteBatch);
-                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
-                    DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
                 case "Play":
                     DrawTiles(gameTime, spriteBatch);
-                    DrawRepeatCat(gameTime, spriteBatch);
-                    //DrawMirrorTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
                     DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
@@ -965,151 +358,6 @@ namespace BeatEngine
                     DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
             }
-        }
-
-        //private void DrawGetReady(GameTime gameTime, SpriteBatch spriteBatch)
-        //{
-        //    Time -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-        //    Texture2D texture = GetReadyTile.Texture;
-
-        //    spriteBatch.Draw(texture, GetReadyTile.Position, Color.White);
-
-        //    if (Time < 0)
-        //    {
-        //        IsGetReadyMessageStillPlaying = false;
-        //    }
-        //}
-
-        public void DrawWatchCat(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            wcgetReadyTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            float t = MathHelper.Clamp(wcgetReadyTimer / DefaultAnimationDuration, 0f, 1f);
-            float x;
-
-            if (t < 0.4f)
-            {
-                // Phase 1: Enter & slow down (ease-out)
-                float p = t / 0.4f;
-                p = EaseOutPowerFive(p);
-                x = MathHelper.Lerp(wcoffscreenLeftX, wccenterX, p);
-            }
-            else if (t < 0.6f)
-            {
-                // Phase 2: Stay in center
-                x = wccenterX;
-            }
-            else
-            {
-                // Phase 3: Accelerate out (ease-in)
-                float p = (t - 0.6f) / 0.4f;
-                p = EaseIPowerNine(p);
-                x = MathHelper.Lerp(wccenterX, wcoffscreenLeftX, p);
-            }
-
-            WatchCat.Position = new Vector2(WatchCat.Position.X, x);
-
-            spriteBatch.Draw(WatchCat.Texture, WatchCat.Position, Color.White);
-        }
-
-        public void DrawRepeatCat(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            rcgetReadyTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            float t = MathHelper.Clamp(rcgetReadyTimer / DefaultAnimationDuration, 0f, 1f);
-            float x;
-
-            if (t < 0.4f)
-            {
-                // Phase 1: Enter & slow down (ease-out)
-                float p = t / 0.4f;
-                p = EaseOutPowerFive(p);
-                x = MathHelper.Lerp(rcoffscreenLeftX, rccenterX, p);
-            }
-            else if (t < 0.6f)
-            {
-                // Phase 2: Stay in center
-                x = rccenterX;
-            }
-            else
-            {
-                //// Phase 3: Accelerate out (ease-in)
-                //if(!UserPlayedHand)
-                //{
-                //    x = rccenterX; 
-                //}
-                //else
-                //{
-                //    float p = (t - 0.6f) / 0.4f;
-                //    p = EaseIPowerNine(p);
-                //    x = MathHelper.Lerp(rccenterX, rcoffscreenLeftX, p);
-                //}
-
-                float p = (t - 0.6f) / 0.4f;
-                p = EaseIPowerNine(p);
-                x = MathHelper.Lerp(rccenterX, rcoffscreenLeftX, p);
-
-            }
-
-            RepeatCat.Position = new Vector2(RepeatCat.Position.X, x);
-
-            spriteBatch.Draw(RepeatCat.Texture, RepeatCat.Position, Color.White);
-        }
-
-        private void DrawGetReady(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            getReadyTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            float t = MathHelper.Clamp(getReadyTimer / DefaultAnimationDuration, 0f, 1f);
-            float x;
-
-            if (t < 0.4f)
-            {
-                // Phase 1: Enter & slow down (ease-out)
-                float p = t / 0.4f;
-                p = EaseOutPowerFive(p);
-                x = MathHelper.Lerp(offscreenLeftX, centerX, p);
-            }
-            else if (t < 0.6f)
-            {
-                // Phase 2: Stay in center
-                x = centerX;
-            }
-            else
-            {
-                // Phase 3: Accelerate out (ease-in)
-                float p = (t - 0.6f) / 0.4f;
-                p = EaseIPowerNine(p);
-                x = MathHelper.Lerp(centerX, offscreenRightX, p);
-            }
-
-            GetReadyTile.Position = new Vector2(x, GetReadyTile.Position.Y);
-
-            spriteBatch.Draw(GetReadyTile.Texture, GetReadyTile.Position, Color.White);
-
-            if (t >= 1f)
-            {
-                StartPlayingSong(); 
-            }
-        }
-
-        private void StartPlayingSong()
-        {
-            IsGetReadyMessageStillPlaying = false;
-            getReadyTimer = 0f;
-            IsSongStarted = true;
-            MediaPlayer.Play(Song);
-        }
-
-        private float EaseOutPowerFive(float t)
-        {
-            return 1f - MathF.Pow(1f - t, 5f);
-        }
-
-        private float EaseIPowerNine(float t)
-        {
-            return MathF.Pow(t, 9f);
         }
 
 
@@ -1143,109 +391,13 @@ namespace BeatEngine
                     {
                         Color tint = Color.White;
 
-                        if (tiles[x, y].IsPressed || tiles[x, y].isFlipping || tiles[x, y].isTotallyFlip || tiles[x, y].isBackFlipping)
-                        {                           
-                            if(tiles[x, y].IsPressed || tiles[x, y].isFlipping || tiles[x, y].isTotallyFlip && tiles[x, y].isBackFlipping == false)
-                            {
-                                tint = Color.HotPink; //check also darkseagreen
-                                DrawTileFlip(spriteBatch, texture, tiles[x, y], tint);
-                            }
-                            else
-                            {
-                                DrawTileBackFlip(spriteBatch, texture, tiles[x, y], tint);
-                            }
-                                
-                        }
-
-                        else
+                        if(tiles[x, y].IsPressed)
                         {
-                            spriteBatch.Draw(texture, tiles[x, y].Position, tint);
-                        }
-                    }
-                }
-            }
-        }
-
-        public void DrawTileFlip(SpriteBatch spriteBatch, Texture2D texture, Tile tile, Color tint)
-        {
-            float scaleX;
-
-            // Shrink then expand
-            if (tile.flipProgress < 0.5f)
-                scaleX = MathHelper.Lerp(1f, 0f, tile.flipProgress * 2f);
-            else
-                scaleX = MathHelper.Lerp(0f, 1f, (tile.flipProgress - 0.5f) * 2f);
-
-            Texture2D currentTexture = tile.showingFront ? texture : tile.FlipTexture;
-
-            Vector2 origin = new Vector2(
-                currentTexture.Width / 2f,
-                currentTexture.Height / 2f
-            );
-
-            spriteBatch.Draw(
-                currentTexture,
-                tile.Position + origin,
-                null,
-                tint,
-                0f,                         // no Z rotation
-                origin,
-                new Vector2(scaleX, 1f),    // fake Y-axis flip
-                SpriteEffects.None,
-                0f
-            );
-        }
-
-        public void DrawTileBackFlip(SpriteBatch spriteBatch, Texture2D texture, Tile tile, Color tint)
-        {
-            float scaleX;
-
-            // Shrink then expand
-            if (tile.flipProgress < 0.5f)
-                scaleX = MathHelper.Lerp(1f, 0f, tile.flipProgress * 2f);
-            else
-                scaleX = MathHelper.Lerp(0f, 1f, (tile.flipProgress - 0.5f) * 2f);
-
-            Texture2D currentTexture = !tile.showingFront ? tile.FlipTexture : tile.Texture;
-
-            Vector2 origin = new Vector2(
-                currentTexture.Width / 2f,
-                currentTexture.Height / 2f
-            );
-
-            spriteBatch.Draw(
-                currentTexture,
-                tile.Position + origin,
-                null,
-                tint,
-                0f,                         // no Z rotation
-                origin,
-                new Vector2(scaleX, 1f),    // fake Y-axis flip
-                SpriteEffects.None,
-                0f
-            );
-        }
-
-        private void DrawMirrorTiles(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    // If there is a visible tile in that position
-                    Texture2D texture = mirrorTiles[x, y].Texture;
-
-                    if (texture != null)
-                    {
-                        // Draw it in screen space.
-                        Color tint = Color.White * 0.8f;
-
-                        if (mirrorTiles[x, y].IsPressed)
-                        {
-                            tint = Color.DarkSeaGreen;//Color.MonoGameOrange, Color.DarkOrange also good candidates
+                            //tint = Color.MonoGameOrange;
                         }
 
-                        spriteBatch.Draw(texture, mirrorTiles[x, y].Position, tint);
+                        spriteBatch.Draw(texture, tiles[x, y].Position, tint);
+
                     }
                 }
             }
@@ -1310,104 +462,6 @@ namespace BeatEngine
             }
         }
 
-        private void PositionMirrorTiles()
-        {
-            int initialPosY = 1034;
-            int initialPosX = 920;
-
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    //If there is a visible tile in that position
-                    Texture2D texture = tiles[x, y].Texture;
-                    if (texture != null)
-                    {
-                        //Draw it in screen space.
-                        Vector2 position = new Vector2(initialPosX, initialPosY);
-                        mirrorTiles[x, y].Position = position;
-
-                    }
-                    initialPosX -= 300;
-
-                }
-                initialPosX = 920;
-                initialPosY -= 300;
-            }
-        }
-
-        private void ReadHitsFromFile()
-        {
-            string filePath = GetSavePath();
-            BuildHitListFromSaveFile(filePath);
-        }
-
-        //private void TurnOnTiles()
-        //{
-        //    foreach (Hit hit in Hits)
-        //    {
-        //        //tiles[hit.X, hit.Y].IsPressed = true;
-        //        mirrorTiles[hit.X, hit.Y].IsPressed = true;
-        //    }
-
-        //    for (int y = 0; y < Height; ++y)
-        //    {
-        //        for (int x = 0; x < Width; ++x)
-        //        {
-        //            tiles[x, y].IsPressed = false;
-
-        //            double songTime = MediaPlayer.PlayPosition.TotalSeconds;
-
-        //            List<Hit> futureHits = Hits
-        //                .Where(h => h.Time > songTime)
-        //                .ToList();
-
-        //            List<Hit> currentHits = futureHits.Where(h => h.X == x && h.Y == y).ToList();
-
-        //            foreach (Hit hit in currentHits)
-        //            {
-        //                tiles[x, y].IsPressed = true;
-        //            }
-        //        }
-        //    }
-        //}
-        private const double HIT_WINDOW = 0.05; // seconds
-
-        private void TurnOnTiles()
-        {
-            double songTime = MediaPlayer.PlayPosition.TotalSeconds;
-
-            // Clear all tiles
-            for (int y = 0; y < Height; y++)
-                for (int x = 0; x < Width; x++)
-                    mirrorTiles[x, y].IsPressed = false;
-
-            foreach (Hit hit in Hits)
-            {
-                double delta = Math.Abs(hit.Time - songTime);
-
-                if (delta <= HIT_WINDOW)
-                {
-                    //tiles[hit.X, hit.Y].IsPressed = true;
-                    mirrorTiles[hit.X, hit.Y].IsPressed = true;
-                }
-            }
-        }
-        private void BuildHitListFromSaveFile(string filePath)
-        {
-            var lines = System.IO.File.ReadLines(filePath);
-            foreach (var line in lines)
-            {
-                var parts = line.Split(',');
-                if (parts.Length == 3)
-                {
-                    int x = int.Parse(parts[0]);
-                    int y = int.Parse(parts[1]);
-                    double time = double.Parse(parts[2]);
-                    Hits.Add(new Hit(x, y, time));
-                }
-            }
-        }
         private void CheckFinishedSFX(GameTime gameTime)
         {
             for (int y = 0; y < Height; ++y)
@@ -1428,109 +482,7 @@ namespace BeatEngine
                 }
             }   
         }
-
-        private void InitScoreManager()
-        {
-            if (IsInitScoreManager == false)
-            {
-                int currentHitTarget = SequenceManager.CurrentNumberOfSteps;
-                SequenceManager.IsSequenceCompletelyShown = false;
-                
-                ScoreManager = new ScoreManager(currentHitTarget);
-                IsInitScoreManager = true;
-                UserPlayedHandAndFinalScoreCalculated = false;
-
-            }
-        }
-
-        private void InitFlipBackFlipSequence()
-        {
-            if(IsInitFlipBackFlip == false)
-            {
-                for (int y = 0; y < Height; ++y)
-                {
-                    for (int x = 0; x < Width; ++x)
-                    {
-                        tiles[x, y].showingFront = true;
-                        tiles[x, y].flipProgress = 0f;   // 0 → 1
-                        tiles[x, y].flipDuration = 0.5f; // seconds
-                        tiles[x, y].isFlipping = false;
-                        tiles[x, y].isBackFlipping = false;
-                        tiles[x, y].isTotallyFlip = false;
-                    }
-                }
-                IsInitFlipBackFlip = true;
-
-            } 
-            
-        }
-
-        private void CheckIfBackFlipShouldStartInPlayMode(GameTime gameTime)
-        {
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    if (UserPlayedHand &&  tiles[x, y].isBackFlipping == false && tiles[x, y].isTotallyFlip)
-                    {
-                        tiles[x, y].isBackFlipping = true;
-                        tiles[x, y].flipProgress = 0f;
-                        tiles[x, y].isFlipping = false;
-                    }
-                }
-            }
-        }
-
-        private void CheckIfBackFlipShouldStart(GameTime gameTime)
-        {
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    if (SequenceManager.IsBackFlipping && tiles[x, y].isBackFlipping == false && tiles[x, y].isTotallyFlip)
-                    {
-                        tiles[x, y].isBackFlipping = true;
-                        tiles[x, y].flipProgress = 0f;
-                        tiles[x, y].isFlipping = false;
-
-                        //double currentTime = gameTime.TotalGameTime.TotalSeconds;
-
-                        //double elapsedTime = tiles[x, y].flipEndedInTime + tiles[x, y].flipDuration;
-
-                        //if (currentTime >= elapsedTime && tiles[x, y].isBackFlipping == false)
-                        //{
-                        //    tiles[x, y].isBackFlipping = true;
-                        //    tiles[x, y].flipProgress = 0f;
-                        //    tiles[x, y].isFlipping = false;
-                        //}
-                    }
-                }
-            }
-        }
-
-        public bool CheckTileInHand(int x, int y, GameTime gameTime)
-        {
-            if (CurrentTileInHand > SequenceManager.Steps.Count() - 1)
-            {
-                return false;
-            }
-
-            if (CurrentTileInHand == SequenceManager.Steps.Count() -1)
-            {
-                UserPlayedHand = true;
-                UserEndedPlayingHandAtTime = gameTime.TotalGameTime.TotalSeconds;
-            }
-            
-            (int a, int b) currentStep = SequenceManager.Steps[CurrentTileInHand];
-
-            if(currentStep.a == x && currentStep.b == y)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
+        public Vector2 dragOffset;
         private void CheckIfTileIsPressed(TouchCollection touchLocations, GameTime gameTime)
         {
             for (int y = 0; y < Height; ++y)
@@ -1545,30 +497,18 @@ namespace BeatEngine
                         Vector2 pos = touch.Position;
                         Vector2.Transform(ref pos, ref globalTransformation, out pos);
 
-                        if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
+                        if (touch.State == TouchLocationState.Pressed)
                         {
                             if (tiles[x, y].BoundingRectangle.Contains(pos))
                             {
-                                bool addedPress = false;
-                                if (!PressedTiles.Contains((x, y)))
-                                {
-                                    PressedTiles.Add((x, y));
-                                    addedPress = true;
-                                    CurrentTileInHand++;
-
-                                    tiles[x, y].isFlipping = true;
-                                    tiles[x, y].flipProgress = 0f;
-                                    //StartFlip(tiles[x, y]);
-                                    //int a = 0;
-                                }
-
                                 tiles[x, y].IsPressed = true;
-                                tiles[x, y].IsHit = CheckTileInHand(x, y, gameTime);
 
-                                if(tiles[x, y].IsHit && addedPress)
-                                {
-                                    ScoreManager.UpdateScore();
-                                }
+                                draggedTile = tiles[x, y];
+
+                                //tiles[x, y].dragOffset = tiles[x, y].Position - touch.Position;
+
+                                dragOffset = draggedTile.Position - touch.Position;
+
 
                                 if (!tiles[x, y].IsPlayingSound)
                                 {
@@ -1582,57 +522,51 @@ namespace BeatEngine
 
                         }
 
+                        if(touch.State == TouchLocationState.Moved && draggedTile != null)
+                        {
+                            draggedTile.Position = touch.Position + dragOffset;
+
+                            //TouchLocation prevLoc;
+
+                            //if (!touch.TryGetPreviousLocation(out prevLoc)) continue;
+
+                            //float deltaX = touch.Position.X - prevLoc.Position.X;
+                            //float deltaY = touch.Position.Y - prevLoc.Position.Y;
+
+                            //draggedTile.IsPressed = true;
+                            //draggedTile.Position = new Vector2(draggedTile.Position.X + deltaX, draggedTile.Position.Y + deltaY);
+
+
+
+                            //if (tiles[x, y].BoundingRectangle.Contains(pos))
+                            //{
+                            //    tiles[x, y].Position = touch.Position + tiles[x, y].dragOffset;
+
+                            //    //TouchLocation prevLoc;
+
+                            //    //if (!touch.TryGetPreviousLocation(out prevLoc)) continue;
+
+                            //    //float deltaX = touch.Position.X - prevLoc.Position.X;
+                            //    //float deltaY = touch.Position.Y - prevLoc.Position.Y;
+
+                            //    //tiles[x, y].IsPressed = true;
+                            //    //tiles[x, y].Position = new Vector2(tiles[x, y].Position.X + deltaX, tiles[x, y].Position.Y + deltaY);
+
+                            //}
+                        }
+
+                        if (touch.State == TouchLocationState.Released && draggedTile != null)
+                        {
+                            draggedTile.IsPressed = false;
+                            draggedTile = null;
+
+                        }
+
                     }
 
                 }
             }
         }
-
-        public void AddHit(int x, int y, double time)
-        {
-            Hits.Add(new Hit(x, y, time));
-        }
-
-        public void SaveGame(List<Hit> hits)
-        {
-            string filePath = GetSavePath();
-            string data = "";
-
-            foreach (Hit hit in hits)
-            {
-                data += $"{hit.X},{hit.Y},{hit.Time} \n";
-            }
-            //var lines = System.IO.File.ReadLines(filePath); // Or use BinaryWriter for better efficiency
-            //System.IO.File.WriteAllText(filePath, data); // Or use BinaryWriter for better efficiency
-
-            using (var writer = new StreamWriter(filePath, false))
-            {
-                foreach (var hit in hits)
-                {
-                    writer.Write(hit.X);
-                    writer.Write(',');
-                    writer.Write(hit.Y);
-                    writer.Write(',');
-                    writer.WriteLine(hit.Time.ToString(CultureInfo.InvariantCulture));
-                }
-            } // ← file is CLOSED here
-        }
-
-        public string GetSavePath()
-        {
-            // Gets /storage/emulated/0/Android/data/[your.package.name]/files/
-            var basePath = Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData
-                );
-
-            Directory.CreateDirectory(basePath);
-
-            var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            return Path.Combine(path, "savegame.sav");
-
-        }
-
-
 
         #endregion
     }

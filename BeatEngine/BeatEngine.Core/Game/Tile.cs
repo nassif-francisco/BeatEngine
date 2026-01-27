@@ -38,7 +38,7 @@ namespace BeatEngine
         /// </summary>
         Platform = 2,
     }
-    struct Tile
+    class Tile
     {
         public Texture2D Texture;
         public Texture2D FlipTexture;
@@ -47,7 +47,7 @@ namespace BeatEngine
         public TileCollision Collision; //will be used to define animation when pressed
 
         private Vector2 _position;
-
+        public Vector2 dragOffset;
         public Vector2 Position
         {
             get => _position;
