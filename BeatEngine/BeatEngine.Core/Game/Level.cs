@@ -372,6 +372,7 @@ namespace BeatEngine
             {
                 case "Play":
                     CheckModeTransition(gameTime);
+                    CheckFinishedSFX(gameTime);
                     CheckIfTileIsPressed(touchCollection, gameTime);
                     break;
                 case "Calculate":
@@ -618,6 +619,11 @@ namespace BeatEngine
             {
                 for (int x = 0; x < Width; ++x)
                 {
+                    if (tiles[x, y] == null)
+                    {
+                        continue;
+                    }
+
                     if (tiles[x, y].IsPlayingSound)
                     {
                         double currentTime = gameTime.TotalGameTime.TotalSeconds;
@@ -737,15 +743,6 @@ namespace BeatEngine
 
                                 dragOffset = draggedTile.Position - touch.Position;
 
-
-                                if (!tiles[x, y].IsPlayingSound)
-                                {
-                                    tiles[x, y].IsPlayingSound = true;
-                                    tiles[x, y].SoundDuration = clickSound.Duration.TotalSeconds * 0.5; // this is to allow overlapping sounds, because sound have a long end
-                                    tiles[x, y].InitialTime = (float)gameTime.TotalGameTime.TotalSeconds;
-                                    clickSound.Play();
-                                    
-                                }
                             }
 
                         }
@@ -795,6 +792,15 @@ namespace BeatEngine
                             if(panel != -100)
                             {
                                 AssignSlotToTile(draggedTile, Panels[panel], panel);
+                                
+                                if (!tiles[x, y].IsPlayingSound)
+                                {
+                                    tiles[x, y].IsPlayingSound = true;
+                                    tiles[x, y].SoundDuration = clickSound.Duration.TotalSeconds * 0.5; // this is to allow overlapping sounds, because sound have a long end
+                                    tiles[x, y].InitialTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                                    clickSound.Play();
+
+                                }
                             }
                             else
                             {
