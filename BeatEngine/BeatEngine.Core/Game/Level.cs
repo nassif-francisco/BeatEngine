@@ -19,6 +19,7 @@ using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Framework.Devices.Sensors;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -570,13 +571,47 @@ namespace BeatEngine
             return droppedInPanel;
         }
 
-        public void AssignSlotToTile(Tile draggedTile, Panel panel)
+        public void AssignSlotToTile(Tile draggedTile, Panel panel, int panelNbr)
         {
-            Vector2 newPosition = new Vector2(panel.Position.X + panel.CurrentSlot * panel.SlotDimension, panel.Position.Y + panel.YOffset);
+            Vector2 newPosition;
 
-            draggedTile.Position = newPosition;
+            if(panel.DeallocatedTiles.Count == 0) //no tiles taken off the panel
+            {
+                newPosition = new Vector2(panel.Position.X + panel.SlotsOccupied * panel.SlotDimension, panel.Position.Y + panel.YOffset);
 
-            panel.CurrentSlot += 1;
+                draggedTile.Position = newPosition;
+                draggedTile.CurrentPanel = panelNbr;
+                draggedTile.CurrentPanelPosition = panel.CurrentSlot;
+
+                panel.CurrentSlot += 1;
+                panel.SlotsOccupied += 1;
+                panel.DeallocatedTiles.Clear();
+            }
+            else
+            {
+                int minIndex = panel.DeallocatedTiles.IndexOf(panel.DeallocatedTiles.Min());
+
+                newPosition = new Vector2(panel.Position.X + panel.DeallocatedTiles[minIndex] * panel.SlotDimension, panel.Position.Y + panel.YOffset);
+
+                draggedTile.Position = newPosition;
+                draggedTile.CurrentPanel = panelNbr;
+                draggedTile.CurrentPanelPosition = panel.DeallocatedTiles[minIndex];
+                panel.DeallocatedTiles.RemoveAt(minIndex);
+
+                //panel.CurrentSlot = panel.SlotsOccupied;
+            }
+
+        }
+
+        public void DeallocateTile(Tile draggedTile, Panel panel)
+        {
+            if(draggedTile.CurrentPanel != -100)
+            {
+                panel.DeallocatedTiles.Add(draggedTile.CurrentPanelPosition);
+                //panel.CurrentSlot = draggedTile.CurrentPanelPosition;
+                draggedTile.CurrentPanel = -100;
+                draggedTile.CurrentPanelPosition = -100;
+            }
         }
 
 
@@ -659,7 +694,15 @@ namespace BeatEngine
 
                             if(panel != -100)
                             {
-                                AssignSlotToTile(draggedTile, Panels[panel]);
+                                AssignSlotToTile(draggedTile, Panels[panel], panel);
+                            }
+                            else
+                            {
+                                if(draggedTile.CurrentPanel != -100)
+                                {
+                                    DeallocateTile(draggedTile, Panels[draggedTile.CurrentPanel]);
+                                }
+
                             }
 
                             draggedTile.IsPressed = false;

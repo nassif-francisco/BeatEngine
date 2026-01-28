@@ -48,6 +48,9 @@ namespace BeatEngine
 
         private Vector2 _position;
         public Vector2 dragOffset;
+
+        public int CurrentPanel { get; set; }
+        public int CurrentPanelPosition { get; set; }
         public Vector2 Position
         {
             get => _position;
@@ -90,6 +93,8 @@ namespace BeatEngine
             Collision = collision;
             Size = new Vector2(Width, Height);
             Hit = new HitAnimation(new Vector2(0,0), contentManager);
+            CurrentPanel = 0;
+            CurrentPanelPosition = 0;
         }
 
         public void SetFlipTexture(Texture2D texture)

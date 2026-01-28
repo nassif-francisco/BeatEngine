@@ -16,6 +16,9 @@ namespace BeatEngine.Core.Game
         public Texture2D Texture { get; set; }
 
         public int CurrentSlot { get; set; }
+        public int SlotsOccupied { get; set; }
+
+        public List<int> DeallocatedTiles { get; set; }
 
         public int SlotDimension = 225;
 
@@ -33,6 +36,8 @@ namespace BeatEngine.Core.Game
         {
             Texture = texture2D;
             CurrentSlot = 0;
+            SlotsOccupied = 0;
+            DeallocatedTiles = new List<int> { };
         }
     }
 }
