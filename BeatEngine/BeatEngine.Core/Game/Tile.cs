@@ -18,7 +18,7 @@ namespace BeatEngine
     /// <summary>
     /// Controls the collision detection and response behavior of a tile.
     /// </summary>
-    enum TileCollision
+    public enum TileCollision
     {
         /// <summary>
         /// A passable tile is one which does not hinder player motion at all.
@@ -38,7 +38,7 @@ namespace BeatEngine
         /// </summary>
         Platform = 2,
     }
-    class Tile
+    public class Tile
     {
         public Texture2D Texture;
         public Texture2D FlipTexture;

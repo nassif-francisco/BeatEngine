@@ -47,7 +47,8 @@ namespace BeatEngine
 
         private Tile[,] mirrorTiles;
 
-        private List<Tile> Panels = new List<Tile> ();
+        //private List<Tile> Panels = new List<Tile> ();
+        private List<Panel> Panels = new List<Panel> ();
 
         private Dictionary<double, Step[,]> Steps;
 
@@ -163,8 +164,10 @@ namespace BeatEngine
         {
             for(int k = 0; k< DefaultPanelNumber; k++)
             {
-                var panel = new Tile(Content.Load<Texture2D>("UI/Environment/Panel"), TileCollision.Platform, Content);
-                Panels.Add(panel);  
+                var newPanel = new Panel(Content.Load<Texture2D>("UI/Environment/Panel"));
+                
+                //var panel = new Tile(Content.Load<Texture2D>("UI/Environment/Panel"), TileCollision.Platform, Content);
+                Panels.Add(newPanel);  
             }
         }
 
@@ -514,7 +517,7 @@ namespace BeatEngine
                     Panels[y].Position = position;
 
                 }
-                initialPosY -= 300;
+                initialPosY -= 280;
             }
         }
 
@@ -538,6 +541,45 @@ namespace BeatEngine
                 }
             }   
         }
+
+        public int CheckIfTileIsDroppedInPanel(Tile draggedTile)
+        {
+            int k = 0;
+            int droppedInPanel = -100;
+            int dropeedInPanelDepth = -100;
+
+            foreach(Panel panel in Panels)
+            {
+                var depth = panel.BoundingRectangle.GetIntersectionDepth(draggedTile.BoundingRectangle);
+
+                if(depth.Y != 0)
+                {
+                    int currentDepth = (int)Math.Abs(depth.Y);
+
+                    if (k > droppedInPanel &&  currentDepth > dropeedInPanelDepth)
+                    {
+                        droppedInPanel = k;
+                        dropeedInPanelDepth = currentDepth;
+                    }
+
+                }
+
+                k++;
+            }
+
+            return droppedInPanel;
+        }
+
+        public void AssignSlotToTile(Tile draggedTile, Panel panel)
+        {
+            Vector2 newPosition = new Vector2(panel.Position.X + panel.CurrentSlot * panel.SlotDimension, panel.Position.Y + panel.YOffset);
+
+            draggedTile.Position = newPosition;
+
+            panel.CurrentSlot += 1;
+        }
+
+
         public Vector2 dragOffset;
         private void CheckIfTileIsPressed(TouchCollection touchLocations, GameTime gameTime)
         {
@@ -613,6 +655,13 @@ namespace BeatEngine
 
                         if (touch.State == TouchLocationState.Released && draggedTile != null)
                         {
+                            int panel = CheckIfTileIsDroppedInPanel(draggedTile);
+
+                            if(panel != -100)
+                            {
+                                AssignSlotToTile(draggedTile, Panels[panel]);
+                            }
+
                             draggedTile.IsPressed = false;
                             draggedTile = null;
 
