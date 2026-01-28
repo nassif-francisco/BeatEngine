@@ -239,24 +239,24 @@ namespace BeatEngine
 
         private void LoadTiles()
         {
-            int numberOfRows;
+            int numberOfRows = 4;
 
-            if(Syllables.Count > 0 && Syllables.Count <= 4)
-            {
-                numberOfRows = 1;
-            }
-            else if(Syllables.Count > 4 && Syllables.Count <= 8)
-            {
-                numberOfRows = 2;
-            }
-            else if (Syllables.Count > 8 && Syllables.Count <= 12)
-            {
-                numberOfRows = 4;
-            }
-            else
-            {
-                numberOfRows = 4;
-            }
+            //if(Syllables.Count > 0 && Syllables.Count <= 4)
+            //{
+            //    numberOfRows = 1;
+            //}
+            //else if(Syllables.Count > 4 && Syllables.Count <= 8)
+            //{
+            //    numberOfRows = 2;
+            //}
+            //else if (Syllables.Count > 8 && Syllables.Count <= 12)
+            //{
+            //    numberOfRows = 4;
+            //}
+            //else
+            //{
+            //    numberOfRows = 4;
+            //}
 
             tiles = new Tile[numberOfRows, numberOfRows];
 
@@ -445,14 +445,14 @@ namespace BeatEngine
                     DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
-                    DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
+                    //DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
+                    DrawClue(hudFont, "PISTA: SUPERMERCADO ", new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
                 case "Calculate":
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
-                    DrawTimeElapsed(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
+                    DrawClue(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
             }
         }
@@ -464,10 +464,8 @@ namespace BeatEngine
             //sriteBatch.DrawString(font, value, position, color);
         }
 
-        private void DrawTimeElapsed(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
+        private void DrawClue(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
         {
-            double songTime = MediaPlayer.PlayPosition.TotalSeconds;
-            value += songTime.ToString("F2");
             spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 4, SpriteEffects.None, 1);
             //sriteBatch.DrawString(font, value, position, color);
         }
@@ -500,16 +498,20 @@ namespace BeatEngine
 
                         string text = tiles[x, y].Syllable.SyllableTag;
 
-                        if(text.Count() % 2 == 0)
+                        if(text.Count() == 2)
                         {
                             silabaPosition = new Vector2(tiles[x, y].Position.X + 90, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
                         }
-                        else
+                        else if(text.Count() == 3)
                         {
                             silabaPosition = new Vector2(tiles[x, y].Position.X + 60, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
                         }
+                        else
+                        {
+                            silabaPosition = new Vector2(tiles[x, y].Position.X + 37, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
+                        }
 
-                         DrawShadowedString(hudFont, text, silabaPosition, Color.Black, spriteBatch);
+                            DrawShadowedString(hudFont, text, silabaPosition, Color.Black, spriteBatch);
 
                     }
                 }
