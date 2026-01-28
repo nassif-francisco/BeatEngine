@@ -113,6 +113,8 @@ namespace BeatEngine
 
         private SoundEffect clickSound;
 
+        public List<Syllable> Syllables;
+
         #region Loading
 
         public Level(IServiceProvider serviceProvider, Stream fileStream, int levelIndex, Matrix globalTransformation, GameState gameState)
@@ -120,7 +122,9 @@ namespace BeatEngine
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");
 
-            LoadTiles(fileStream);
+            LoadSyllables(fileStream);
+            ShuffleSyllables();
+            LoadTiles();
             LoadPanels();
             PositionTiles();
             PositionPanels();
@@ -172,58 +176,129 @@ namespace BeatEngine
             }
         }
 
-        private void LoadTiles(Stream fileStream)
+        private void LoadSyllables(Stream fileStream)
         {
-            // Load the level and ensure all of the lines are the same length.
-            int width;
-            List<string> lines = new List<string>();
-            using (StreamReader reader = new StreamReader(fileStream))
+            Syllables = new List<Syllable>();
+
+            using (var reader = new StreamReader(fileStream))
             {
-                string line = reader.ReadLine();
-                width = line.Length;
-                while (line != null)
+                string line;
+
+                while ((line = reader.ReadLine()) != null)
                 {
-                    lines.Add(line);
-                    if (line.Length != width)
-                        throw new Exception(String.Format("The length of line {0} is different from all preceeding lines.", lines.Count));
-                    line = reader.ReadLine();
+                    line = line.Trim();
+
+                    // Skip empty lines
+                    if (string.IsNullOrEmpty(line))
+                        continue;
+
+                    // Expected format: TAG(panelNbr,panelPosition)
+                    int openParen = line.IndexOf('(');
+                    int closeParen = line.IndexOf(')');
+
+                    if (openParen < 0 || closeParen < 0)
+                        continue; // malformed line, skip
+
+                    string tag = line.Substring(0, openParen);
+                    string numbers = line.Substring(openParen + 1, closeParen - openParen - 1);
+
+                    var parts = numbers.Split(',');
+
+                    if (parts.Length != 2)
+                        continue;
+
+                    if (!int.TryParse(parts[0], out int panelNbr))
+                        continue;
+
+                    if (!int.TryParse(parts[1], out int panelPosition))
+                        continue;
+
+                    Syllables.Add(new Syllable
+                    {
+                        SyllableTag = tag,
+                        PanelNbr = panelNbr,
+                        PanelPosition = panelPosition
+                    });
                 }
             }
+        }
+        private static readonly Random _rng = new Random();
 
-            tiles = new Tile[width, lines.Count];
-
-            for (int y = 0; y < Height; ++y)
+        private void ShuffleSyllables()
+        {
+            for (int i = Syllables.Count - 1; i > 0; i--)
             {
-                for (int x = 0; x < Width; ++x)
-                {
-                    // to load each tile.
-                    char tileType = lines[y][x];
-                    tiles[x, y] = LoadTile(tileType, x, y);
-                }
+                int j = _rng.Next(i + 1);
+
+                // swap
+                var temp = Syllables[i];
+                Syllables[i] = Syllables[j];
+                Syllables[j] = temp;
+            }
+        }
+
+        private void LoadTiles()
+        {
+            int numberOfRows;
+
+            if(Syllables.Count > 0 && Syllables.Count <= 4)
+            {
+                numberOfRows = 1;
+            }
+            else if(Syllables.Count > 4 && Syllables.Count <= 8)
+            {
+                numberOfRows = 2;
+            }
+            else if (Syllables.Count > 8 && Syllables.Count <= 12)
+            {
+                numberOfRows = 4;
+            }
+            else
+            {
+                numberOfRows = 4;
             }
 
+            tiles = new Tile[numberOfRows, numberOfRows];
+
+            int k = 0;
+            bool allSyllablesRead= false;
+
+            for (int y = 0; y < 4; ++y)
+            {
+                if(allSyllablesRead)
+                {
+                    break;
+                }
+                
+                for (int x = 0; x < 4; ++x)
+                {
+                    if(k == Syllables.Count)
+                    {
+                        allSyllablesRead = true;
+                        break;
+                    }
+                    else
+                    {
+                        tiles[x, y] = LoadTile(Syllables[k]);
+                        k++;
+                    }
+                        
+                }
+            }
+            
         }
 
       
-        private Tile LoadTile(char tileType, int x, int y)
+        private Tile LoadTile(Syllable syllable)
         {
-            switch (tileType)
-            {
-                case 'B':
-                    return LoadTile("blue", TileCollision.Platform);
-
-                case 'M':
-                    return LoadTile("magenta", TileCollision.Platform);
-
-                // Unknown tile type character
-                default:
-                    throw new NotSupportedException(String.Format("Unsupported tile type character '{0}' at position {1}, {2}.", tileType, x, y));
-            }
+            return LoadTile("magenta", TileCollision.Platform, syllable);
         }
 
-        private Tile LoadTile(string name, TileCollision collision)
+        private Tile LoadTile(string name, TileCollision collision, Syllable syllable)
         {
             Tile tile = new Tile(Content.Load<Texture2D>("Tiles/" + name), collision, Content);
+            tile.Syllable = syllable;   
+
             tile.SetFlipTexture(Content.Load<Texture2D>("Tiles/front"));
 
             return tile;
@@ -402,6 +477,11 @@ namespace BeatEngine
             {
                 for (int x = 0; x < Width; ++x)
                 {
+                    if (tiles[x, y] == null)
+                    {
+                        continue;
+                    }
+
                     // If there is a visible tile in that position
                     Texture2D texture = tiles[x, y].Texture;
 
@@ -416,16 +496,16 @@ namespace BeatEngine
 
                         spriteBatch.Draw(texture, tiles[x, y].Position, tint);
                         var silabaPosition = new Vector2(tiles[x, y].Position.X + 90, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
-                        string text = string.Empty;
-                        if(x%2 == 1)
+
+                        string text = tiles[x, y].Syllable.SyllableTag;
+
+                        if(text.Count() % 2 == 0)
                         {
-                            text = "TXV";
-                            silabaPosition = new Vector2(tiles[x, y].Position.X + 60, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
+                            silabaPosition = new Vector2(tiles[x, y].Position.X + 90, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
                         }
                         else
                         {
-                            text = "RE";
-                            silabaPosition = new Vector2(tiles[x, y].Position.X + 90, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
+                            silabaPosition = new Vector2(tiles[x, y].Position.X + 60, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
                         }
 
                          DrawShadowedString(hudFont, text, silabaPosition, Color.Black, spriteBatch);
@@ -450,6 +530,11 @@ namespace BeatEngine
             {
                 for (int x = 0; x < Width; ++x)
                 {
+                    if (tiles[x, y] == null)
+                    {
+                        continue;
+                    }
+
                     // If there is a visible tile in that position
                     Texture2D texture = tiles[x, y].Texture;
                     if (texture != null)
@@ -479,7 +564,7 @@ namespace BeatEngine
 
         private void PositionTiles()
         {
-            int initialPosY = 1534;
+            int initialPosY = 1934;
             int initialPosX = 920;
 
             for (int y = 0; y < Height; ++y)
@@ -487,6 +572,11 @@ namespace BeatEngine
                 for (int x = 0; x < Width; ++x)
                 {
                     //If there is a visible tile in that position
+                    if(tiles[x, y] == null)
+                    {
+                        continue;
+                    }
+
                     Texture2D texture = tiles[x, y].Texture;
                     if (texture != null)
                     {
@@ -622,6 +712,11 @@ namespace BeatEngine
             {
                 for (int x = 0; x < Width; ++x)
                 {
+                    if (tiles[x, y] == null)
+                    {
+                        continue;
+                    }
+
                     tiles[x, y].IsPressed = false;
                     tiles[x, y].IsHit = false;
 

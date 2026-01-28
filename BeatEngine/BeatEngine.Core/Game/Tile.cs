@@ -85,6 +85,8 @@ namespace BeatEngine
 
         public string Tag { get; set; }
 
+        public Syllable Syllable { get; set; }
+
         public Vector2 Size = new Vector2();
 
         public Tile(Texture2D texture, TileCollision collision, ContentManager contentManager)
