@@ -93,8 +93,8 @@ namespace BeatEngine
             Collision = collision;
             Size = new Vector2(Width, Height);
             Hit = new HitAnimation(new Vector2(0,0), contentManager);
-            CurrentPanel = 0;
-            CurrentPanelPosition = 0;
+            CurrentPanel = -100;
+            CurrentPanelPosition = -100;
         }
 
         public void SetFlipTexture(Texture2D texture)

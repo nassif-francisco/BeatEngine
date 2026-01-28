@@ -659,6 +659,11 @@ namespace BeatEngine
                         {
                             draggedTile.Position = touch.Position + dragOffset;
 
+                            if (draggedTile.CurrentPanel != -100)
+                            {
+                                DeallocateTile(draggedTile, Panels[draggedTile.CurrentPanel]);
+                            }
+
                             //TouchLocation prevLoc;
 
                             //if (!touch.TryGetPreviousLocation(out prevLoc)) continue;
