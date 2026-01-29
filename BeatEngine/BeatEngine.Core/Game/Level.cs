@@ -672,6 +672,10 @@ namespace BeatEngine
                         {
                             silabaPosition = new Vector2(tiles[x, y].Position.X + 90, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
                         }
+                        else if (text.Count() == 1)
+                        {
+                            silabaPosition = new Vector2(tiles[x, y].Position.X + 120, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
+                        }
                         else if(text.Count() == 3)
                         {
                             silabaPosition = new Vector2(tiles[x, y].Position.X + 60, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
