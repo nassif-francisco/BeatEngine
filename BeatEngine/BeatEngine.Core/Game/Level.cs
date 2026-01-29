@@ -416,9 +416,25 @@ namespace BeatEngine
             if(score == Panels.Count)
             {
                 MissionAccomplised = true;
+                InitiateCelebrationAnimation();
             }
             
         }
+
+        public void InitiateCelebrationAnimation()
+        {
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    if (tiles[x, y] == null)
+                    {
+                        continue;
+                    }
+                    tiles[x, y].IsHit = true;
+                }
+            }
+        }   
 
         public bool AllSyllableTilesBelongToSamePanel(List<Syllable> syllables)
         {
@@ -510,7 +526,6 @@ namespace BeatEngine
                     DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawClue(hudFont, "PISTA: SUPERMERCADO ", new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
                 case "Play":
                     DrawPanels(gameTime, spriteBatch);
