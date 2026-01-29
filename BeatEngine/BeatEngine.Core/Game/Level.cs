@@ -115,6 +115,7 @@ namespace BeatEngine
         private SoundEffect levelFinished;
 
         public List<Syllable> Syllables;
+        string Clue = string.Empty;
 
         #region Loading
 
@@ -203,10 +204,17 @@ namespace BeatEngine
             using (var reader = new StreamReader(fileStream))
             {
                 string line;
-
+                int k = 0;
                 while ((line = reader.ReadLine()) != null)
                 {
                     line = line.Trim();
+                    
+                    if (k == 0) //first line is the clue
+                    {
+                        Clue = line;
+                        k++;
+                        continue;
+                    }
 
                     // Skip empty lines
                     if (string.IsNullOrEmpty(line))
@@ -239,6 +247,8 @@ namespace BeatEngine
                         PanelNbr = panelNbr,
                         PanelPosition = panelPosition
                     });
+
+                    k++;
                 }
             }
         }
@@ -616,13 +626,13 @@ namespace BeatEngine
                     DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawClue(hudFont, "PISTA: SUPERMERCADO ", new Vector2(100, 30), Color.Brown, spriteBatch);
+                    DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
                 case "Calculate":
                     DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawClue(hudFont, "PISTA: SUPERMERCADO ", new Vector2(100, 30), Color.Brown, spriteBatch);
+                    DrawClue(hudFont, string.Format("PISTA: {0}", Clue), new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
             }
         }
