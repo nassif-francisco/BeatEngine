@@ -153,6 +153,8 @@ namespace BeatEngine
             CurrentMode = Modes.Where(m => m.Tag == "Play").FirstOrDefault();
             Song = Content.Load<Song>("Sounds/StarlitPulse");
 
+            MissionAccomplised = false;
+
         }
 
         private void AddModes()
@@ -389,8 +391,11 @@ namespace BeatEngine
 
         #region Draw
 
+        public bool MissionAccomplised;
+
         public void CalculateScore()
         {
+            int score = 0;
             foreach(var panel in Panels)
             {
                 List<Syllable> syllables = new List<Syllable>();
@@ -403,9 +408,14 @@ namespace BeatEngine
 
                 if(AllSyllableTilesBelongToSamePanel(syllables) && AllSyllableTilesAreOrdered(syllables))
                 {
-                    int a = 0;
+                    score++;
                 }
 
+            }
+
+            if(score == Panels.Count)
+            {
+                MissionAccomplised = true;
             }
             
         }
@@ -469,7 +479,10 @@ namespace BeatEngine
 
                 case "Calculate":
                     
-                   
+                   if(MissionAccomplised)
+                   {
+                        ToNextMode();
+                   }
 
                     break;
             }
@@ -494,7 +507,10 @@ namespace BeatEngine
                     DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
                     break;
                 case "Show":
+                    DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
+                    DrawFX(gameTime, spriteBatch);
+                    DrawClue(hudFont, "PISTA: SUPERMERCADO ", new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
                 case "Play":
                     DrawPanels(gameTime, spriteBatch);
