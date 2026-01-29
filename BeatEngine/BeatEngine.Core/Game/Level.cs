@@ -112,6 +112,7 @@ namespace BeatEngine
         public List<Hit> Hits = new List<Hit>();
 
         private SoundEffect clickSound;
+        private SoundEffect levelFinished;
 
         public List<Syllable> Syllables;
 
@@ -129,6 +130,9 @@ namespace BeatEngine
             PositionTiles();
             PositionPanels();
 
+            LoadLevelEndingTile("Excelente", TileCollision.Passable);
+
+
             //SequenceManager.InitiateSequence(new GameTime(), tiles);
 
             // Load background layer textures. For now, all levels must
@@ -143,6 +147,7 @@ namespace BeatEngine
 
             // Load sounds.
             clickSound = Content.Load<SoundEffect>("Sounds/Click");
+            levelFinished = Content.Load<SoundEffect>("Sounds/Check");
             this.globalTransformation = Matrix.Invert(globalTransformation);
 
             hudFont = Content.Load<SpriteFont>("Fonts/Hud");
@@ -176,6 +181,18 @@ namespace BeatEngine
                 //var panel = new Tile(Content.Load<Texture2D>("UI/Environment/Panel"), TileCollision.Platform, Content);
                 Panels.Add(newPanel);  
             }
+        }
+
+        private Tile LoadLevelEndingTile(string name, TileCollision collision)
+        {
+            LevelEndingTile = new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
+            LevelEndingTile.Position = new Vector2(-150, 800);
+
+            offscreenLeftX = -80000;
+            offscreenRightX = 1200;
+            centerX = (1300 - LevelEndingTile.Texture.Width) / 2f;
+
+            return LevelEndingTile;
         }
 
         private void LoadSyllables(Stream fileStream)
@@ -236,6 +253,59 @@ namespace BeatEngine
                 var temp = Syllables[i];
                 Syllables[i] = Syllables[j];
                 Syllables[j] = temp;
+            }
+        }
+
+        private float EaseOutPowerFive(float t)
+        {
+            return 1f - MathF.Pow(1f - t, 5f);
+        }
+
+        private float EaseIPowerNine(float t)
+        {
+            return MathF.Pow(t, 9f);
+        }
+        private float levelEndingTimer = 0f;
+
+        private float offscreenLeftX;
+        private float offscreenRightX;
+        private float centerX;
+        public Tile LevelEndingTile;
+        private void DrawLevelEndingTile(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+            levelEndingTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            float t = MathHelper.Clamp(levelEndingTimer / DefaultAnimationDuration, 0f, 1f);
+            float x;
+
+            if (t < 0.4f)
+            {
+                // Phase 1: Enter & slow down (ease-out)
+                float p = t / 0.4f;
+                p = EaseOutPowerFive(p);
+                x = MathHelper.Lerp(offscreenLeftX, centerX, p);
+            }
+            else if (t < 0.6f)
+            {
+                // Phase 2: Stay in center
+                x = centerX;
+                levelFinished.Play();
+            }
+            else
+            {
+                // Phase 3: Accelerate out (ease-in)
+                float p = (t - 0.6f) / 0.4f;
+                p = EaseIPowerNine(p);
+                x = MathHelper.Lerp(centerX, offscreenRightX, p);
+            }
+
+            LevelEndingTile.Position = new Vector2(x, LevelEndingTile.Position.Y);
+
+            spriteBatch.Draw(LevelEndingTile.Texture, LevelEndingTile.Position, Color.White);
+
+            if (t >= 1f)
+            {
+                int a = 0;
             }
         }
 
@@ -524,6 +594,7 @@ namespace BeatEngine
                     break;
                 case "Show":
                     DrawPanels(gameTime, spriteBatch);
+                    DrawLevelEndingTile(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
                     break;
