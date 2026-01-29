@@ -122,6 +122,7 @@ namespace BeatEngine
         {
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");
+            GameState = gameState;
 
             LoadSyllables(fileStream);
             ShuffleSyllables();
@@ -305,10 +306,10 @@ namespace BeatEngine
 
             if (t >= 1f)
             {
-                int a = 0;
+                LevelFinishedAndEffectsShown = true;
             }
         }
-
+        public bool LevelFinishedAndEffectsShown = false;
         private void LoadTiles()
         {
             int numberOfRows = 4;
@@ -453,13 +454,26 @@ namespace BeatEngine
                     CalculateScore();
                     CheckModeTransition(gameTime);
                     break;
+                case "Show":
+                    MoveToNextScene();
+                    break;
             }
         }
 
-       
+
         #endregion
 
         #region Draw
+        GameState GameState;
+        public void MoveToNextScene()
+        {
+            if (LevelFinishedAndEffectsShown)
+            {
+                GameState.Level = 2;
+                GameState.DirtyScene = true;
+            }
+        }
+
 
         public bool MissionAccomplised;
 
