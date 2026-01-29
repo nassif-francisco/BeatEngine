@@ -38,6 +38,7 @@ namespace BeatEngine.Core.Game
             CurrentSlot = 0;
             SlotsOccupied = 0;
             DeallocatedTiles = new List<int> { };
+            Tiles = new List<Tile>();
         }
     }
 }

@@ -371,11 +371,14 @@ namespace BeatEngine
             switch (CurrentMode.Tag)
             {
                 case "Play":
-                    CheckModeTransition(gameTime);
                     CheckFinishedSFX(gameTime);
                     CheckIfTileIsPressed(touchCollection, gameTime);
+                    AllTilesAssigned = CheckIfAllTilesAreAssignedToPanels();
+                    CheckModeTransition(gameTime);
                     break;
                 case "Calculate":
+                    CheckFinishedSFX(gameTime);
+                    CalculateScore();
                     CheckModeTransition(gameTime);
                     break;
             }
@@ -385,6 +388,54 @@ namespace BeatEngine
         #endregion
 
         #region Draw
+
+        public void CalculateScore()
+        {
+            foreach(var panel in Panels)
+            {
+                List<Syllable> syllables = new List<Syllable>();
+                List<Tile> tiles = panel.Tiles;
+
+                foreach(Tile tile in tiles)
+                {
+                    syllables.Add(tile.Syllable);
+                }
+
+                if(AllSyllableTilesBelongToSamePanel(syllables) && AllSyllableTilesAreOrdered(syllables))
+                {
+                    int a = 0;
+                }
+
+            }
+            
+        }
+
+        public bool AllSyllableTilesBelongToSamePanel(List<Syllable> syllables)
+        {
+
+            var count = syllables.DistinctBy(s=>s.PanelNbr).ToList().Count();
+
+
+            return count == 1;
+        }
+
+        public bool AllSyllableTilesAreOrdered(List<Syllable> syllables)
+        {
+            int orderedTilePosition = 1;
+            bool allTilesAreOrdered = true;
+
+            foreach (var syllable in syllables)
+            {
+                if(syllable.PanelPosition != orderedTilePosition)
+                {
+                    allTilesAreOrdered = false;
+                    break;
+                }
+                orderedTilePosition++;
+            }
+
+            return allTilesAreOrdered;
+        }
 
         public void ToNextMode()
         {
@@ -403,12 +454,16 @@ namespace BeatEngine
                     break;
                 case "Show":
 
+
                    
                     break;
 
                 case "Play":
                     
-                   
+                    if (AllTilesAssigned)
+                    {
+                        ToNextMode();
+                    }
 
                     break;
 
@@ -445,14 +500,13 @@ namespace BeatEngine
                     DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    //DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
                     DrawClue(hudFont, "PISTA: SUPERMERCADO ", new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
                 case "Calculate":
+                    DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
-                    DrawClue(hudFont, "TIME: ", new Vector2(100, 30), Color.Brown, spriteBatch);
+                    DrawClue(hudFont, "PISTA: SUPERMERCADO ", new Vector2(100, 30), Color.Brown, spriteBatch);
                     break;
             }
         }
@@ -684,6 +738,8 @@ namespace BeatEngine
                 panel.CurrentSlot += 1;
                 panel.SlotsOccupied += 1;
                 panel.DeallocatedTiles.Clear();
+
+                panel.Tiles.Add(draggedTile);
             }
             else
             {
@@ -695,6 +751,8 @@ namespace BeatEngine
                 draggedTile.CurrentPanel = panelNbr;
                 draggedTile.CurrentPanelPosition = panel.DeallocatedTiles[minIndex];
                 panel.DeallocatedTiles.RemoveAt(minIndex);
+
+                panel.Tiles.Add(draggedTile);
 
                 //panel.CurrentSlot = panel.SlotsOccupied;
             }
@@ -709,7 +767,45 @@ namespace BeatEngine
                 //panel.CurrentSlot = draggedTile.CurrentPanelPosition;
                 draggedTile.CurrentPanel = -100;
                 draggedTile.CurrentPanelPosition = -100;
+
+                panel.Tiles.Remove(draggedTile);
             }
+        }
+
+        public bool AllTilesAssigned = false;
+
+        public bool CheckIfAllTilesAreAssignedToPanels()
+        {
+            bool allTilesAssigned = true;
+
+
+            for (int y = 0; y < Height; ++y)
+            {
+                if(!allTilesAssigned)
+                { break;
+                }
+                
+                for (int x = 0; x < Width; ++x)
+                {
+                    if (tiles[x, y] == null)
+                    {
+                        continue;
+                    }
+
+                    if(tiles[x, y].CurrentPanel == -100)
+                    {
+                        allTilesAssigned = false;
+                    }
+
+                    if (!allTilesAssigned)
+                    {
+                        break;
+                    }
+
+                }
+            }
+
+            return allTilesAssigned;
         }
 
 
