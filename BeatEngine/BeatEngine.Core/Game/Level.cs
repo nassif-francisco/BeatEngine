@@ -479,7 +479,7 @@ namespace BeatEngine
         {
             if (LevelFinishedAndEffectsShown)
             {
-                GameState.Level = 2;
+                GameState.Level++;
                 GameState.DirtyScene = true;
             }
         }
@@ -593,6 +593,10 @@ namespace BeatEngine
                    {
                         ToNextMode();
                    }
+                    else
+                    {
+                        CurrentMode = Modes.Where(m => m.Tag == "Play").FirstOrDefault();
+                    }
 
                     break;
             }
@@ -626,13 +630,14 @@ namespace BeatEngine
                     DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(100, 30), Color.Brown, spriteBatch);
+                    DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(100, 30), Color.ForestGreen, spriteBatch);
                     break;
+
                 case "Calculate":
                     DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawClue(hudFont, string.Format("PISTA: {0}", Clue), new Vector2(100, 30), Color.Brown, spriteBatch);
+                    DrawClue(hudFont, string.Format("PISTA: {0}", Clue), new Vector2(100, 30), Color.Green, spriteBatch);
                     break;
             }
         }

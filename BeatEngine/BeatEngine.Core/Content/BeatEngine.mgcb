@@ -67,6 +67,27 @@
 #begin Levels/2.txt
 /copy:Levels/2.txt
 
+#begin Levels/3.txt
+/copy:Levels/3.txt
+
+#begin Levels/4.txt
+/copy:Levels/4.txt
+
+#begin Levels/5.txt
+/copy:Levels/5.txt
+
+#begin Levels/6.txt
+/copy:Levels/6.txt
+
+#begin Levels/7.txt
+/copy:Levels/7.txt
+
+#begin Levels/8.txt
+/copy:Levels/8.txt
+
+#begin Levels/9.txt
+/copy:Levels/9.txt
+
 #begin Levels/1_steps.txt
 /copy:Levels/1_steps.txt
 
