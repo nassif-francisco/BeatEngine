@@ -31,6 +31,7 @@ namespace BeatEngine
         // The layer which entities are drawn on top of.
         private const int EntityLayer = 2;
         public List<Tile> Pressedtiles = new List<Tile>();
+        private Tile WelcomeTile;
 
         private Matrix globalTransformation;
 
@@ -96,7 +97,9 @@ namespace BeatEngine
             GameState = gameState;
 
             LoadButtons(fileStream);
+            LoadWelcomeText();
             PositionButtons();
+            PositionTitle();
 
             // Load background layer textures. For now, all levels must
             // use the same backgrounds and only use the left-most part of them.
@@ -114,6 +117,12 @@ namespace BeatEngine
             //Content.Load<Song>("Sounds/ElectricSunshine");
         }
 
+        private void LoadWelcomeText()
+        {
+            WelcomeTile = LoadButton("Welcome_button", TileCollision.Platform);
+            WelcomeTile.Position = new Vector2(100, 80);
+        }
+
         /// <summary>
         /// Iterates over every tile in the structure file and loads its
         /// appearance and behavior. This method also validates that the
@@ -122,6 +131,7 @@ namespace BeatEngine
         /// <param name="fileStream">
         /// A stream containing the tile data.
         /// </param>
+        /// 
         private void LoadButtons(Stream fileStream)
         {
             // Load the level and ensure all of the lines are the same length.
@@ -153,7 +163,6 @@ namespace BeatEngine
                     buttons[x, y] = LoadButton(tileType, x, y);
                 }
             }
-
         }
 
         /// <summary>
@@ -179,10 +188,15 @@ namespace BeatEngine
                     startTile.Tag = "START";
                     return startTile;
 
-                case 'E':
-                    Tile exitTile = LoadButton("Exit_button", TileCollision.Platform);
-                    exitTile.Tag = "EXIT";
-                    return exitTile;
+                case 'C':
+                    Tile continueTile = LoadButton("Continue_button", TileCollision.Platform);
+                    continueTile.Tag = "CONTINUE";
+                    return continueTile;
+
+                case 'B':
+                    Tile sylabrixTitle = LoadButton("SylabrixTitle", TileCollision.Platform);
+                    sylabrixTitle.Tag = "SYLABRIXTITLE";
+                    return sylabrixTitle;
 
                 // Unknown tile type character
                 default:
@@ -258,11 +272,19 @@ namespace BeatEngine
             for (int i = 0; i <= EntityLayer; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
 
+            DrawWelcomeText(spriteBatch);
             DrawTiles(spriteBatch);
+            
 
             for (int i = EntityLayer + 1; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
         }
+
+        public void DrawWelcomeText(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(WelcomeTile.Texture, WelcomeTile.Position, Color.White);
+        }
+
 
         /// <summary>
         /// Draws each tile in the level.
@@ -293,10 +315,19 @@ namespace BeatEngine
             }
         }
 
+        private void PositionTitle()
+        {
+            Tile titleTile = buttons[0,buttons.Length -1];
+            
+            Vector2 position = new Vector2(titleTile.Position.X -90, titleTile.Position.Y -250);
+
+            titleTile.Position = position;
+        }
+
         private void PositionButtons()
         {
             int initialPosY = 1134;
-            int initialPosX = 70;
+            int initialPosX = 50;
 
             for (int y = 0; y < Height; ++y)
             {
@@ -312,8 +343,13 @@ namespace BeatEngine
 
                     }
 
+                    if(buttons[x, y].Tag == "CONTINUE")
+                    {
+                        buttons[x, y].Position = new Vector2(initialPosX + 20, initialPosY);
+                    }
+
                 }
-                initialPosX = 70;
+                initialPosX = 50;
                 initialPosY -= 350;
             }
 
