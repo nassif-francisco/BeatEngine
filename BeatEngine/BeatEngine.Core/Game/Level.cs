@@ -197,7 +197,7 @@ namespace BeatEngine
 
             offscreenLeftX = -80000;
             offscreenRightX = 1200;
-            centerX = (1300 - LevelEndingTile.Texture.Width) / 2f;
+            centerX = (1210 - LevelEndingTile.Texture.Width) / 2f;
 
             return LevelEndingTile;
         }
