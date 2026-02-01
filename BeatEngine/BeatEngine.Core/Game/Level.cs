@@ -117,6 +117,8 @@ namespace BeatEngine
         public List<Syllable> Syllables;
         string Clue = string.Empty;
 
+        public int TotalNbrBackgrounds = 2;
+
         #region Loading
 
         public Level(IServiceProvider serviceProvider, Stream fileStream, int levelIndex, Matrix globalTransformation, GameState gameState)
@@ -140,11 +142,14 @@ namespace BeatEngine
             // Load background layer textures. For now, all levels must
             // use the same backgrounds and only use the left-most part of them.
             layers = new Texture2D[3];
+            Random rng = new Random();
+            int value = rng.Next(0, TotalNbrBackgrounds);
+
             for (int i = 0; i < layers.Length; ++i)
             {
                 // Choose a random segment if each background layer for level variety.
                 int segmentIndex = levelIndex;
-                layers[i] = Content.Load<Texture2D>("NewBackgrounds/Layer" + 0 + "_" + i);
+                layers[i] = Content.Load<Texture2D>("NewBackgrounds/Layer" + value + "_" + i);
             }
 
             // Load sounds.

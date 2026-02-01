@@ -65,6 +65,21 @@
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
+    <Compile Include="NewBackgrounds\Layer1_0.png">
+      <Name>Layer1_0</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="NewBackgrounds\Layer1_1.png">
+      <Name>Layer1_1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="NewBackgrounds\Layer1_2.png">
+      <Name>Layer1_2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
     <None Include="Levels\0.txt">
       <Name>0</Name>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
