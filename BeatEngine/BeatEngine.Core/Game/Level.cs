@@ -650,13 +650,13 @@ namespace BeatEngine
 
         private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 4, SpriteEffects.None, 1);
+            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 3.7f, SpriteEffects.None, 1);
             //sriteBatch.DrawString(font, value, position, color);
         }
 
         private void DrawClue(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 4, SpriteEffects.None, 1);
+            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 4.25f, SpriteEffects.None, 1);
             //sriteBatch.DrawString(font, value, position, color);
         }
 
@@ -690,19 +690,19 @@ namespace BeatEngine
 
                         if(text.Count() == 2)
                         {
-                            silabaPosition = new Vector2(tiles[x, y].Position.X + 90, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
+                            silabaPosition = new Vector2(tiles[x, y].Position.X + 98, tiles[x, y].Position.Y + tiles[x, y].Height / 2.75f);
                         }
                         else if (text.Count() == 1)
                         {
-                            silabaPosition = new Vector2(tiles[x, y].Position.X + 120, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
+                            silabaPosition = new Vector2(tiles[x, y].Position.X + 118, tiles[x, y].Position.Y + tiles[x, y].Height / 2.75f);
                         }
                         else if(text.Count() == 3)
                         {
-                            silabaPosition = new Vector2(tiles[x, y].Position.X + 60, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
+                            silabaPosition = new Vector2(tiles[x, y].Position.X + 78, tiles[x, y].Position.Y + tiles[x, y].Height / 2.75f);
                         }
                         else
                         {
-                            silabaPosition = new Vector2(tiles[x, y].Position.X + 37, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
+                            silabaPosition = new Vector2(tiles[x, y].Position.X + 58, tiles[x, y].Position.Y + tiles[x, y].Height / 2.75f);
                         }
 
                             DrawShadowedString(hudFont, text, silabaPosition, Color.Black, spriteBatch);
