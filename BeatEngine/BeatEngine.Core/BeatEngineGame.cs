@@ -296,11 +296,26 @@ namespace BeatEngine
                 Scene = new StartGameScene(Services, fileStream, GameState.Level, globalTransformation, GameState);
         }
 
+        private void LoadTutorialScene()
+        {
+            if (Scene != null)
+                Scene.Dispose();
+
+            // Load the level.
+            string tutorialScenePath = string.Format("Content/Scenes/TutorialScene.txt", GameState.Level);
+            using (Stream fileStream = TitleContainer.OpenStream(tutorialScenePath))
+                Scene = new TutorialGameScene(Services, fileStream, GameState.Level, globalTransformation, GameState);
+        }
+
         private void LoadScene()
         {
             if (GameState.Level == 0)
             {
                 LoadStartScene();
+            }
+            else if(GameState.Level == -1)
+            {
+                LoadTutorialScene();
             }
             else
             {

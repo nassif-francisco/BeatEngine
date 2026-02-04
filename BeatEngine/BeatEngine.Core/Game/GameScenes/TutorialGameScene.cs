@@ -20,11 +20,13 @@ using MonoGame.Framework.Devices.Sensors;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
 
 namespace BeatEngine
 {
-    class StartGameScene : ISceneBase
+    class TutorialGameScene : ISceneBase
     {
         private Tile[,] buttons;
         private Texture2D[] layers;
@@ -33,8 +35,13 @@ namespace BeatEngine
         public List<Tile> Pressedtiles = new List<Tile>();
         private Tile WelcomeTile;
 
-        private Matrix globalTransformation;
+        public List<Tile> TutorialTiles = new List<Tile>(); 
 
+        public int CurrentTutorialTile = 0;
+
+        private Matrix globalTransformation;
+        private SoundEffect clickSound;
+        public double InitialTime { get; set; }
         // Entities in the level.
         public Player Player
         {
@@ -90,17 +97,16 @@ namespace BeatEngine
         /// <param name="fileStream">
         /// A stream containing the tile data.
         /// </param>
-        public StartGameScene(IServiceProvider serviceProvider, Stream fileStream, int levelIndex, Matrix globalTransformation, GameState gameState)
+        public TutorialGameScene(IServiceProvider serviceProvider, Stream fileStream, int levelIndex, Matrix globalTransformation, GameState gameState)
         {
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");
             GameState = gameState;
 
             LoadButtons(fileStream);
-            LoadWelcomeText();
+            LoadTutorialTiles();
             PositionButtons();
-            PositionTitle();
-
+            clickSound = Content.Load<SoundEffect>("Sounds/Click");
             // Load background layer textures. For now, all levels must
             // use the same backgrounds and only use the left-most part of them.
             layers = new Texture2D[3];
@@ -117,10 +123,38 @@ namespace BeatEngine
             //Content.Load<Song>("Sounds/ElectricSunshine");
         }
 
-        private void LoadWelcomeText()
+        private void LoadTutorialTiles()
         {
-            WelcomeTile = LoadButton("Welcome_button", TileCollision.Platform);
-            WelcomeTile.Position = new Vector2(100, 80);
+            TutorialTiles.Add(new Tile(Content.Load<Texture2D>("Tiles/" + "Tutorial1"), TileCollision.Passable, Content));
+            TutorialTiles.Add(new Tile(Content.Load<Texture2D>("Tiles/" + "Tutorial2"), TileCollision.Passable, Content));
+            TutorialTiles.Add(new Tile(Content.Load<Texture2D>("Tiles/" + "Tutorial3"), TileCollision.Passable, Content));
+            TutorialTiles.Add(new Tile(Content.Load<Texture2D>("Tiles/" + "Tutorial4"), TileCollision.Passable, Content));
+
+        }
+        private void CheckFinishedSFX(GameTime gameTime)
+        {
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    if (buttons[x, y] == null)
+                    {
+                        continue;
+                    }
+
+                    if (buttons[x, y].IsPlayingSound)
+                    {
+                        double currentTime = gameTime.TotalGameTime.TotalSeconds;
+
+                        double elapsedTime = buttons[x, y].InitialTime + buttons[x, y].SoundDuration;
+
+                        if (currentTime >= elapsedTime)
+                        {
+                            buttons[x, y].IsPlayingSound = false;
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -183,20 +217,10 @@ namespace BeatEngine
         {
             switch (tileType)
             {
-                case 'S':
-                    Tile startTile = LoadButton("Start_button", TileCollision.Platform);
-                    startTile.Tag = "START";
+                case 'E':
+                    Tile startTile = LoadButton("Entendido_button", TileCollision.Platform);
+                    startTile.Tag = "UNDERSTOOD";
                     return startTile;
-
-                case 'C':
-                    Tile continueTile = LoadButton("Continue_button", TileCollision.Platform);
-                    continueTile.Tag = "CONTINUE";
-                    return continueTile;
-
-                case 'B':
-                    Tile sylabrixTitle = LoadButton("SylabrixTitle", TileCollision.Platform);
-                    sylabrixTitle.Tag = "SYLABRIXTITLE";
-                    return sylabrixTitle;
 
                 // Unknown tile type character
                 default:
@@ -254,8 +278,9 @@ namespace BeatEngine
             TouchCollection touchCollection,
             DisplayOrientation orientation)
         {
-            CheckIfTileIsPressed(touchCollection);
-            TraversePressedButtons();
+            CheckIfTileIsPressed(touchCollection, gameTime);
+            CheckFinishedSFX(gameTime);
+            TraversePressedButtons(gameTime);
 
         }
 
@@ -272,20 +297,27 @@ namespace BeatEngine
             for (int i = 0; i <= EntityLayer; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
 
-            DrawWelcomeText(spriteBatch);
+            if (CurrentTutorialTile >= TutorialTiles.Count)
+            {
+                return;
+            }
+
             DrawTiles(spriteBatch);
-            
+            DrawTutorialTiles(spriteBatch);
+
 
             for (int i = EntityLayer + 1; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
         }
 
-        public void DrawWelcomeText(SpriteBatch spriteBatch)
-        {
-            spriteBatch.Draw(WelcomeTile.Texture, WelcomeTile.Position, Color.White);
+        private void DrawTutorialTiles(SpriteBatch spriteBatch)
+        {   
+            TutorialTiles[CurrentTutorialTile].Position = new Vector2(40, 500);
+            spriteBatch.Draw(TutorialTiles[CurrentTutorialTile].Texture, TutorialTiles[CurrentTutorialTile].Position, null, Color.White, 0, new Vector2(1.0f, 1.0f), 3.5f, SpriteEffects.None, 1);
+
+
+            //spriteBatch.Draw(TutorialTiles[CurrentTutorialTile].Texture, TutorialTiles[CurrentTutorialTile].Position , Color.White);
         }
-
-
         /// <summary>
         /// Draws each tile in the level.
         /// </summary>
@@ -308,25 +340,17 @@ namespace BeatEngine
 
                         }
 
-                       spriteBatch.Draw(texture, buttons[x, y].Position, tint);
-                       //spriteBatch.Draw(texture, buttons[x, y].Position, null, tint, -MathHelper.PiOver2, new Vector2(0, 0), 1, SpriteEffects.None, 0);
+                        spriteBatch.Draw(texture, buttons[x, y].Position, tint);
+                        //spriteBatch.Draw(texture, buttons[x, y].Position, null, tint, -MathHelper.PiOver2, new Vector2(0, 0), 1, SpriteEffects.None, 0);
                     }
                 }
             }
         }
 
-        private void PositionTitle()
-        {
-            Tile titleTile = buttons[0,buttons.Length -1];
-            
-            Vector2 position = new Vector2(titleTile.Position.X -90, titleTile.Position.Y -250);
-
-            titleTile.Position = position;
-        }
 
         private void PositionButtons()
         {
-            int initialPosY = 1134;
+            int initialPosY = 1734;
             int initialPosX = 50;
 
             for (int y = 0; y < Height; ++y)
@@ -343,7 +367,7 @@ namespace BeatEngine
 
                     }
 
-                    if(buttons[x, y].Tag == "CONTINUE")
+                    if (buttons[x, y].Tag == "CONTINUE")
                     {
                         buttons[x, y].Position = new Vector2(initialPosX + 20, initialPosY);
                     }
@@ -356,7 +380,7 @@ namespace BeatEngine
 
         }
 
-        private void CheckIfTileIsPressed(TouchCollection touchLocations)
+        private void CheckIfTileIsPressed(TouchCollection touchLocations, GameTime gameTime)
         {
             //Pressedtiles.Clear();
 
@@ -375,13 +399,24 @@ namespace BeatEngine
                         {
                             if (buttons[x, y].BoundingRectangle.Contains(pos))
                             {
+                                if (!buttons[x, y].IsPlayingSound)
+                                {
+                                    buttons[x, y].IsPlayingSound = true;
+                                    buttons[x, y].SoundDuration = clickSound.Duration.TotalSeconds * 0.5; // this is to allow overlapping sounds, because sound have a long end
+                                    buttons[x, y].InitialTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                                    clickSound.Play();
+
+                                    //InitialTime = (float)gameTime.TotalGameTime.TotalSeconds;
+
+                                }
+
                                 buttons[x, y].IsPressed = true;
 
-                                if(!Pressedtiles.Contains(buttons[x, y]))
+                                if (!Pressedtiles.Contains(buttons[x, y]))
                                 {
                                     Pressedtiles.Add(buttons[x, y]);
                                 }
-                                
+
 
                             }
                         }
@@ -392,16 +427,58 @@ namespace BeatEngine
             }
         }
 
-        private void TraversePressedButtons()
+        private void TraversePressedButtons(GameTime gameTime)
         {
-           foreach(Tile tile in Pressedtiles)
-           {
-                if(tile.Tag == "START")
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
                 {
-                    GameState.Level = -1; //read from file
-                    GameState.DirtyScene = true;
+                    if (buttons[x, y].IsPressed && buttons[x,y].Tag == "UNDERSTOOD")
+                    {
+                        if (CurrentTutorialTile < TutorialTiles.Count)
+                        {
+                            if ((float)gameTime.TotalGameTime.TotalSeconds > InitialTime + 1)
+                            {
+                                CurrentTutorialTile++;
+                                InitialTime = gameTime.TotalGameTime.TotalSeconds;
+                            }
+
+                        }
+
+                        else
+                        {
+                            GameState.Level = 1;
+                            GameState.DirtyScene = true;
+                        }
+
+                    }
                 }
-           }
+            }
+
+
+            //foreach (Tile tile in Pressedtiles)
+            //{
+            //    if (tile.Tag == "UNDERSTOOD")
+            //    {
+                    
+            //        if(CurrentTutorialTile < TutorialTiles.Count)
+            //        {
+            //            if((float)gameTime.TotalGameTime.TotalSeconds > InitialTime + 2)
+            //            {
+            //                CurrentTutorialTile++;
+            //                InitialTime = gameTime.TotalGameTime.TotalSeconds;
+            //            }
+
+            //        }
+
+            //        else
+            //        {
+            //            GameState.Level = 1;
+            //            GameState.DirtyScene = true;
+            //        }
+
+            //    }
+            //}
         }
 
         #endregion
