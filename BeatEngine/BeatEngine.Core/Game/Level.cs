@@ -135,6 +135,7 @@ namespace BeatEngine
             PositionPanels();
 
             LoadLevelEndingTile("Excelente", TileCollision.Passable);
+            LoadSkipToNextLevelTile("Arrow", TileCollision.Passable);
 
 
             //SequenceManager.InitiateSequence(new GameTime(), tiles);
@@ -200,6 +201,14 @@ namespace BeatEngine
             centerX = (1210 - LevelEndingTile.Texture.Width) / 2f;
 
             return LevelEndingTile;
+        }
+
+        private Tile LoadSkipToNextLevelTile(string name, TileCollision collision)
+        {
+            NextLevelTile = new Tile(Content.Load<Texture2D>("UI/Buttons/" + name), collision, Content);
+            NextLevelTile.Position = new Vector2(900, 30);
+
+            return NextLevelTile;
         }
 
         private void LoadSyllables(Stream fileStream)
@@ -287,6 +296,8 @@ namespace BeatEngine
         private float offscreenRightX;
         private float centerX;
         public Tile LevelEndingTile;
+
+        public Tile NextLevelTile;
         private void DrawLevelEndingTile(GameTime gameTime, SpriteBatch spriteBatch)
         {
             levelEndingTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -461,6 +472,7 @@ namespace BeatEngine
                 case "Play":
                     CheckFinishedSFX(gameTime);
                     CheckIfTileIsPressed(touchCollection, gameTime);
+                    CheckIfSkipTileIsPressed(touchCollection, gameTime);
                     AllTilesAssigned = CheckIfAllTilesAreAssignedToPanels();
                     CheckModeTransition(gameTime);
                     break;
@@ -515,7 +527,14 @@ namespace BeatEngine
             if(score == Panels.Count)
             {
                 MissionAccomplised = true;
+                GameState.Score += 30;
                 InitiateCelebrationAnimation();
+            }
+            else //skip button was pressed
+            {
+                MissionAccomplised = true;
+                LevelFinishedAndEffectsShown = true;
+                GameState.Score -= 10;
             }
             
         }
@@ -590,6 +609,11 @@ namespace BeatEngine
                         ToNextMode();
                     }
 
+                    if(NextLevelTile.IsPressed)
+                    {
+                        ToNextMode();
+                    }
+
                     break;
 
                 case "Calculate":
@@ -634,8 +658,11 @@ namespace BeatEngine
                 case "Play":
                     DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
+                    DrawSkipToNextLevelTile(spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(100, 30), Color.ForestGreen, spriteBatch);
+                    DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(150, 2500), Color.ForestGreen, spriteBatch);
+                    DrawScoreString(hudFont, string.Format("SCORE:", GameState.Score), new Vector2(100, 50), Color.ForestGreen, spriteBatch);
+                    DrawScore(hudFont, GameState.Score.ToString(), new Vector2(380, 30), Color.ForestGreen, spriteBatch);
                     break;
 
                 case "Calculate":
@@ -658,6 +685,23 @@ namespace BeatEngine
         {
             spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 4.25f, SpriteEffects.None, 1);
             //sriteBatch.DrawString(font, value, position, color);
+        }
+
+        private void DrawScore(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
+        {
+            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 6f, SpriteEffects.None, 1);
+            //sriteBatch.DrawString(font, value, position, color);
+        }
+
+        private void DrawScoreString(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
+        {
+            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 4.25f, SpriteEffects.None, 1);
+            //sriteBatch.DrawString(font, value, position, color);
+        }
+
+        private void DrawSkipToNextLevelTile(SpriteBatch spriteBatch)
+        {
+            spriteBatch.Draw(NextLevelTile.Texture, NextLevelTile.Position, Color.White);
         }
 
         private void DrawTiles(GameTime gameTime, SpriteBatch spriteBatch)
@@ -946,6 +990,23 @@ namespace BeatEngine
             }
 
             return allTilesAssigned;
+        }
+
+        public void CheckIfSkipTileIsPressed(TouchCollection touchLocations, GameTime gameTime)
+        {
+            foreach (var touch in touchLocations)
+            {
+                Vector2 pos = touch.Position;
+                Vector2.Transform(ref pos, ref globalTransformation, out pos);
+
+                if (touch.State == TouchLocationState.Pressed)
+                {
+                    if (NextLevelTile.BoundingRectangle.Contains(pos))
+                    {
+                        NextLevelTile.IsPressed = true;
+                    }
+                }
+            }
         }
 
 
