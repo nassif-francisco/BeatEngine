@@ -20,7 +20,6 @@ using MonoGame.Framework.Devices.Sensors;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using static System.Net.WebRequestMethods;
 
 namespace BeatEngine
 {
@@ -400,16 +399,56 @@ namespace BeatEngine
             }
         }
 
+        public string GetSavePath()
+        {
+            // Gets /storage/emulated/0/Android/data/[your.package.name]/files/
+            var basePath = Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData
+                );
+
+            Directory.CreateDirectory(basePath);
+
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            return Path.Combine(path, "savegame.sav");
+
+        }
+        public void ReadGameState()
+        {
+            var path = GetSavePath();
+            if (File.Exists(path))
+            {
+                using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
+                using (var reader = new StreamReader(fileStream))
+                {
+                    string levelLine = reader.ReadLine();
+                    string scoreLine = reader.ReadLine();
+                    if (int.TryParse(levelLine, out int level))
+                    {
+                        GameState.Level = level;
+                    }
+                    if (int.TryParse(scoreLine, out int score))
+                    {
+                        GameState.Score = score;
+                    }
+                }
+            }
+        }
         private void TraversePressedButtons()
         {
            foreach(Tile tile in Pressedtiles)
            {
                 if(tile.Tag == "START")
                 {
-                    GameState.Level = -1; //read from file
+                    GameState.Level = -1; //this will take you to the tutorial scene
                     GameState.DirtyScene = true;
                 }
-           }
+
+                if (tile.Tag == "CONTINUE")
+                {
+                    ReadGameState();
+                    GameState.DirtyScene = true;
+                }
+            }
         }
 
         #endregion
