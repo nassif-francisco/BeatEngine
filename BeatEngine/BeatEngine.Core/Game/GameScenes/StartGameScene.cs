@@ -345,7 +345,12 @@ namespace BeatEngine
 
                     if(buttons[x, y].Tag == "CONTINUE")
                     {
-                        buttons[x, y].Position = new Vector2(initialPosX + 20, initialPosY);
+                        buttons[x, y].Position = new Vector2(initialPosX + 20, initialPosY + 200);
+                    }
+
+                    if (buttons[x, y].Tag == "START")
+                    {
+                        buttons[x, y].Position = new Vector2(initialPosX + 20, initialPosY + 100);
                     }
 
                 }
@@ -373,6 +378,9 @@ namespace BeatEngine
 
                         if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
                         {
+                            Rectangle rectangle = buttons[x, y].BoundingRectangle;
+
+
                             if (buttons[x, y].BoundingRectangle.Contains(pos))
                             {
                                 buttons[x, y].IsPressed = true;

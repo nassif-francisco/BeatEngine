@@ -30,7 +30,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using static System.Formats.Asn1.AsnWriter;
-using static System.Net.WebRequestMethods;
 
 namespace BeatEngine
 {
@@ -528,15 +527,32 @@ namespace BeatEngine
             {
                 MissionAccomplised = true;
                 GameState.Score += 30;
+                GameState.Level++;
+                PeristGameState();
                 InitiateCelebrationAnimation();
             }
             else //skip button was pressed
             {
+
                 MissionAccomplised = true;
                 LevelFinishedAndEffectsShown = true;
                 GameState.Score -= 10;
+                GameState.Level++;
+                PeristGameState();
+
             }
             
+        }
+
+        public void PeristGameState()
+        {
+            var path = GetSavePath();
+            using (var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write))
+            using (var writer = new StreamWriter(fileStream))
+            {
+                writer.WriteLine(GameState.Level);
+                writer.WriteLine(GameState.Score);
+            }
         }
 
         public void InitiateCelebrationAnimation()
@@ -579,6 +595,20 @@ namespace BeatEngine
             }
 
             return allTilesAreOrdered;
+        }
+
+        public string GetSavePath()
+        {
+            // Gets /storage/emulated/0/Android/data/[your.package.name]/files/
+            var basePath = Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData
+                );
+
+            Directory.CreateDirectory(basePath);
+
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            return Path.Combine(path, "savegame.sav");
+
         }
 
         public void ToNextMode()

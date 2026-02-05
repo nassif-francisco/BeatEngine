@@ -122,6 +122,40 @@ namespace BeatEngine
             LoadScene();
             //LoadNextLevel();
         }
+        public string GetSavePath()
+        {
+            // Gets /storage/emulated/0/Android/data/[your.package.name]/files/
+            var basePath = Environment.GetFolderPath(
+                    Environment.SpecialFolder.LocalApplicationData
+                );
+
+            Directory.CreateDirectory(basePath);
+
+            var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            return Path.Combine(path, "savegame.sav");
+
+        }
+        public void ReadGameState()
+        {
+            var path = GetSavePath();
+            if (File.Exists(path))
+            {
+                using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read))
+                using (var reader = new StreamReader(fileStream))
+                {
+                    string levelLine = reader.ReadLine();
+                    string scoreLine = reader.ReadLine();
+                    if (int.TryParse(levelLine, out int level))
+                    {
+                        GameState.Level = level;
+                    }
+                    if (int.TryParse(scoreLine, out int score))
+                    {
+                        GameState.Score = score;
+                    }
+                }
+            }
+        }
 
         public void ScalePresentationArea()
         {
@@ -278,6 +312,8 @@ namespace BeatEngine
             // Unloads the content for the current level before loading the next one.
             if (Scene != null)
                 Scene.Dispose();
+
+            ReadGameState();
 
             // Load the level.
             string levelPath = string.Format("Content/Levels/{0}.txt", GameState.Level);

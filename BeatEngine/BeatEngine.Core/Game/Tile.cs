@@ -111,5 +111,14 @@ namespace BeatEngine
                 return new Rectangle((int)Position.X, (int)Position.Y, (int)Texture.Width, (int)Texture.Height);
             }
         }
+
+        public Rectangle ShrinkedBoundingRectangle
+        {
+            get
+            {
+                return new Rectangle((int)Position.X, (int)Position.Y, (int)Texture.Width, (int)Texture.Height);
+            }
+        }
+
     }
 }
