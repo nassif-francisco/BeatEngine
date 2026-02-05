@@ -681,9 +681,9 @@ namespace BeatEngine
                     break;
                 case "Show":
                     DrawPanels(gameTime, spriteBatch);
-                    DrawLevelEndingTile(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
+                    DrawLevelEndingTile(gameTime, spriteBatch);
                     break;
                 case "Play":
                     DrawPanels(gameTime, spriteBatch);
@@ -866,7 +866,7 @@ namespace BeatEngine
 
         private void PositionPanels()
         {
-            int initialPosY = 734;
+            int initialPosY = 1234;
             int initialPosX = 10;
 
             for (int y = 0; y < Panels.Count; ++y)
