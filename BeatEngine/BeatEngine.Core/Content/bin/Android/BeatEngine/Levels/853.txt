@@ -1,0 +1,13 @@
+SUPERMERCADO
+QUESO(1,1)
+
+HUE(2,1)
+VOS(2,2)
+
+JU(3,1)
+GOS(3,2)
+
+
+
+
+

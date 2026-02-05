@@ -1,0 +1,13 @@
+EDIFICIOS
+CA(1,1)
+SA(1,2)
+
+RES(2,1)
+TAU(2,2)
+RAN(2,3)
+TE(2,4)
+
+BAN(3,1)
+CO(3,2)
+
+

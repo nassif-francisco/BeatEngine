@@ -1,0 +1,14 @@
+PROFESIONES
+IN(1,1)
+GE(1,2)
+NIE(1,3)
+RO(1,4)
+
+PO(2,1)
+LI(2,2)
+CIA(2,3)
+
+PE(3,1)
+RIO(3,2)
+DIS(3,3)
+TA(3,4)

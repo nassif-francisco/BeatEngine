@@ -1,0 +1,13 @@
+DEPORTES
+ES(1,1)
+QUI(1,2)
+
+A(2,1)
+QUA(2,2)
+TICS(2,3)
+
+JUDO(3,1)
+
+
+
+

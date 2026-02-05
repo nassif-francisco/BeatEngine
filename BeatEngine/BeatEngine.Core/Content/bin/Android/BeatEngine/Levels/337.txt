@@ -1,0 +1,13 @@
+NATURALEZA
+LU(1,1)
+NA(1,2)
+
+DE(2,1)
+SIE(2,2)
+RTO(2,3)
+
+JUN(3,1)
+GLA(3,2)
+
+
+

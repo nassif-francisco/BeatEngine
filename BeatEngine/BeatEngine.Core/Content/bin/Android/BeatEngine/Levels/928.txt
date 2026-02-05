@@ -1,0 +1,13 @@
+PAISES
+FRAN(1,1)
+CIA(1,2)
+
+HO(2,1)
+LAN(2,2)
+DA(2,3)
+
+AU(3,1)
+STRIA(3,2)
+
+
+

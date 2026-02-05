@@ -1,0 +1,13 @@
+NATURALEZA
+AR(1,1)
+BOL(1,2)
+
+ES(2,1)
+TRE(2,2)
+LLAS(2,3)
+
+NUBE(3,1)
+
+
+
+

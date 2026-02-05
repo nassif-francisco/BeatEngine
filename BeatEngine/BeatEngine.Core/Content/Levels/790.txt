@@ -1,0 +1,13 @@
+PROFESIONES
+DOC(1,1)
+TOR(1,2)
+
+BO(2,1)
+M(2,2)
+BE(2,3)
+RO(2,4)
+
+PE(3,1)
+RIO(3,2)
+DIS(3,3)
+TA(3,4)

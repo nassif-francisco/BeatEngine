@@ -1,0 +1,13 @@
+SUPERMERCADO
+COM(1,1)
+PRAR(1,2)
+
+LIS(2,1)
+TA(2,2)
+
+YOGUR(3,1)
+
+
+
+
+

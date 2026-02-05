@@ -1,0 +1,14 @@
+PROFESIONES
+PILO(1,1)
+TO(1,2)
+
+VEN(2,1)
+TE(2,2)
+DO(2,3)
+R(2,4)
+
+FAR(3,1)
+MA(3,2)
+CEU(3,3)
+TI(3,4)
+CO(3,5)

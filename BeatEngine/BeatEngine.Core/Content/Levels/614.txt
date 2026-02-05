@@ -1,0 +1,13 @@
+DEPORTES
+FU(1,1)
+TOL(1,2)
+
+NA(2,1)
+TA(2,2)
+CION(2,3)
+
+VO(3,1)
+LEI(3,2)
+BOL(3,3)
+
+

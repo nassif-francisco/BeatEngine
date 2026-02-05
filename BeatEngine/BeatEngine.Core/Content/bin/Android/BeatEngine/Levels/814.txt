@@ -1,0 +1,13 @@
+TECNOLOGIA
+RA(1,1)
+DIO(1,2)
+
+MO(2,1)
+USE(2,2)
+
+TEC(3,1)
+LA(3,2)
+DO(3,3)
+
+
+

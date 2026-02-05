@@ -1,0 +1,13 @@
+SUPERMERCADO
+COM(1,1)
+PRAR(1,2)
+
+A(2,1)
+NA(2,2)
+QUE(2,3)
+LES(2,4)
+
+JU(3,1)
+GOS(3,2)
+
+

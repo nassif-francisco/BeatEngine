@@ -1,0 +1,13 @@
+SUPERMERCADO
+YOGUR(1,1)
+
+PAN(2,1)
+
+HUE(3,1)
+VOS(3,2)
+
+
+
+
+
+

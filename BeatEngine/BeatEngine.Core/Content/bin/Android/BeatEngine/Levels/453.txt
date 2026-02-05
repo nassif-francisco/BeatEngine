@@ -1,0 +1,13 @@
+SUPERMERCADO
+COM(1,1)
+PRAR(1,2)
+
+VER(2,1)
+DU(2,2)
+RAS(2,3)
+
+PAN(3,1)
+
+
+
+

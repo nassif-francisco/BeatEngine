@@ -1,0 +1,13 @@
+DEPORTES
+FU(1,1)
+TOL(1,2)
+
+VO(2,1)
+LEI(2,2)
+BOL(2,3)
+
+JUDO(3,1)
+
+
+
+

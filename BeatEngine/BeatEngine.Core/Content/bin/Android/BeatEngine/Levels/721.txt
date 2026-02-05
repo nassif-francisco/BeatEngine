@@ -1,0 +1,13 @@
+NATURALEZA
+FLOR(1,1)
+
+ES(2,1)
+TRE(2,2)
+LLAS(2,3)
+
+VO(3,1)
+L(3,2)
+CAN(3,3)
+
+
+

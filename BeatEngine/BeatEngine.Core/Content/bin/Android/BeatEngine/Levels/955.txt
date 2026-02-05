@@ -1,0 +1,13 @@
+NATURALEZA
+FLOR(1,1)
+
+MON(2,1)
+TA(2,2)
+ÑA(2,3)
+
+NUBE(3,1)
+
+
+
+
+

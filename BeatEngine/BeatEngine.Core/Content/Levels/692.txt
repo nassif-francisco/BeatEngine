@@ -1,0 +1,13 @@
+SUPERMERCADO
+LE(1,1)
+CHE(1,2)
+
+DE(2,1)
+TER(2,2)
+GEN(2,3)
+TE(2,4)
+
+JA(3,1)
+BON(3,2)
+
+

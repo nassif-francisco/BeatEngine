@@ -1,0 +1,13 @@
+PROFESIONES
+DOC(1,1)
+TOR(1,2)
+
+AB(2,1)
+O(2,2)
+GA(2,3)
+DO(2,4)
+
+PO(3,1)
+LI(3,2)
+CIA(3,3)
+

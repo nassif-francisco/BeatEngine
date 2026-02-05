@@ -1,0 +1,13 @@
+DEPORTES
+BA(1,1)
+LON(1,2)
+CES(1,3)
+TO(1,4)
+
+A(2,1)
+TLE(2,2)
+TIS(2,3)
+MO(2,4)
+
+GOLF(3,1)
+

@@ -1,0 +1,13 @@
+SUPERMERCADO
+LAC(1,1)
+TE(1,2)
+OS(1,3)
+
+PAN(2,1)
+
+HUE(3,1)
+VOS(3,2)
+
+
+
+

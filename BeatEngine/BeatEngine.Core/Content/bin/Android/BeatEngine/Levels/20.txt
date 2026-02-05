@@ -1,0 +1,13 @@
+EDIFICIOS
+HO(1,1)
+SPI(1,2)
+TAL(1,3)
+
+SU(2,1)
+PER(2,2)
+MER(2,3)
+CA(2,4)
+DO(2,5)
+
+BAN(3,1)
+CO(3,2)

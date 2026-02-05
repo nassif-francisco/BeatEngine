@@ -1,0 +1,13 @@
+TECNOLOGIA
+RA(1,1)
+DIO(1,2)
+
+TE(2,1)
+LE(2,2)
+VI(2,3)
+SION(2,4)
+
+TEC(3,1)
+LA(3,2)
+DO(3,3)
+

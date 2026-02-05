@@ -1,0 +1,13 @@
+SUPERMERCADO
+PAN(1,1)
+
+JU(2,1)
+GOS(2,2)
+
+JA(3,1)
+BON(3,2)
+
+
+
+
+

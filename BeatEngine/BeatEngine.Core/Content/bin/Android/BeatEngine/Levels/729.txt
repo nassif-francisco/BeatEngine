@@ -1,0 +1,13 @@
+DEPORTES
+BA(1,1)
+SQUET(1,2)
+
+A(2,1)
+TLE(2,2)
+TIS(2,3)
+MO(2,4)
+
+KAR(3,1)
+TE(3,2)
+
+

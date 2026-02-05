@@ -1,0 +1,13 @@
+NATURALEZA
+NUBE(1,1)
+
+VO(2,1)
+L(2,2)
+CAN(2,3)
+
+DE(3,1)
+SIE(3,2)
+RTO(3,3)
+
+
+

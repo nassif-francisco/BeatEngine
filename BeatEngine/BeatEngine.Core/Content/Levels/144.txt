@@ -1,0 +1,13 @@
+SUPERMERCADO
+PA(1,1)
+SI(1,2)
+LLOS(1,3)
+
+LE(2,1)
+CHE(2,2)
+
+YOGUR(3,1)
+
+
+
+

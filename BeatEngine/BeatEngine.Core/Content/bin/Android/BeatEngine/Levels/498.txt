@@ -1,0 +1,13 @@
+NATURALEZA
+AR(1,1)
+BOL(1,2)
+
+SOL(2,1)
+
+LLU(3,1)
+VIA(3,2)
+
+
+
+
+

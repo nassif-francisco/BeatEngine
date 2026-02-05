@@ -1,0 +1,13 @@
+SUPERMERCADO
+HUE(1,1)
+VOS(1,2)
+
+JA(2,1)
+BON(2,2)
+
+CE(3,1)
+RE(3,2)
+AL(3,3)
+
+
+

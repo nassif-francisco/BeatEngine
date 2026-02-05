@@ -1,0 +1,13 @@
+TECNOLOGIA
+RA(1,1)
+DIO(1,2)
+
+TEC(2,1)
+LA(2,2)
+DO(2,3)
+
+AL(3,1)
+TA(3,2)
+VOZ(3,3)
+
+
