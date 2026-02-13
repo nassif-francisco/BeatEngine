@@ -690,7 +690,7 @@ namespace BeatEngine
                     DrawTiles(gameTime, spriteBatch);
                     DrawSkipToNextLevelTile(spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(150, 2500), Color.ForestGreen, spriteBatch);
+                    //DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(150, 2500), Color.ForestGreen, spriteBatch);
                     DrawScoreString(hudFont, string.Format("SCORE:", GameState.Score), new Vector2(100, 50), Color.ForestGreen, spriteBatch);
                     DrawScore(hudFont, GameState.Score.ToString(), new Vector2(380, 30), Color.ForestGreen, spriteBatch);
                     break;
@@ -699,7 +699,7 @@ namespace BeatEngine
                     DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawFX(gameTime, spriteBatch);
-                    DrawClue(hudFont, string.Format("PISTA: {0}", Clue), new Vector2(100, 30), Color.Green, spriteBatch);
+                    //DrawClue(hudFont, string.Format("PISTA: {0}", Clue), new Vector2(100, 30), Color.Green, spriteBatch);
                     break;
             }
         }
