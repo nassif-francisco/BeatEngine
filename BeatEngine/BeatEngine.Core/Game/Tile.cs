@@ -63,6 +63,10 @@ namespace BeatEngine
         }
         public bool IsPressed { get; set; }
 
+        public bool MustRepaintAfterPressed { get; set; }
+
+        public TimeSpan TimePressed { get; set; }
+
         public bool IsHit { get; set; }
 
         public bool IsPlayingSound { get; set; }

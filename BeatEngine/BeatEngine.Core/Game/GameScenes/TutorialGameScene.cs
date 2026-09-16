@@ -334,7 +334,7 @@ namespace BeatEngine
                         // Draw it in screen space.
                         Color tint = Color.White;
 
-                        if (buttons[x, y].IsPressed)
+                        if (buttons[x, y].MustRepaintAfterPressed)
                         {
                             tint = Color.DarkOrchid; //Color.MonoGameOrange, Color.DarkOrange also good candidates
 
@@ -390,6 +390,11 @@ namespace BeatEngine
                 {
                     buttons[x, y].IsPressed = false;
 
+                    if(buttons[x, y].MustRepaintAfterPressed && gameTime.TotalGameTime > buttons[x, y].TimePressed + TimeSpan.FromSeconds(0.1)) //painting must have already occured!
+                    {
+                        buttons[x, y].MustRepaintAfterPressed = false;
+                    }
+
                     foreach (var touch in touchLocations)
                     {
                         Vector2 pos = touch.Position;
@@ -409,8 +414,13 @@ namespace BeatEngine
                                     //InitialTime = (float)gameTime.TotalGameTime.TotalSeconds;
 
                                 }
-
-                                buttons[x, y].IsPressed = true;
+                                if (!buttons[x, y].IsPressed && gameTime.TotalGameTime > buttons[x, y].TimePressed + TimeSpan.FromSeconds(0.3))
+                                {
+                                    buttons[x, y].IsPressed = true;
+                                    buttons[x, y].MustRepaintAfterPressed = true;
+                                    buttons[x, y].TimePressed = gameTime.TotalGameTime;
+                                }
+ 
 
                                 if (!Pressedtiles.Contains(buttons[x, y]))
                                 {
@@ -433,25 +443,32 @@ namespace BeatEngine
             {
                 for (int x = 0; x < Width; ++x)
                 {
+                    if(CurrentTutorialTile >= TutorialTiles.Count)
+                    {
+                        GameState.Level = 1;
+                        GameState.DirtyScene = true;
+                    }
+                    
                     if (buttons[x, y].IsPressed && buttons[x,y].Tag == "UNDERSTOOD")
                     {
                         if (CurrentTutorialTile < TutorialTiles.Count)
                         {
-                            if ((float)gameTime.TotalGameTime.TotalSeconds > InitialTime + 1)
-                            {
+                            //if ((float)gameTime.TotalGameTime.TotalSeconds > InitialTime + 1)
+                            //{
                                 CurrentTutorialTile++;
                                 InitialTime = gameTime.TotalGameTime.TotalSeconds;
-                            }
+                                //buttons[x, y].IsPressed = false;
+                            //}
 
                         }
 
                         else
                         {
-                            GameState.Level = 1;
-                            GameState.DirtyScene = true;
+                           
                         }
 
                     }
+
                 }
             }
 
