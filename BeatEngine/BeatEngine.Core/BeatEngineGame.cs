@@ -10,6 +10,7 @@
 using BeatEngine.Core.Game;
 using BeatEngine.Core.Game.GameScenes;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -329,7 +330,7 @@ namespace BeatEngine
             // Load the level.
             string startScenePath = string.Format("Content/Scenes/StartScene.txt", GameState.Level);
             using (Stream fileStream = TitleContainer.OpenStream(startScenePath))
-                Scene = new StartGameScene(Services, fileStream, GameState.Level, globalTransformation, GameState);
+                Scene = new StartGameScene(Services, fileStream, GameState.Level, globalTransformation, GameState) { clickSound = Content.Load<SoundEffect>("Sounds/Click")};
         }
 
         private void LoadTutorialScene()

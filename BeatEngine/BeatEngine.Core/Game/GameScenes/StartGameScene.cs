@@ -32,6 +32,8 @@ namespace BeatEngine
         public List<Tile> Pressedtiles = new List<Tile>();
         private Tile WelcomeTile;
 
+        public SoundEffect clickSound;
+
         private Matrix globalTransformation;
 
         // Entities in the level.
@@ -244,6 +246,32 @@ namespace BeatEngine
 
         #endregion
 
+        private void CheckFinishedSFX(GameTime gameTime)
+        {
+            for (int y = 0; y < Height; ++y)
+            {
+                for (int x = 0; x < Width; ++x)
+                {
+                    if (buttons[x, y] == null)
+                    {
+                        continue;
+                    }
+
+                    if (buttons[x, y].IsPlayingSound)
+                    {
+                        double currentTime = gameTime.TotalGameTime.TotalSeconds;
+
+                        double elapsedTime = buttons[x, y].InitialTime + buttons[x, y].SoundDuration;
+
+                        if (currentTime >= elapsedTime)
+                        {
+                            buttons[x, y].IsPlayingSound = false;
+                        }
+                    }
+                }
+            }
+        }
+
         #region Update
         public void Update(
             GameTime gameTime,
@@ -253,8 +281,9 @@ namespace BeatEngine
             TouchCollection touchCollection,
             DisplayOrientation orientation)
         {
-            CheckIfTileIsPressed(touchCollection);
-            TraversePressedButtons();
+            CheckIfTileIsPressed(touchCollection, gameTime);
+            CheckFinishedSFX(gameTime);
+            TraversePressedButtons(gameTime);
 
         }
 
@@ -301,7 +330,7 @@ namespace BeatEngine
                         // Draw it in screen space.
                         Color tint = Color.White;
 
-                        if (buttons[x, y].IsPressed)
+                        if (buttons[x, y].MustRepaintAfterPressed) //exclude ta
                         {
                             tint = Color.DarkOrchid; //Color.MonoGameOrange, Color.DarkOrange also good candidates
 
@@ -360,7 +389,7 @@ namespace BeatEngine
 
         }
 
-        private void CheckIfTileIsPressed(TouchCollection touchLocations)
+        private void CheckIfTileIsPressed(TouchCollection touchLocations, GameTime gameTime)
         {
             //Pressedtiles.Clear();
 
@@ -370,6 +399,11 @@ namespace BeatEngine
                 {
                     buttons[x, y].IsPressed = false;
 
+                    if (buttons[x, y].MustRepaintAfterPressed && gameTime.TotalGameTime > buttons[x, y].TimePressed + TimeSpan.FromSeconds(0.1)) //painting must have already occured!
+                    {
+                        buttons[x, y].MustRepaintAfterPressed = false;
+                    }
+
                     foreach (var touch in touchLocations)
                     {
                         Vector2 pos = touch.Position;
@@ -377,18 +411,31 @@ namespace BeatEngine
 
                         if (touch.State == TouchLocationState.Moved || touch.State == TouchLocationState.Pressed)
                         {
-                            Rectangle rectangle = buttons[x, y].BoundingRectangle;
-
-
-                            if (buttons[x, y].BoundingRectangle.Contains(pos))
+                            if (buttons[x, y].BoundingRectangle.Contains(pos) && buttons[x, y].Tag != "SYLABRIXTITLE")
                             {
-                                buttons[x, y].IsPressed = true;
+                                if (!buttons[x, y].IsPlayingSound)
+                                {
+                                    buttons[x, y].IsPlayingSound = true;
+                                    buttons[x, y].SoundDuration = clickSound.Duration.TotalSeconds * 0.5; // this is to allow overlapping sounds, because sound have a long end
+                                    buttons[x, y].InitialTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                                    clickSound.Play();
 
-                                if(!Pressedtiles.Contains(buttons[x, y]))
+                                    //InitialTime = (float)gameTime.TotalGameTime.TotalSeconds;
+
+                                }
+                                if (!buttons[x, y].IsPressed && gameTime.TotalGameTime > buttons[x, y].TimePressed + TimeSpan.FromSeconds(0.3))
+                                {
+                                    buttons[x, y].IsPressed = true;
+                                    buttons[x, y].MustRepaintAfterPressed = true;
+                                    buttons[x, y].TimePressed = gameTime.TotalGameTime;
+                                }
+
+
+                                if (!Pressedtiles.Contains(buttons[x, y]))
                                 {
                                     Pressedtiles.Add(buttons[x, y]);
                                 }
-                                
+
 
                             }
                         }
@@ -433,17 +480,17 @@ namespace BeatEngine
                 }
             }
         }
-        private void TraversePressedButtons()
+        private void TraversePressedButtons(GameTime gameTime)
         {
            foreach(Tile tile in Pressedtiles)
            {
-                if(tile.Tag == "START")
+                if(tile.Tag == "START" && gameTime.TotalGameTime > tile.TimePressed + TimeSpan.FromSeconds(0.1))
                 {
                     GameState.Level = -1; //this will take you to the tutorial scene
                     GameState.DirtyScene = true;
                 }
 
-                if (tile.Tag == "CONTINUE")
+                if (tile.Tag == "CONTINUE" && gameTime.TotalGameTime > tile.TimePressed + TimeSpan.FromSeconds(0.1))
                 {
                     ReadGameState();
                     GameState.DirtyScene = true;

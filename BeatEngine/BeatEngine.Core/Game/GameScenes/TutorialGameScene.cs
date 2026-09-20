@@ -39,9 +39,11 @@ namespace BeatEngine
 
         public int CurrentTutorialTile = 0;
 
+        bool TutorialCompleted = false;
+
         private Matrix globalTransformation;
         private SoundEffect clickSound;
-        public double InitialTime { get; set; }
+        public TimeSpan InitialTime { get; set; }
         // Entities in the level.
         public Player Player
         {
@@ -297,10 +299,10 @@ namespace BeatEngine
             for (int i = 0; i <= EntityLayer; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
 
-            if (CurrentTutorialTile >= TutorialTiles.Count)
-            {
-                return;
-            }
+            //if (CurrentTutorialTile >= TutorialTiles.Count)
+            //{
+            //    CurrentTutorialTile--;
+            //}
 
             DrawTiles(spriteBatch);
             DrawTutorialTiles(spriteBatch);
@@ -311,9 +313,12 @@ namespace BeatEngine
         }
 
         private void DrawTutorialTiles(SpriteBatch spriteBatch)
-        {   
-            TutorialTiles[CurrentTutorialTile].Position = new Vector2(40, 500);
-            spriteBatch.Draw(TutorialTiles[CurrentTutorialTile].Texture, TutorialTiles[CurrentTutorialTile].Position, null, Color.White, 0, new Vector2(1.0f, 1.0f), 3.5f, SpriteEffects.None, 1);
+        {
+            int tutTileToDraw = CurrentTutorialTile >= TutorialTiles.Count ? TutorialTiles.Count - 1 : CurrentTutorialTile;
+
+
+            TutorialTiles[tutTileToDraw].Position = new Vector2(40, 500);
+            spriteBatch.Draw(TutorialTiles[tutTileToDraw].Texture, TutorialTiles[tutTileToDraw].Position, null, Color.White, 0, new Vector2(1.0f, 1.0f), 3.5f, SpriteEffects.None, 1);
 
 
             //spriteBatch.Draw(TutorialTiles[CurrentTutorialTile].Texture, TutorialTiles[CurrentTutorialTile].Position , Color.White);
@@ -443,12 +448,12 @@ namespace BeatEngine
             {
                 for (int x = 0; x < Width; ++x)
                 {
-                    if(CurrentTutorialTile >= TutorialTiles.Count)
+                    if (CurrentTutorialTile >= TutorialTiles.Count && gameTime.TotalGameTime > InitialTime + TimeSpan.FromSeconds(0.1))
                     {
                         GameState.Level = 1;
                         GameState.DirtyScene = true;
                     }
-                    
+
                     if (buttons[x, y].IsPressed && buttons[x,y].Tag == "UNDERSTOOD")
                     {
                         if (CurrentTutorialTile < TutorialTiles.Count)
@@ -456,7 +461,7 @@ namespace BeatEngine
                             //if ((float)gameTime.TotalGameTime.TotalSeconds > InitialTime + 1)
                             //{
                                 CurrentTutorialTile++;
-                                InitialTime = gameTime.TotalGameTime.TotalSeconds;
+                                InitialTime = buttons[x, y].TimePressed;
                                 //buttons[x, y].IsPressed = false;
                             //}
 
