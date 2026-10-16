@@ -235,3 +235,5 @@ stacktrace.txt
 
 # Customization dlls
 Customizations/**/Bin/
+# MonoGame generated binaries and compiled content
+**/bin/

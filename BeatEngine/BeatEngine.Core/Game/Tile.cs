@@ -84,8 +84,8 @@ namespace BeatEngine
         public double InitialTime { get; set; }
         public HitAnimation Hit { get; set; }
 
-        public float Width = 260;
-        public float Height = 260;
+        public float Width = 220;
+        public float Height = 220;
 
         public string Tag { get; set; }
 

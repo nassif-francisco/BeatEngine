@@ -68,6 +68,8 @@ namespace BeatEngine
         public BeatEngineGame()
         {
             graphics = new GraphicsDeviceManager(this);
+            Window.Title = "En Silabas";
+            TouchPanel.EnableMouseTouchPoint = true;
 
 #if WINDOWS_PHONE
             TargetElapsedTime = TimeSpan.FromTicks(333333);
@@ -370,7 +372,7 @@ namespace BeatEngine
         {
             graphics.GraphicsDevice.Clear(Color.White);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, globalTransformation);
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.LinearClamp, null, null, null, globalTransformation);
 
             Scene.Draw(gameTime, spriteBatch);
 

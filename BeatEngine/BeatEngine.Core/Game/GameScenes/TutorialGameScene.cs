@@ -317,8 +317,8 @@ namespace BeatEngine
             int tutTileToDraw = CurrentTutorialTile >= TutorialTiles.Count ? TutorialTiles.Count - 1 : CurrentTutorialTile;
 
 
-            TutorialTiles[tutTileToDraw].Position = new Vector2(40, 500);
-            spriteBatch.Draw(TutorialTiles[tutTileToDraw].Texture, TutorialTiles[tutTileToDraw].Position, null, Color.White, 0, new Vector2(1.0f, 1.0f), 3.5f, SpriteEffects.None, 1);
+            TutorialTiles[tutTileToDraw].Position = new Vector2(60, 400);
+            spriteBatch.Draw(TutorialTiles[tutTileToDraw].Texture, TutorialTiles[tutTileToDraw].Position, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1);
 
 
             //spriteBatch.Draw(TutorialTiles[CurrentTutorialTile].Texture, TutorialTiles[CurrentTutorialTile].Position , Color.White);
@@ -341,7 +341,7 @@ namespace BeatEngine
 
                         if (buttons[x, y].MustRepaintAfterPressed)
                         {
-                            tint = Color.DarkOrchid; //Color.MonoGameOrange, Color.DarkOrange also good candidates
+                            tint = Color.LightGray; //Color.MonoGameOrange, Color.DarkOrange also good candidates
 
                         }
 

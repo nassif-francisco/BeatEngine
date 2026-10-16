@@ -332,7 +332,7 @@ namespace BeatEngine
 
                         if (buttons[x, y].MustRepaintAfterPressed) //exclude ta
                         {
-                            tint = Color.DarkOrchid; //Color.MonoGameOrange, Color.DarkOrange also good candidates
+                            tint = Color.LightGray; //Color.MonoGameOrange, Color.DarkOrange also good candidates
 
                         }
 
@@ -345,48 +345,16 @@ namespace BeatEngine
 
         private void PositionTitle()
         {
-            Tile titleTile = buttons[0,buttons.Length -1];
-            
-            Vector2 position = new Vector2(titleTile.Position.X -90, titleTile.Position.Y -250);
-
-            titleTile.Position = position;
+            foreach (Tile button in buttons)
+                if (button.Tag == "SYLABRIXTITLE")
+                    button.Position = new Vector2(60, 400);
         }
 
         private void PositionButtons()
         {
-            int initialPosY = 1134;
-            int initialPosX = 50;
-
-            for (int y = 0; y < Height; ++y)
-            {
-                for (int x = 0; x < Width; ++x)
-                {
-                    //If there is a visible tile in that position
-                    Texture2D texture = buttons[x, y].Texture;
-                    if (texture != null)
-                    {
-                        //Draw it in screen space.
-                        Vector2 position = new Vector2(initialPosX, initialPosY);
-                        buttons[x, y].Position = position;
-
-                    }
-
-                    if(buttons[x, y].Tag == "CONTINUE")
-                    {
-                        buttons[x, y].Position = new Vector2(initialPosX + 20, initialPosY + 200);
-                    }
-
-                    if (buttons[x, y].Tag == "START")
-                    {
-                        buttons[x, y].Position = new Vector2(initialPosX + 20, initialPosY + 100);
-                    }
-
-                }
-                initialPosX = 50;
-                initialPosY -= 350;
-            }
-
-
+            foreach (Tile button in buttons)
+                button.Position = new Vector2(60, button.Tag == "START" ? 1250 : 1480);
+            WelcomeTile.Position = new Vector2(60, 180);
         }
 
         private void CheckIfTileIsPressed(TouchCollection touchLocations, GameTime gameTime)

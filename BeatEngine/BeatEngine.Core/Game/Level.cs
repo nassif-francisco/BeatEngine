@@ -84,6 +84,7 @@ namespace BeatEngine
         private static readonly Point InvalidPosition = new Point(-1, -1);
 
         private SpriteFont hudFont;
+        private SpriteFont syllableFont;
 
         // Level game state.
         private Random random = new Random(354668); // Arbitrary, but constant seed
@@ -115,6 +116,9 @@ namespace BeatEngine
 
         public List<Syllable> Syllables;
         string Clue = string.Empty;
+        private const int HintCost = 5;
+        private bool clueRevealed;
+        private Tile hintButton;
 
         public int TotalNbrBackgrounds = 2;
 
@@ -135,6 +139,8 @@ namespace BeatEngine
 
             LoadLevelEndingTile("Excelente", TileCollision.Passable);
             LoadSkipToNextLevelTile("Arrow", TileCollision.Passable);
+            hintButton = new Tile(Content.Load<Texture2D>("UI/Buttons/ShowHint_button"), TileCollision.Passable, Content);
+            hintButton.Position = new Vector2(60, 230);
 
 
             //SequenceManager.InitiateSequence(new GameTime(), tiles);
@@ -158,6 +164,7 @@ namespace BeatEngine
             this.globalTransformation = Matrix.Invert(globalTransformation);
 
             hudFont = Content.Load<SpriteFont>("Fonts/Hud");
+            syllableFont = Content.Load<SpriteFont>("Fonts/Syllable");
 
             AddModes();
 
@@ -193,7 +200,7 @@ namespace BeatEngine
         private Tile LoadLevelEndingTile(string name, TileCollision collision)
         {
             LevelEndingTile = new Tile(Content.Load<Texture2D>("UI/Environment/" + name), collision, Content);
-            LevelEndingTile.Position = new Vector2(-150, 800);
+            LevelEndingTile.Position = new Vector2(-150, 1500);
 
             offscreenLeftX = -80000;
             offscreenRightX = 1200;
@@ -472,6 +479,7 @@ namespace BeatEngine
                     CheckFinishedSFX(gameTime);
                     CheckIfTileIsPressed(touchCollection, gameTime);
                     CheckIfSkipTileIsPressed(touchCollection, gameTime);
+                    CheckIfHintIsPressed(touchCollection);
                     AllTilesAssigned = CheckIfAllTilesAreAssignedToPanels();
                     CheckModeTransition(gameTime);
                     break;
@@ -673,11 +681,13 @@ namespace BeatEngine
             for (int i = 0; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
             
+            if (clueRevealed)
+                DrawClue(hudFont, Clue, new Vector2(60, 400), Color.Black, spriteBatch);
             switch (CurrentMode.Tag)
             {
                 case "Intro":
                     DrawTiles(gameTime, spriteBatch);
-                    DrawShadowedString(hudFont, "SCORE: ", new Vector2(700, 30), Color.Brown, spriteBatch);
+                    DrawShadowedString(hudFont, "PUNTOS: ", new Vector2(700, 30), Color.Black, spriteBatch);
                     break;
                 case "Show":
                     DrawPanels(gameTime, spriteBatch);
@@ -689,10 +699,12 @@ namespace BeatEngine
                     DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawSkipToNextLevelTile(spriteBatch);
+                    if (!clueRevealed)
+                        spriteBatch.Draw(hintButton.Texture, hintButton.Position, Color.White);
                     DrawFX(gameTime, spriteBatch);
-                    //DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(150, 2500), Color.ForestGreen, spriteBatch);
-                    DrawScoreString(hudFont, string.Format("SCORE:", GameState.Score), new Vector2(100, 50), Color.ForestGreen, spriteBatch);
-                    DrawScore(hudFont, GameState.Score.ToString(), new Vector2(380, 30), Color.ForestGreen, spriteBatch);
+                    //DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(150, 2500), Color.Black, spriteBatch);
+                    DrawScoreString(hudFont, string.Format("PUNTOS:", GameState.Score), new Vector2(100, 50), Color.Black, spriteBatch);
+                    DrawScore(hudFont, GameState.Score.ToString(), new Vector2(480, 30), Color.Black, spriteBatch);
                     break;
 
                 case "Calculate":
@@ -713,8 +725,8 @@ namespace BeatEngine
 
         private void DrawClue(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 4.25f, SpriteEffects.None, 1);
-            //sriteBatch.DrawString(font, value, position, color);
+            float scale = Math.Min(4.25f, 1080f / Math.Max(1f, font.MeasureString(value).X));
+            spriteBatch.DrawString(font, value, position, color, 0, Vector2.Zero, scale, SpriteEffects.None, 1);
         }
 
         private void DrawScore(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
@@ -758,28 +770,13 @@ namespace BeatEngine
                         }
 
                         spriteBatch.Draw(texture, tiles[x, y].Position, tint);
-                        var silabaPosition = new Vector2(tiles[x, y].Position.X + 90, tiles[x, y].Position.Y + tiles[x, y].Height / 3f);
-
                         string text = tiles[x, y].Syllable.SyllableTag;
-
-                        if(text.Count() == 2)
-                        {
-                            silabaPosition = new Vector2(tiles[x, y].Position.X + 98, tiles[x, y].Position.Y + tiles[x, y].Height / 2.75f);
-                        }
-                        else if (text.Count() == 1)
-                        {
-                            silabaPosition = new Vector2(tiles[x, y].Position.X + 118, tiles[x, y].Position.Y + tiles[x, y].Height / 2.75f);
-                        }
-                        else if(text.Count() == 3)
-                        {
-                            silabaPosition = new Vector2(tiles[x, y].Position.X + 78, tiles[x, y].Position.Y + tiles[x, y].Height / 2.75f);
-                        }
-                        else
-                        {
-                            silabaPosition = new Vector2(tiles[x, y].Position.X + 58, tiles[x, y].Position.Y + tiles[x, y].Height / 2.75f);
-                        }
-
-                            DrawShadowedString(hudFont, text, silabaPosition, Color.Black, spriteBatch);
+                        const float textScale = 3.7f;
+                        Vector2 textSize = syllableFont.MeasureString(text) * textScale;
+                        Vector2 textPosition = tiles[x, y].Position +
+                            (new Vector2(texture.Width, texture.Height) - textSize) / 2f;
+                        spriteBatch.DrawString(syllableFont, text, textPosition, Color.Black,
+                            0f, Vector2.Zero, textScale, SpriteEffects.None, 0f);
 
                     }
                 }
@@ -791,7 +788,7 @@ namespace BeatEngine
             for(int k = 0; k < Panels.Count; k++)
             {
                 Texture2D texture = Panels[k].Texture;
-                spriteBatch.Draw(texture, Panels[k].Position, Color.White * 0.7f);
+                spriteBatch.Draw(texture, Panels[k].Position, Color.White);
             }
         }
 
@@ -835,7 +832,7 @@ namespace BeatEngine
 
         private void PositionTiles()
         {
-            int initialPosY = 1934;
+            int initialPosY = 2320;
             int initialPosX = 920;
 
             for (int y = 0; y < Height; ++y)
@@ -866,8 +863,8 @@ namespace BeatEngine
 
         private void PositionPanels()
         {
-            int initialPosY = 1234;
-            int initialPosX = 10;
+            int initialPosY = 1140;
+            int initialPosX = 35;
 
             for (int y = 0; y < Panels.Count; ++y)
             {
@@ -879,7 +876,7 @@ namespace BeatEngine
                     Panels[y].Position = position;
 
                 }
-                initialPosY -= 280;
+                initialPosY -= 270;
             }
         }
 
@@ -1022,6 +1019,24 @@ namespace BeatEngine
             return allTilesAssigned;
         }
 
+        private void CheckIfHintIsPressed(TouchCollection touchLocations)
+        {
+            if (clueRevealed)
+                return;
+
+            foreach (var touch in touchLocations)
+            {
+                Vector2 position = Vector2.Transform(touch.Position, globalTransformation);
+                if (touch.State == TouchLocationState.Pressed && hintButton.BoundingRectangle.Contains(position))
+                {
+                    clueRevealed = true;
+                    GameState.Score -= HintCost;
+                    PeristGameState();
+                    break;
+                }
+            }
+        }
+
         public void CheckIfSkipTileIsPressed(TouchCollection touchLocations, GameTime gameTime)
         {
             foreach (var touch in touchLocations)
@@ -1070,7 +1085,7 @@ namespace BeatEngine
 
                                 //tiles[x, y].dragOffset = tiles[x, y].Position - touch.Position;
 
-                                dragOffset = draggedTile.Position - touch.Position;
+                                dragOffset = draggedTile.Position - pos;
 
                             }
 
@@ -1078,7 +1093,7 @@ namespace BeatEngine
 
                         if(touch.State == TouchLocationState.Moved && draggedTile != null)
                         {
-                            draggedTile.Position = touch.Position + dragOffset;
+                            draggedTile.Position = pos + dragOffset;
 
                             if (draggedTile.CurrentPanel != -100)
                             {

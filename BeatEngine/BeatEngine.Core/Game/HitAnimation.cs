@@ -16,7 +16,7 @@ namespace BeatEngine.Core.Game
         private Vector2 origin;
 
         public readonly int PointValue = 30;
-        public readonly Color Color = Color.Yellow;
+        public readonly Color Color = Color.Black;
 
         private Animation starAnimation;
         private AnimationPlayer sprite;

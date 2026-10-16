@@ -87,6 +87,13 @@
 
 
 
+#begin Fonts/Syllable.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Syllable.spritefont
+
 #begin Fonts/Hud.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -94,8 +101,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/Hud.spritefont
 
-#begin Levels/0.txt
-/copy:Levels/0.txt
 
 #begin Levels/1.txt
 /copy:Levels/1.txt
@@ -3124,8 +3129,6 @@
 #begin Levels/1009.txt
 /copy:Levels/1009.txt
 
-#begin Levels/1_steps.txt
-/copy:Levels/1_steps.txt
 
 #begin Scenes/StartScene.txt
 /copy:Scenes/StartScene.txt
@@ -3437,3 +3440,11 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Sprites/Star.png
+
+#begin UI/Buttons/ShowHint_button.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Color
+/build:UI/Buttons/ShowHint_button.png
