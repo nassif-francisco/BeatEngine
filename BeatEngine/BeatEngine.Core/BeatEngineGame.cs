@@ -1,4 +1,4 @@
-#region File Description
+﻿#region File Description
 //-----------------------------------------------------------------------------
 // PlatformerGame.cs
 //
@@ -370,7 +370,7 @@ namespace BeatEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            graphics.GraphicsDevice.Clear(Color.White);
+            graphics.GraphicsDevice.Clear(GameTheme.Background);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.LinearClamp, null, null, null, globalTransformation);
 

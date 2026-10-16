@@ -396,7 +396,9 @@ namespace BeatEngine
       
         private Tile LoadTile(Syllable syllable)
         {
-            return LoadTile("magenta", TileCollision.Platform, syllable);
+            string[] faces = { "magenta", "blue", "leaf", "gray" };
+            int colorIndex = syllable.SyllableTag.Sum(character => (int)character) % faces.Length;
+            return LoadTile(faces[colorIndex], TileCollision.Platform, syllable);
         }
 
         private Tile LoadTile(string name, TileCollision collision, Syllable syllable)
@@ -681,13 +683,16 @@ namespace BeatEngine
             for (int i = 0; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
             
+            DrawSectionLabel(spriteBatch, "FORMA TRES PALABRAS", new Vector2(60, 445), GameTheme.Accent);
+            if (CurrentMode.Tag == "Play")
+                DrawSectionLabel(spriteBatch, "S\u00cdLABAS DISPONIBLES", new Vector2(60, 1280), GameTheme.Muted);
             if (clueRevealed)
-                DrawClue(hudFont, Clue, new Vector2(60, 400), Color.Black, spriteBatch);
+                DrawClue(hudFont, "Pista: " + Clue, new Vector2(60, 370), GameTheme.Accent, spriteBatch);
             switch (CurrentMode.Tag)
             {
                 case "Intro":
                     DrawTiles(gameTime, spriteBatch);
-                    DrawShadowedString(hudFont, "PUNTOS: ", new Vector2(700, 30), Color.Black, spriteBatch);
+                    DrawShadowedString(hudFont, "PUNTOS: ", new Vector2(700, 30), GameTheme.Text, spriteBatch);
                     break;
                 case "Show":
                     DrawPanels(gameTime, spriteBatch);
@@ -702,9 +707,9 @@ namespace BeatEngine
                     if (!clueRevealed)
                         spriteBatch.Draw(hintButton.Texture, hintButton.Position, Color.White);
                     DrawFX(gameTime, spriteBatch);
-                    //DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(150, 2500), Color.Black, spriteBatch);
-                    DrawScoreString(hudFont, string.Format("PUNTOS:", GameState.Score), new Vector2(100, 50), Color.Black, spriteBatch);
-                    DrawScore(hudFont, GameState.Score.ToString(), new Vector2(480, 30), Color.Black, spriteBatch);
+                    //DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(150, 2500), GameTheme.Text, spriteBatch);
+                    DrawSectionLabel(spriteBatch, "PUNTOS", new Vector2(760, 230), GameTheme.Muted);
+                    DrawScore(hudFont, GameState.Score.ToString(), new Vector2(760, 280), GameTheme.Text, spriteBatch);
                     break;
 
                 case "Calculate":
@@ -717,6 +722,12 @@ namespace BeatEngine
         }
 
 
+        private void DrawSectionLabel(SpriteBatch spriteBatch, string text, Vector2 position, Color color)
+        {
+            spriteBatch.DrawString(hudFont, text, position, color,
+                0f, Vector2.Zero, 2.2f, SpriteEffects.None, 0f);
+        }
+
         private void DrawShadowedString(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
         {
             spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 3.7f, SpriteEffects.None, 1);
@@ -725,13 +736,16 @@ namespace BeatEngine
 
         private void DrawClue(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
         {
-            float scale = Math.Min(4.25f, 1080f / Math.Max(1f, font.MeasureString(value).X));
+            Vector2 measured = font.MeasureString(value);
+            // Confine the clue to its own band, above the section heading at Y=445.
+            float scale = Math.Min(3.2f, Math.Min(1080f / Math.Max(1f, measured.X),
+                50f / Math.Max(1f, measured.Y)));
             spriteBatch.DrawString(font, value, position, color, 0, Vector2.Zero, scale, SpriteEffects.None, 1);
         }
 
         private void DrawScore(SpriteFont font, string value, Vector2 position, Color color, SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 6f, SpriteEffects.None, 1);
+            spriteBatch.DrawString(font, value, position + new Vector2(1.0f, 1.0f), color, 0, new Vector2(1.0f, 1.0f), 3.2f, SpriteEffects.None, 1);
             //sriteBatch.DrawString(font, value, position, color);
         }
 
@@ -766,7 +780,7 @@ namespace BeatEngine
 
                         if(tiles[x, y].IsPressed)
                         {
-                            //tint = Color.MonoGameOrange;
+                            tint = GameTheme.Pressed;
                         }
 
                         spriteBatch.Draw(texture, tiles[x, y].Position, tint);
@@ -775,7 +789,7 @@ namespace BeatEngine
                         Vector2 textSize = syllableFont.MeasureString(text) * textScale;
                         Vector2 textPosition = tiles[x, y].Position +
                             (new Vector2(texture.Width, texture.Height) - textSize) / 2f;
-                        spriteBatch.DrawString(syllableFont, text, textPosition, Color.Black,
+                        spriteBatch.DrawString(syllableFont, text, textPosition, GameTheme.TileInk,
                             0f, Vector2.Zero, textScale, SpriteEffects.None, 0f);
 
                     }
@@ -832,8 +846,8 @@ namespace BeatEngine
 
         private void PositionTiles()
         {
-            int initialPosY = 2320;
-            int initialPosX = 920;
+            int initialPosY = 1370 + ((Syllables.Count + 3) / 4 - 1) * 240;
+            int initialPosX = 910;
 
             for (int y = 0; y < Height; ++y)
             {
@@ -853,17 +867,17 @@ namespace BeatEngine
                         tiles[x, y].Position = position;
 
                     }
-                    initialPosX -= 300;
+                    initialPosX -= 280;
 
                 }
-                initialPosX = 920;
-                initialPosY -= 300;
+                initialPosX = 910;
+                initialPosY -= 240;
             }
         }
 
         private void PositionPanels()
         {
-            int initialPosY = 1140;
+            int initialPosY = 1000;
             int initialPosX = 35;
 
             for (int y = 0; y < Panels.Count; ++y)
@@ -876,7 +890,7 @@ namespace BeatEngine
                     Panels[y].Position = position;
 
                 }
-                initialPosY -= 270;
+                initialPosY -= 240;
             }
         }
 

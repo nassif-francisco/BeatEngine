@@ -341,7 +341,7 @@ namespace BeatEngine
 
                         if (buttons[x, y].MustRepaintAfterPressed)
                         {
-                            tint = Color.LightGray; //Color.MonoGameOrange, Color.DarkOrange also good candidates
+                            tint = GameTheme.Pressed; //Color.MonoGameOrange, Color.DarkOrange also good candidates
 
                         }
 

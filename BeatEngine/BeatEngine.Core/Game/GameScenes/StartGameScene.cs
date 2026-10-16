@@ -332,7 +332,7 @@ namespace BeatEngine
 
                         if (buttons[x, y].MustRepaintAfterPressed) //exclude ta
                         {
-                            tint = Color.LightGray; //Color.MonoGameOrange, Color.DarkOrange also good candidates
+                            tint = GameTheme.Pressed; //Color.MonoGameOrange, Color.DarkOrange also good candidates
 
                         }
 
@@ -347,14 +347,14 @@ namespace BeatEngine
         {
             foreach (Tile button in buttons)
                 if (button.Tag == "SYLABRIXTITLE")
-                    button.Position = new Vector2(60, 400);
+                    button.Position = new Vector2(60, 480);
         }
 
         private void PositionButtons()
         {
             foreach (Tile button in buttons)
                 button.Position = new Vector2(60, button.Tag == "START" ? 1250 : 1480);
-            WelcomeTile.Position = new Vector2(60, 180);
+            WelcomeTile.Position = new Vector2(60, 220);
         }
 
         private void CheckIfTileIsPressed(TouchCollection touchLocations, GameTime gameTime)

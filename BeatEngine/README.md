@@ -4,7 +4,7 @@ A MonoGame syllable puzzle. Drag the syllables into three word rows, using the c
 
 ## Visual direction
 
-Black ink on white, square outlined cells, monospaced type, and generous space inspired by Sudoku. All original source images have been replaced, including the menu, tutorial, tiles, word rows, feedback, legacy variants, and platform icons/splashes. Press feedback uses gray; completion uses a simple check mark. Audio is retained.
+The title is four colored syllable tiles: EN / SI / LA / BAS, shared by the menu and compact in-game header. A warm paper background, charcoal typography, softly squared tiles, and continuous sage word trays give En Silabas its own visual identity. Yellow, mint, ivory, and gray tile faces are decorative. Each tray represents a whole word; subtle baseline guides suggest tile positions without dividing the row into boxes. Clues occupy a bounded band above the board heading. Controls, tutorials, feedback, and platform art share the same geometry. No wood texture or raised tile effects are used.
 
 The clue starts hidden. "Mostrar Pista" reveals it and deducts 5 points once per level. The deduction is saved immediately. Completion feedback appears below the word rows.
 
@@ -28,7 +28,7 @@ Regenerate the geometric assets and reference layouts using Python and Pillow:
 python tools/generate_art.py
 ```
 
-Reference layouts (composed from the assets, not runtime screenshots) are in `ArtPreview/`. The script uses the bundled Consolas font and no external artwork. Existing content filenames remain compatible with the MonoGame pipeline.
+Reference layouts (composed from the assets, not runtime screenshots) are in `ArtPreview/`. The script uses the bundled Avenir and Roboto fonts and no external artwork. Existing content filenames remain compatible with the MonoGame pipeline.
 
 ## Project layout
 
