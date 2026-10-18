@@ -83,6 +83,9 @@ namespace BeatEngine
         private Point exit = InvalidPosition;
         private static readonly Point InvalidPosition = new Point(-1, -1);
 
+        private MenuControls controls;
+        private readonly Rectangle homeButton = new Rectangle(60, 30, 600, 110);
+        private Texture2D preferredTileTexture;
         private SpriteFont hudFont;
         private SpriteFont syllableFont;
 
@@ -171,6 +174,7 @@ namespace BeatEngine
             this.globalTransformation = Matrix.Invert(globalTransformation);
 
             hudFont = Content.Load<SpriteFont>("Fonts/Hud");
+            controls = new MenuControls(feedbackPixel.GraphicsDevice, hudFont);
             syllableFont = Content.Load<SpriteFont>("Fonts/Syllable");
 
             AddModes();
@@ -417,6 +421,30 @@ namespace BeatEngine
         private Tile LoadTile(string name, TileCollision collision, Syllable syllable)
         {
             Tile tile = new Tile(Content.Load<Texture2D>("Tiles/" + name), collision, Content);
+            if (GameState.Preferences.TileColor != TileColor.Multicolor)
+            {
+                if (preferredTileTexture == null)
+                {
+                    // Recolor only the solid face, preserving its border and transparent corners.
+                    var source = Content.Load<Texture2D>("Tiles/magenta");
+                    var pixels = new Color[source.Width * source.Height];
+                    source.GetData(pixels);
+                    Color original = pixels[(source.Height / 2) * source.Width + source.Width / 2];
+                    Color face = GameState.Preferences.TileColor switch
+                    {
+                        TileColor.Blanco => Color.White,
+                        TileColor.Gris => new Color(212, 216, 219),
+                        TileColor.Amarillo => new Color(246, 207, 101),
+                        TileColor.Crema => new Color(255, 248, 233),
+                        _ => new Color(199, 231, 204)
+                    };
+                    for (int i = 0; i < pixels.Length; i++)
+                        if (pixels[i] == original) pixels[i] = face;
+                    preferredTileTexture = new Texture2D(source.GraphicsDevice, source.Width, source.Height);
+                    preferredTileTexture.SetData(pixels);
+                }
+                tile.Texture = preferredTileTexture;
+            }
             tile.Syllable = syllable;   
 
             tile.SetFlipTexture(Content.Load<Texture2D>("Tiles/front"));
@@ -427,6 +455,8 @@ namespace BeatEngine
       
         public void Dispose()
         {
+            controls.Dispose();
+            preferredTileTexture?.Dispose();
             feedbackPixel.Dispose();
             Content.Unload();
         }
@@ -489,6 +519,15 @@ namespace BeatEngine
             TouchCollection touchCollection,
             DisplayOrientation orientation)
         {
+            foreach (var touch in touchCollection)
+                if (touch.State == TouchLocationState.Pressed &&
+                    homeButton.Contains(Vector2.Transform(touch.Position, globalTransformation)))
+                {
+                    PeristGameState();
+                    GameState.Level = 0;
+                    GameState.DirtyScene = true;
+                    return;
+                }
             switch (CurrentMode.Tag)
             {
                 case "Play":
@@ -691,6 +730,7 @@ namespace BeatEngine
             for (int i = 0; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
             
+            controls.Button(spriteBatch, homeButton, "Ir a Inicio");
             DrawSectionLabel(spriteBatch, "FORMA TRES PALABRAS", new Vector2(60, 445), GameTheme.Accent);
             if (CurrentMode.Tag == "Play")
                 DrawSectionLabel(spriteBatch, "S\u00cdLABAS DISPONIBLES", new Vector2(60, 1280), GameTheme.Muted);

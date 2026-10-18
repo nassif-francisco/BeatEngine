@@ -25,6 +25,12 @@ namespace BeatEngine
 {
     class StartGameScene : ISceneBase
     {
+        private readonly Rectangle preferencesButton = new Rectangle(60, 1710, 1080, 180);
+        private readonly Rectangle backButton = new Rectangle(60, 220, 400, 120);
+        private readonly Rectangle colorDropdown = new Rectangle(60, 760, 1080, 150);
+        private MenuControls controls;
+        private bool showingPreferences;
+        private bool dropdownOpen;
         private Tile[,] buttons;
         private Texture2D[] layers;
         // The layer which entities are drawn on top of.
@@ -96,6 +102,7 @@ namespace BeatEngine
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");
             GameState = gameState;
+            controls = new MenuControls(content.Load<Texture2D>("UI/Buttons/Continue_button").GraphicsDevice, content.Load<SpriteFont>("Fonts/Hud"));
 
             LoadButtons(fileStream);
             LoadWelcomeText();
@@ -227,6 +234,7 @@ namespace BeatEngine
         /// </summary>
         public void Dispose()
         {
+            controls.Dispose();
             Content.Unload();
         }
 
@@ -281,6 +289,41 @@ namespace BeatEngine
             TouchCollection touchCollection,
             DisplayOrientation orientation)
         {
+            foreach (var touch in touchCollection)
+            {
+                if (touch.State != TouchLocationState.Pressed) continue;
+                Vector2 position = Vector2.Transform(touch.Position, globalTransformation);
+                if (showingPreferences)
+                {
+                    if (backButton.Contains(position))
+                    {
+                        showingPreferences = false;
+                        dropdownOpen = false;
+                        return;
+                    }
+                    if (colorDropdown.Contains(position))
+                        dropdownOpen = !dropdownOpen;
+                    else
+                    {
+                        if (dropdownOpen)
+                            foreach (TileColor color in Enum.GetValues<TileColor>())
+                                if (ColorOptionBounds(color).Contains(position))
+                                {
+                                    GameState.Preferences.TileColor = color;
+                                    GameState.Preferences.Save();
+                                    break;
+                                }
+                        dropdownOpen = false;
+                    }
+                }
+                else if (preferencesButton.Contains(position))
+                {
+                    Pressedtiles.Clear();
+                    showingPreferences = true;
+                    return;
+                }
+            }
+            if (showingPreferences) return;
             CheckIfTileIsPressed(touchCollection, gameTime);
             CheckFinishedSFX(gameTime);
             TraversePressedButtons(gameTime);
@@ -300,6 +343,18 @@ namespace BeatEngine
             for (int i = 0; i <= EntityLayer; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
 
+            if (showingPreferences)
+            {
+                controls.Button(spriteBatch, backButton, "Ir a Inicio");
+                controls.Text(spriteBatch, "Preferencias", new Vector2(600, 480), 5f);
+                controls.Text(spriteBatch, "Color de fichas", new Vector2(600, 660), 4f);
+                controls.Button(spriteBatch, colorDropdown, GameState.Preferences.TileColor + (dropdownOpen ? "   ^" : "   v"));
+                if (dropdownOpen)
+                    foreach (TileColor color in Enum.GetValues<TileColor>())
+                        controls.Button(spriteBatch, ColorOptionBounds(color), color.ToString(), color == GameState.Preferences.TileColor);
+                return;
+            }
+            controls.Button(spriteBatch, preferencesButton, "Preferencias");
             DrawWelcomeText(spriteBatch);
             DrawTiles(spriteBatch);
             
@@ -307,6 +362,9 @@ namespace BeatEngine
             for (int i = EntityLayer + 1; i < layers.Length; ++i)
                 spriteBatch.Draw(layers[i], Vector2.Zero, Color.White);
         }
+
+        private Rectangle ColorOptionBounds(TileColor color) =>
+            new Rectangle(60, 920 + (int)color * 140, 1080, 140);
 
         public void DrawWelcomeText(SpriteBatch spriteBatch)
         {

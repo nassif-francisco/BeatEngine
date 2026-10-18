@@ -14,6 +14,8 @@ namespace BeatEngine.Core.Game
             Score = 0;
             DirtyScene = false;
         }
+        public PlayerPreferences Preferences { get; } = PlayerPreferences.Load();
+
         public int Level { get; set; }
 
         public int Score { get; set; }
