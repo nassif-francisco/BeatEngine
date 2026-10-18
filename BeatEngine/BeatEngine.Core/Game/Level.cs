@@ -1,4 +1,4 @@
-﻿#region File Description
+#region File Description
 //-----------------------------------------------------------------------------
 // Level.cs
 //
@@ -119,6 +119,11 @@ namespace BeatEngine
         private const int HintCost = 5;
         private bool clueRevealed;
         private Tile hintButton;
+        private Texture2D feedbackPixel;
+        private string successMessage;
+        private string failureMessage;
+        private float mistakeTimeRemaining;
+        private string lastFailedArrangement;
 
         public int TotalNbrBackgrounds = 2;
 
@@ -141,6 +146,8 @@ namespace BeatEngine
             LoadSkipToNextLevelTile("Arrow", TileCollision.Passable);
             hintButton = new Tile(Content.Load<Texture2D>("UI/Buttons/ShowHint_button"), TileCollision.Passable, Content);
             hintButton.Position = new Vector2(60, 230);
+            feedbackPixel = new Texture2D(LevelEndingTile.Texture.GraphicsDevice, 1, 1);
+            feedbackPixel.SetData(new[] { Color.White });
 
 
             //SequenceManager.InitiateSequence(new GameTime(), tiles);
@@ -182,6 +189,7 @@ namespace BeatEngine
             Modes.Add(new Mode() { Tag = "Play", NextModeTag = "Calculate" });
             Modes.Add(new Mode() { Tag = "Show", NextModeTag = "Play" });
             Modes.Add(new Mode() { Tag = "Calculate", NextModeTag = "Show" });
+            Modes.Add(new Mode() { Tag = "Mistake", NextModeTag = "Play" });
         }
 
         int DefaultPanelNumber = 3;
@@ -306,6 +314,11 @@ namespace BeatEngine
         public Tile NextLevelTile;
         private void DrawLevelEndingTile(GameTime gameTime, SpriteBatch spriteBatch)
         {
+            // Skipping completes the level without starting a success animation.
+            // The scene can still draw once before the next level is loaded.
+            if (LevelFinishedAndEffectsShown)
+                return;
+
             levelEndingTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             float t = MathHelper.Clamp(levelEndingTimer / DefaultAnimationDuration, 0f, 1f);
@@ -334,7 +347,7 @@ namespace BeatEngine
 
             LevelEndingTile.Position = new Vector2(x, LevelEndingTile.Position.Y);
 
-            spriteBatch.Draw(LevelEndingTile.Texture, LevelEndingTile.Position, Color.White);
+            DrawFeedback(spriteBatch, successMessage, LevelEndingTile.Position, true, 1f);
 
             if (t >= 1f)
             {
@@ -414,6 +427,7 @@ namespace BeatEngine
       
         public void Dispose()
         {
+            feedbackPixel.Dispose();
             Content.Unload();
         }
 
@@ -490,6 +504,11 @@ namespace BeatEngine
                     CalculateScore();
                     CheckModeTransition(gameTime);
                     break;
+                case "Mistake":
+                    mistakeTimeRemaining -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (mistakeTimeRemaining <= 0f)
+                        CurrentMode = Modes.First(m => m.Tag == "Play");
+                    break;
                 case "Show":
                     MoveToNextScene();
                     break;
@@ -505,7 +524,6 @@ namespace BeatEngine
         {
             if (LevelFinishedAndEffectsShown)
             {
-                GameState.Level++;
                 GameState.DirtyScene = true;
             }
         }
@@ -515,43 +533,38 @@ namespace BeatEngine
 
         public void CalculateScore()
         {
-            int score = 0;
-            foreach(var panel in Panels)
+            var rows = Panels.Select(panel => panel.Tiles
+                .OrderBy(tile => tile.CurrentPanelPosition).Select(tile => tile.Syllable));
+            AttemptResult result = AttemptRules.Evaluate(rows, Syllables, NextLevelTile.IsPressed);
+            GameState.Score += result.ScoreDelta;
+
+            if (result.Outcome == AttemptOutcome.Mistake)
             {
-                List<Syllable> syllables = new List<Syllable>();
-                List<Tile> tiles = panel.Tiles;
-
-                foreach(Tile tile in tiles)
-                {
-                    syllables.Add(tile.Syllable);
-                }
-
-                if(AllSyllableTilesBelongToSamePanel(syllables) && AllSyllableTilesAreOrdered(syllables))
-                {
-                    score++;
-                }
-
+                failureMessage = FeedbackMessages.NextFailure();
+                lastFailedArrangement = GetArrangementKey();
+                mistakeTimeRemaining = DefaultAnimationDuration;
+                MissionAccomplised = false;
+                CurrentMode = Modes.First(m => m.Tag == "Mistake");
             }
-
-            if(score == Panels.Count)
+            else
             {
                 MissionAccomplised = true;
-                GameState.Score += 30;
                 GameState.Level++;
-                PeristGameState();
-                InitiateCelebrationAnimation();
+                if (result.Outcome == AttemptOutcome.Skipped)
+                    LevelFinishedAndEffectsShown = true;
+                else
+                {
+                    successMessage = FeedbackMessages.NextSuccess();
+                    InitiateCelebrationAnimation();
+                }
             }
-            else //skip button was pressed
-            {
+            PeristGameState();
+        }
 
-                MissionAccomplised = true;
-                LevelFinishedAndEffectsShown = true;
-                GameState.Score -= 10;
-                GameState.Level++;
-                PeristGameState();
-
-            }
-            
+        private string GetArrangementKey()
+        {
+            return string.Join(";", tiles.Cast<Tile>().Where(tile => tile != null)
+                .Select(tile => tile.CurrentPanel + ":" + tile.CurrentPanelPosition));
         }
 
         public void PeristGameState()
@@ -644,15 +657,10 @@ namespace BeatEngine
 
                 case "Play":
                     
-                    if (AllTilesAssigned)
-                    {
+                    // An unchanged failed board must not be charged again each frame.
+                    if (NextLevelTile.IsPressed ||
+                        (AllTilesAssigned && GetArrangementKey() != lastFailedArrangement))
                         ToNextMode();
-                    }
-
-                    if(NextLevelTile.IsPressed)
-                    {
-                        ToNextMode();
-                    }
 
                     break;
 
@@ -700,12 +708,18 @@ namespace BeatEngine
                     DrawFX(gameTime, spriteBatch);
                     DrawLevelEndingTile(gameTime, spriteBatch);
                     break;
+                case "Mistake":
                 case "Play":
                     DrawPanels(gameTime, spriteBatch);
                     DrawTiles(gameTime, spriteBatch);
                     DrawSkipToNextLevelTile(spriteBatch);
                     if (!clueRevealed)
                         spriteBatch.Draw(hintButton.Texture, hintButton.Position, Color.White);
+                    if (CurrentMode.Tag == "Mistake")
+                    {
+                        float opacity = MathHelper.Clamp(mistakeTimeRemaining / 0.25f, 0f, 1f);
+                        DrawFeedback(spriteBatch, failureMessage, new Vector2(60, 1500), false, opacity);
+                    }
                     DrawFX(gameTime, spriteBatch);
                     //DrawClue(hudFont, string.Format( "PISTA: {0}", Clue), new Vector2(150, 2500), GameTheme.Text, spriteBatch);
                     DrawSectionLabel(spriteBatch, "PUNTOS", new Vector2(760, 230), GameTheme.Muted);
@@ -721,6 +735,24 @@ namespace BeatEngine
             }
         }
 
+
+        private void DrawFeedback(SpriteBatch spriteBatch, string message, Vector2 position, bool success, float opacity)
+        {
+            if (string.IsNullOrEmpty(message))
+                return;
+
+            var bounds = new Rectangle((int)position.X + 90, (int)position.Y + 35, 900, 290);
+            Color accent = success ? GameTheme.Accent : new Color(167, 107, 54);
+            spriteBatch.Draw(feedbackPixel, bounds, new Color(188, 197, 181) * opacity);
+            spriteBatch.Draw(feedbackPixel, new Rectangle(bounds.X + 3, bounds.Y + 3, bounds.Width - 6, bounds.Height - 6),
+                new Color(252, 251, 247) * opacity);
+            Vector2 center = new Vector2(position.X + 540, position.Y + 110);
+            spriteBatch.Draw(feedbackPixel, new Rectangle((int)center.X - 35, (int)center.Y - 4, 70, 8), accent * opacity);
+            Vector2 size = hudFont.MeasureString(message);
+            float scale = Math.Min(4.5f, 800f / Math.Max(1f, size.X));
+            spriteBatch.DrawString(hudFont, message, new Vector2(center.X, position.Y + 215),
+                GameTheme.Text * opacity, 0f, size / 2f, scale, SpriteEffects.None, 0f);
+        }
 
         private void DrawSectionLabel(SpriteBatch spriteBatch, string text, Vector2 position, Color color)
         {

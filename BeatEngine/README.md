@@ -6,6 +6,8 @@ A MonoGame syllable puzzle. Drag the syllables into three word rows, using the c
 
 The title is four colored syllable tiles: EN / SI / LA / BAS, shared by the menu and compact in-game header. A warm paper background, charcoal typography, softly squared tiles, and continuous sage word trays give En Silabas its own visual identity. Yellow, mint, ivory, and gray tile faces are decorative. Each tray represents a whole word; subtle baseline guides suggest tile positions without dividing the row into boxes. Clues occupy a bounded band above the board heading. Controls, tutorials, feedback, and platform art share the same geometry. No wood texture or raised tile effects are used.
 
+An incorrect completed arrangement shows "Puedes hacerlo mejor!", deducts 400 points, and lets the player retry the same level. An unchanged failed arrangement is not charged again. Skipping still costs 10 points.
+
 The clue starts hidden. "Mostrar Pista" reveals it and deducts 5 points once per level. The deduction is saved immediately. Completion feedback appears below the word rows.
 
 The design resolution is 1200 × 2664. Tiles are 220 × 220 inside 225-pixel word-row slots. Tile labels are measured and centered at runtime. The HUD font includes Latin-1 characters for Spanish clues.

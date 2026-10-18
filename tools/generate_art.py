@@ -59,14 +59,14 @@ def title(size):
     im=canvas(size)
     logo=tile_title()
     im.alpha_composite(logo,((size[0]-logo.width)//2,210))
-    text(im,'El placer de encontrar las palabras.',(size[0]/2,515),36,MUTED)
+    text(im,'Cada cosa en su lugar',(size[0]/2,515),36,MUTED)
     return im
 
 def tutorial(n):
     im=canvas((1080,1040));d=ImageDraw.Draw(im)
     d.rounded_rectangle((1,1,1078,1038),radius=4,fill=SURFACE,outline=LINE,width=2)
     headings=['Cada palabra empieza aqu\u00ed.','Una s\u00edlaba por casilla.','Ordena. Une. Descubre.','A tu ritmo.']
-    lines=[('Forma tres palabras con las s\u00edlabas.','Mostrar Pista revela una ayuda.'),('Arrastra cada ficha a una fila.','Puedes moverla otra vez.'),('Lee cada fila de izquierda a derecha.','Completa las tres palabras.'),('Mostrar Pista resta 5 puntos por nivel.','Saltar una ronda resta 10 puntos.')]
+    lines=[('Forma tres palabras con las s\u00edlabas.','Mostrar Pista revela una ayuda.'),('Arrastra cada ficha a una fila.','Puedes moverla otra vez.'),('Lee cada fila de izquierda a derecha.','Completa las tres palabras.'),('Un intento incorrecto resta 400 puntos.','Mostrar Pista: -5. Saltar una ronda: -10.')]
     text(im,f'C\u00d3MO JUGAR   /   0{n}',(540,85),28,TEAL,bold=True)
     text(im,headings[n-1],(540,220),48,bold=True)
     for k,syllable in enumerate(['CA','MI','NO']):
@@ -84,9 +84,14 @@ def panel():
     return im
 
 def feedback(label):
+    mistake = label == "Puedes hacerlo mejor!"
     im=canvas((1080,360));d=ImageDraw.Draw(im)
     d.rounded_rectangle((90,35,990,325),radius=5,fill=SURFACE,outline=LINE,width=3)
-    d.line((480,100,520,140,590,70),fill=TEAL,width=9)
+    if mistake:
+        d.arc((495,65,585,155),25,315,fill='#A76B36',width=8)
+        d.polygon(((578,65),(598,83),(572,91)),fill='#A76B36')
+    else:
+        d.line((480,100,520,140,590,70),fill=TEAL,width=9)
     text(im,label,(540,215),60,bold=True)
     return im
 
@@ -111,13 +116,13 @@ def generate():
             if name=='front':text(im,'\u00b7',(110,105),64,INK)
         elif name.startswith('SylabrixTitle'):im=title((1080,620))
         elif name=='Welcome_button':
-            im=canvas((1080,180));text(im,'PALABRAS. ORDEN. DESCUBRIMIENTO.',(540,90),27,TEAL,bold=True)
+            im=canvas((1080,180))
         elif name=='ShowHint_button':im=button((600,120),'Mostrar Pista')
         elif name=='Arrow':im=button((220,110),'Saltar >')
         elif p.parent.name=='Buttons':im=button((1080,180),labels.get(name.split('_')[0],'Continuar'),name.startswith(('Start','Entendido','Play')))
         elif name=='Panel':im=panel()
         elif p.parent.name in ('Environment','Overlays'):
-            label={'Excelente':'Bien hecho.','GetReady':'Prepara tus palabras.','GetReady2':'Prepara tus palabras.','WatchCat':'Observa.','RepeatCat':'Tu turno.','you_win':'Bien hecho.','you_lose':'Int\u00e9ntalo otra vez.'}.get(name,'En Silabas')
+            label={'TryAgain':'Puedes hacerlo mejor!','Excelente':'Bien hecho.','GetReady':'Prepara tus palabras.','GetReady2':'Prepara tus palabras.','WatchCat':'Observa.','RepeatCat':'Tu turno.','you_win':'Bien hecho.','you_lose':'Int\u00e9ntalo otra vez.'}.get(name,'En Silabas')
             im=feedback(label)
         elif name=='Star':
             im=canvas((416,32));d=ImageDraw.Draw(im)
