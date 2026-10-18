@@ -3,7 +3,14 @@
     <TargetFramework>net9.0-android</TargetFramework>
     <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
-    <ApplicationId>com.companyname.BeatEngine.Android</ApplicationId>
+    <ApplicationId>com.ensilabas.app</ApplicationId>
+    <ApplicationTitle>EnSilabas</ApplicationTitle>
+    <AssemblyName>EnSilabas</AssemblyName>
+    <RootNamespace>BeatEngine.Android</RootNamespace>
+    <Title>EnSilabas</Title>
+    <Product>EnSilabas</Product>
+    <Company>EnSilabas</Company>
+    <Description>EnSilabas</Description>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <Platforms>AnyCPU;ARM64</Platforms>
@@ -13,6 +20,7 @@
     <AndroidResource Include="Resources\Drawable\splash_background.xml" />
     <AndroidResource Include="Resources\Drawable\splash_icon.xml" />
     <AndroidResource Include="Resources\Values\Styles.xml" />
+    <AndroidResource Include="Resources\Values\Strings.xml" />
     <AndroidResource Include="Resources\Values-v31\Styles.xml" />
   </ItemGroup>
   <ItemGroup>

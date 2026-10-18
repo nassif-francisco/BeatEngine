@@ -22,6 +22,20 @@ dotnet run --project BeatEngine/BeatEngine.DesktopGL/BeatEngine.DesktopGL.csproj
 
 Mouse input is enabled for desktop play. Touch input uses the same puzzle coordinates.
 
+## Android APK
+
+```powershell
+dotnet build BeatEngine/BeatEngine.Android/BeatEngine.Android.csproj -c Release
+```
+
+The app and launcher labels, assembly title, and product name are `EnSilabas`.
+The Android package ID is `com.ensilabas.app`. The signed APK is generated at
+`BeatEngine/BeatEngine.Android/bin/Release/net9.0-android/com.ensilabas.app-Signed.apk`.
+Use this APK rather than older `BeatEngine.Android-Signed.apk` build artifacts.
+
+The package ID differs from the old `BeatEngine.Android` installation, so Android
+installs it as a separate app with its own save data.
+
 ## Artwork
 
 Regenerate the geometric assets and reference layouts using Python and Pillow:

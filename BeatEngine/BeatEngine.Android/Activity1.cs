@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 namespace BeatEngine.Android
 {
     [Activity(
-        Label = "En Silabas",
+        Label = "@string/app_name",
         MainLauncher = true,
         Icon = "@drawable/icon",
         Theme = "@style/Theme.Splash",
