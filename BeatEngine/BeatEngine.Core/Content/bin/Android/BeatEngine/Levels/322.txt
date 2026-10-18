@@ -1,13 +1,13 @@
 PROFESIONES
-DOC(1,1)
-TOR(1,2)
+DEN(1,1)
+TIS(1,2)
+TA(1,3)
 
-AB(2,1)
-O(2,2)
+A(2,1)
+BO(2,2)
 GA(2,3)
 DO(2,4)
 
-PO(3,1)
-LI(3,2)
-CIA(3,3)
-
+DI(3,1)
+REC(3,2)
+TOR(3,3)

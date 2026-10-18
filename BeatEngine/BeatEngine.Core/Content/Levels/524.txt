@@ -1,13 +1,13 @@
 NUMEROS
-TRE(1,1)
-S(1,2)
+VEIN(1,1)
+TIO(1,2)
+CHO(1,3)
 
-CUA(2,1)
-TRO(2,2)
+CIN(2,1)
+CUEN(2,2)
+TA(2,3)
 
-NUE(3,1)
-VE(3,2)
-
-
-
-
+DIE(3,1)
+CI(3,2)
+NUE(3,3)
+VE(3,4)

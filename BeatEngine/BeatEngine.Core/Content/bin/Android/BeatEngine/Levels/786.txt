@@ -1,13 +1,12 @@
 NUMEROS
-DOS(1,1)
+DIE(1,1)
+CI(1,2)
+SÉIS(1,3)
 
-NUE(2,1)
-VE(2,2)
+VEIN(2,1)
+TIO(2,2)
+CHO(2,3)
 
-CIEN(3,1)
-
-
-
-
-
-
+CIN(3,1)
+CUEN(3,2)
+TA(3,3)

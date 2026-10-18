@@ -1,13 +1,12 @@
 VERBOS
-CO(1,1)
-RER(1,2)
+A(1,1)
+PREN(1,2)
+DER(1,3)
 
-SAL(2,1)
-TAR(2,2)
+COM(2,1)
+PAR(2,2)
+TIR(2,3)
 
-BA(3,1)
-ILAR(3,2)
-
-
-
-
+DES(3,1)
+CU(3,2)
+BRIR(3,3)

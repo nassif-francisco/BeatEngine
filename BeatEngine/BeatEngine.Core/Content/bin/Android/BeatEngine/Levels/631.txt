@@ -1,13 +1,13 @@
 NUMEROS
-U(1,1)
-NO(1,2)
+CIN(1,1)
+CUEN(1,2)
+TA(1,3)
 
-DOS(2,1)
+QUI(2,1)
+NIEN(2,2)
+TOS(2,3)
 
-NUE(3,1)
-VE(3,2)
-
-
-
-
-
+VEIN(3,1)
+TI(3,2)
+NUE(3,3)
+VE(3,4)

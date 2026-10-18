@@ -1,13 +1,12 @@
 NATURALEZA
-NUBE(1,1)
+DE(1,1)
+SIER(1,2)
+TO(1,3)
 
-VO(2,1)
-L(2,2)
-CAN(2,3)
+A(2,1)
+RE(2,2)
+NA(2,3)
 
-DE(3,1)
-SIE(3,2)
-RTO(3,3)
-
-
-
+VOL(3,1)
+CA(3,2)
+NES(3,3)

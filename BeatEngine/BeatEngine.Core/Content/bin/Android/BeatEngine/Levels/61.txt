@@ -1,13 +1,12 @@
 NATURALEZA
-FLOR(1,1)
+DE(1,1)
+SIER(1,2)
+TO(1,3)
 
-NUBE(2,1)
+A(2,1)
+RE(2,2)
+NA(2,3)
 
-DE(3,1)
-SIE(3,2)
-RTO(3,3)
-
-
-
-
-
+BA(3,1)
+RRAN(3,2)
+CO(3,3)

@@ -1,13 +1,13 @@
 NUMEROS
-DOS(1,1)
+CIN(1,1)
+CUEN(1,2)
+TA(1,3)
 
-TRE(2,1)
-S(2,2)
+TRES(2,1)
+CIEN(2,2)
+TOS(2,3)
 
-NUE(3,1)
-VE(3,2)
-
-
-
-
-
+VEIN(3,1)
+TI(3,2)
+NUE(3,3)
+VE(3,4)
