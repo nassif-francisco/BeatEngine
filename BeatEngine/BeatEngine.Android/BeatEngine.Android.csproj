@@ -10,7 +10,10 @@
   </PropertyGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\Drawable\Splash.png" />
+    <AndroidResource Include="Resources\Drawable\splash_background.xml" />
+    <AndroidResource Include="Resources\Drawable\splash_icon.xml" />
     <AndroidResource Include="Resources\Values\Styles.xml" />
+    <AndroidResource Include="Resources\Values-v31\Styles.xml" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="..\BeatEngine.Core\Content\BeatEngine.mgcb" Link="Content\BeatEngine.mgcb" />

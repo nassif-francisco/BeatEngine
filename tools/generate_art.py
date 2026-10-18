@@ -55,11 +55,12 @@ def tile_title(side=220,gap=20):
     return im
 
 
-def title(size):
+def title(size,tagline=True):
     im=canvas(size)
     logo=tile_title()
     im.alpha_composite(logo,((size[0]-logo.width)//2,210))
-    text(im,'Cada cosa en su lugar',(size[0]/2,515),36,MUTED)
+    if tagline:
+        text(im,'Cada cosa en su lugar',(size[0]/2,515),36,MUTED)
     return im
 
 def tutorial(n):
@@ -127,7 +128,9 @@ def generate():
         elif name=='Star':
             im=canvas((416,32));d=ImageDraw.Draw(im)
             for i in range(13):d.line((i*32+8,16,i*32+14,22,i*32+25,9),fill=TEAL,width=2)
-        elif name in ('Splash','Default'):
+        elif name=='Splash':
+            im=title((1080,620),tagline=False)
+        elif name=='Default':
             im=canvas(size,True);logo=mark((min(size)//2,)*2);im.alpha_composite(logo,((size[0]-logo.width)//2,(size[1]-logo.height)//2))
         else:im=mark(size)
         if p.suffix.lower() in ('.jpg','.bmp'):im=im.convert('RGB')
