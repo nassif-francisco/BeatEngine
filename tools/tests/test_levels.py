@@ -11,13 +11,19 @@ spec.loader.exec_module(levels)
 
 
 class LevelTests(unittest.TestCase):
+    def test_content_pipeline_packages_only_the_catalog(self):
+        manifest = (DIRECTORY.parent / "BeatEngine.mgcb").read_text(encoding="utf-8-sig")
+        copies = [line for line in manifest.splitlines() if line.startswith("/copy:Levels/")]
+        self.assertEqual(copies, ["/copy:Levels/levels.json"])
+
     def test_all_shipped_levels(self):
-        files = sorted(DIRECTORY.glob("[0-9]*.txt"), key=lambda p: int(p.stem))
-        self.assertEqual([int(p.stem) for p in files], list(range(1, 1010)))
+        records = levels.load_catalog()
+        self.assertEqual([record['id'] for record in records], list(range(1, 1010)))
+        self.assertEqual(list(DIRECTORY.glob('[0-9]*.txt')), [])
         seen = set()
-        for path in files:
-            with self.subTest(level=path.name):
-                theme, words = levels.parse_level(path)
+        for record in records:
+            with self.subTest(level=record['id']):
+                theme, words = levels.parse_level(record)
                 self.assertTrue(levels.validate_level(words))
                 self.assertTrue(levels.curated(theme, words))
                 key = (theme, levels.combo_key(words))

@@ -1,4 +1,4 @@
-﻿#region File Description
+#region File Description
 //-----------------------------------------------------------------------------
 // PlatformerGame.cs
 //
@@ -43,6 +43,7 @@ namespace BeatEngine
         private Texture2D diedOverlay;
 
         private ISceneBase Scene;
+        private LevelCatalog levelCatalog;
         private bool wasContinuePressed;
 
         // When the time remaining is less than the warning time, it blinks on the hud
@@ -58,12 +59,6 @@ namespace BeatEngine
         TimeSpan? lastClickTime = null;
 
         private VirtualGamePad virtualGamePad;
-
-        // The number of levels in the Levels directory of our content. We assume that
-        // levels in our content are 0-based and that all numbers under this constant
-        // have a level file present. This allows us to not need to check for the file
-        // or handle exceptions, both of which can add unnecessary time to level loading.
-        private const int numberOfLevels = 3;
 
         public BeatEngineGame()
         {
@@ -318,10 +313,12 @@ namespace BeatEngine
 
             ReadGameState();
 
-            // Load the level.
-            string levelPath = string.Format("Content/Levels/{0}.txt", GameState.Level);
-            using (Stream fileStream = TitleContainer.OpenStream(levelPath))
-                Scene = new Level(Services, fileStream, GameState.Level, globalTransformation, GameState);
+            if (levelCatalog == null)
+                using (Stream stream = TitleContainer.OpenStream("Content/Levels/levels.json"))
+                    levelCatalog = LevelCatalog.Load(stream);
+
+            Scene = new Level(Services, levelCatalog.GetLevel(GameState.Level),
+                GameState.Level, globalTransformation, GameState);
         }
 
         private void LoadStartScene()

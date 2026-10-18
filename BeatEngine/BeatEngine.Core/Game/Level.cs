@@ -132,13 +132,13 @@ namespace BeatEngine
 
         #region Loading
 
-        public Level(IServiceProvider serviceProvider, Stream fileStream, int levelIndex, Matrix globalTransformation, GameState gameState)
+        public Level(IServiceProvider serviceProvider, LevelDefinition definition, int levelIndex, Matrix globalTransformation, GameState gameState)
         {
             // Create a new content manager to load content used just by this level.
             content = new ContentManager(serviceProvider, "Content");
             GameState = gameState;
 
-            LoadSyllables(fileStream);
+            LoadSyllables(definition);
             ShuffleSyllables();
             LoadTiles();
             LoadPanels();
@@ -229,60 +229,18 @@ namespace BeatEngine
             return NextLevelTile;
         }
 
-        private void LoadSyllables(Stream fileStream)
+        private void LoadSyllables(LevelDefinition definition)
         {
+            Clue = definition.Theme;
             Syllables = new List<Syllable>();
-
-            using (var reader = new StreamReader(fileStream))
-            {
-                string line;
-                int k = 0;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    line = line.Trim();
-                    
-                    if (k == 0) //first line is the clue
-                    {
-                        Clue = line;
-                        k++;
-                        continue;
-                    }
-
-                    // Skip empty lines
-                    if (string.IsNullOrEmpty(line))
-                        continue;
-
-                    // Expected format: TAG(panelNbr,panelPosition)
-                    int openParen = line.IndexOf('(');
-                    int closeParen = line.IndexOf(')');
-
-                    if (openParen < 0 || closeParen < 0)
-                        continue; // malformed line, skip
-
-                    string tag = line.Substring(0, openParen);
-                    string numbers = line.Substring(openParen + 1, closeParen - openParen - 1);
-
-                    var parts = numbers.Split(',');
-
-                    if (parts.Length != 2)
-                        continue;
-
-                    if (!int.TryParse(parts[0], out int panelNbr))
-                        continue;
-
-                    if (!int.TryParse(parts[1], out int panelPosition))
-                        continue;
-
+            for (int row = 0; row < definition.Words.Length; row++)
+                for (int slot = 0; slot < definition.Words[row].Length; slot++)
                     Syllables.Add(new Syllable
                     {
-                        SyllableTag = tag,
-                        PanelNbr = panelNbr,
-                        PanelPosition = panelPosition
+                        SyllableTag = definition.Words[row][slot],
+                        PanelNbr = row + 1,
+                        PanelPosition = slot + 1
                     });
-
-                    k++;
-                }
-            }
         }
         private static readonly Random _rng = new Random();
 
