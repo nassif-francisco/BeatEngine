@@ -1,22 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0-android</TargetFramework>
     <SupportedOSPlatformVersion>23</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
-    <ApplicationId>com.ensilabas.app</ApplicationId>
-    <ApplicationTitle>EnSilabas</ApplicationTitle>
-    <AssemblyName>EnSilabas</AssemblyName>
+    <IntermediateOutputPath>obj\Library32\$(Configuration)\</IntermediateOutputPath>
+    <ApplicationId>com.rpgprototype.app</ApplicationId>
+    <ApplicationTitle>RPG Prototype</ApplicationTitle>
+    <AssemblyName>RPGPrototype</AssemblyName>
     <RootNamespace>BeatEngine.Android</RootNamespace>
-    <Title>EnSilabas</Title>
-    <Product>EnSilabas</Product>
-    <Company>EnSilabas</Company>
-    <Description>EnSilabas</Description>
+    <Title>RPGPrototype</Title>
+    <Product>RPGPrototype</Product>
+    <Company>RPGPrototype</Company>
+    <Description>RPGPrototype</Description>
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <Platforms>AnyCPU;ARM64</Platforms>
   </PropertyGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\Drawable\Splash.png" />
+    <AndroidResource Remove="Resources\Drawable\Splash.png;Resources\Drawable\Icon.png" />
+    <AndroidResource Include="Resources\Drawable\rpg_mark.xml" />
     <AndroidResource Include="Resources\Drawable\splash_background.xml" />
     <AndroidResource Include="Resources\Drawable\splash_icon.xml" />
     <AndroidResource Include="Resources\Values\Styles.xml" />
@@ -24,7 +26,7 @@
     <AndroidResource Include="Resources\Values-v31\Styles.xml" />
   </ItemGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="..\BeatEngine.Core\Content\BeatEngine.mgcb" Link="Content\BeatEngine.mgcb" />
+    <MonoGameContentReference OutputFolder="Library32" Include="..\BeatEngine.Core\Content\BeatEngine.mgcb" Link="Content\BeatEngine.mgcb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BeatEngine.Core\BeatEngine.Core.csproj" />

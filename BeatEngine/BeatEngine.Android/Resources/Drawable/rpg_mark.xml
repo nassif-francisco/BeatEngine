@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A small pixel wizard mark, matching the imported player's magenta palette. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp" android:height="96dp"
+    android:viewportWidth="96" android:viewportHeight="96">
+  <path android:fillColor="#241B2E" android:pathData="M20,38H28V30H36V22H44V14H52V22H60V30H68V38H76V54H68V78H60V86H36V78H28V54H20Z" />
+  <path android:fillColor="#A92D86" android:pathData="M28,38H36V30H44V22H52V30H60V38H68V46H28Z" />
+  <path android:fillColor="#E367BF" android:pathData="M44,22H52V30H60V38H52V34H44Z" />
+  <path android:fillColor="#714449" android:pathData="M28,46H68V54H28Z" />
+  <path android:fillColor="#E6B886" android:pathData="M36,54H60V70H52V78H44V70H36Z" />
+  <path android:fillColor="#241B2E" android:pathData="M40,54H44V62H40ZM52,54H56V62H52Z" />
+  <path android:fillColor="#A92D86" android:pathData="M36,70H44V78H52V70H60V78H56V86H40V78H36Z" />
+</vector>

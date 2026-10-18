@@ -1,0 +1,374 @@
+{
+  "Rpg/Maps/test.map": {
+    "source": "Maps/Library32/library.map",
+    "sha256": "c427966d130a6d39f40202987497bf0fb3e66a113bc5c964ceadfdf5da0577ff"
+  },
+  "Rpg/scene.json": {
+    "source": "Maps/Library32/scene.json",
+    "sha256": "d339513e758e347912978063d26c4ce89ce2b161f6e33f32739198134d782adf"
+  },
+  "Rpg/Textures/ground.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_wood_01.png",
+    "sha256": "6e471906c911a239ceb5e2731368c79d37b0fb7de0f8292ce6bdd1fedace2a51"
+  },
+  "Rpg/Textures/player.png": {
+    "source": "Player/Library32/Player.png",
+    "sha256": "3ffe7909b7ea5b07e4e492f22768c74b4c0b5a51ab5928e8414dbc006e63f1bc"
+  },
+  "Rpg/Textures/player_idle.png": {
+    "source": "Player/Library32/Player_Idle.png",
+    "sha256": "0ea0a33edcccc742ba4534cd39367a06cd685f4e09b02d75c550ceb83f462cf4"
+  },
+  "Rpg/Textures/arched_window.png": {
+    "source": "Environment/Packs/Library32/props/arched_window.png",
+    "sha256": "626ca1c4f8eb80cbaca470391fd67cab5530903f3b837cb9429a526794dd543a"
+  },
+  "Rpg/Textures/armchair.png": {
+    "source": "Environment/Packs/Library32/props/armchair.png",
+    "sha256": "e7fa367d394048e7922cb1829422981bd8bde48cf2b98564916566a71d8ad2c4"
+  },
+  "Rpg/Textures/book_blue.png": {
+    "source": "Environment/Packs/Library32/props/book_blue.png",
+    "sha256": "ae637f2789d2a1c9688e44215b32c1838da19e5c60a15dea8f986ca70a4cb90e"
+  },
+  "Rpg/Textures/book_burgundy.png": {
+    "source": "Environment/Packs/Library32/props/book_burgundy.png",
+    "sha256": "b0b5f80c635dfa02e7c6f704d413a7078f6c679bfd3b41d233e9b702927fb2d8"
+  },
+  "Rpg/Textures/book_cart.png": {
+    "source": "Environment/Packs/Library32/props/book_cart.png",
+    "sha256": "7ddfaf4a58f1088c54b2e9e41058120abd507354267dc0288e35718a39d62650"
+  },
+  "Rpg/Textures/book_ochre.png": {
+    "source": "Environment/Packs/Library32/props/book_ochre.png",
+    "sha256": "992bcd5a9bccd9ce24eb34e5d342ed85fc9e418ad360808b7e73898bb8df5e78"
+  },
+  "Rpg/Textures/book_sign.png": {
+    "source": "Environment/Packs/Library32/props/book_sign.png",
+    "sha256": "91d5734b02c371a9deec46ac4656f67eefa3a43c8d07311b282872413e97cc22"
+  },
+  "Rpg/Textures/book_stack.png": {
+    "source": "Environment/Packs/Library32/props/book_stack.png",
+    "sha256": "22db93b6886a085521c42d0fbb5febd6d22e7d64244fce5fb2693fc8e7fc6875"
+  },
+  "Rpg/Textures/book_teal.png": {
+    "source": "Environment/Packs/Library32/props/book_teal.png",
+    "sha256": "2bb088e8ae4fe636565916e7aeb9489e0681b613e4f69034ab3227d44afcfc77"
+  },
+  "Rpg/Textures/bookshelf_back.png": {
+    "source": "Environment/Packs/Library32/props/bookshelf_back.png",
+    "sha256": "cb6f45a5d1383122ea65cbe2a65bfce7f5d39d6f8b09789cb6bd9aadcb471036"
+  },
+  "Rpg/Textures/bookshelf_full.png": {
+    "source": "Environment/Packs/Library32/props/bookshelf_full.png",
+    "sha256": "0353760deaf4980522e4c14d851fb3ada3c961b7feeb4782686bbf7f618b7892"
+  },
+  "Rpg/Textures/bookshelf_low.png": {
+    "source": "Environment/Packs/Library32/props/bookshelf_low.png",
+    "sha256": "98d0aae367c5ea4f23b13e8e0eb00373732ce190203e5ba3b287c988d1e8e37d"
+  },
+  "Rpg/Textures/bookshelf_rare.png": {
+    "source": "Environment/Packs/Library32/props/bookshelf_rare.png",
+    "sha256": "dfbcd236450bb9aed0b774944008e5ae7697a96610e07a3990171d0d3cc7bff9"
+  },
+  "Rpg/Textures/bookshelf_scrolls.png": {
+    "source": "Environment/Packs/Library32/props/bookshelf_scrolls.png",
+    "sha256": "d42bb91aff7871f257c938c919ed7f9e65ba5354a6140db3c3e908f40b133614"
+  },
+  "Rpg/Textures/brass_key.png": {
+    "source": "Environment/Packs/Library32/props/brass_key.png",
+    "sha256": "1b25cd8a49998696fb3a7053bea98d651b0fe5d2b0dad84537c399bd149b3ba1"
+  },
+  "Rpg/Textures/candle.png": {
+    "source": "Environment/Packs/Library32/props/candle.png",
+    "sha256": "484a155171717460da5826450b965d08c31c669bd2157f8b5fec5794447bae12"
+  },
+  "Rpg/Textures/carpet_center.png": {
+    "source": "Environment/Packs/Library32/tiles/carpet_center.png",
+    "sha256": "a004be218a208764a67961b465becd66302a2e7bd2fcc8a4dcebff246de7bd3e"
+  },
+  "Rpg/Textures/carpet_e.png": {
+    "source": "Environment/Packs/Library32/tiles/carpet_e.png",
+    "sha256": "61a6b2cbb09f79d7c118acd3c12cf2af215d9ebdfb8b24530794d4e62ebbbc31"
+  },
+  "Rpg/Textures/carpet_n.png": {
+    "source": "Environment/Packs/Library32/tiles/carpet_n.png",
+    "sha256": "33fdf3de994f8d84c7f83a4787e10d8582f2fcdc679ec2a5488a27ccd007f254"
+  },
+  "Rpg/Textures/carpet_ne.png": {
+    "source": "Environment/Packs/Library32/tiles/carpet_ne.png",
+    "sha256": "073edf947adbd4dc12bcf09a40b1d4add6b28059bdc74616cfdd3bfdbc26b8f3"
+  },
+  "Rpg/Textures/carpet_nw.png": {
+    "source": "Environment/Packs/Library32/tiles/carpet_nw.png",
+    "sha256": "a200a44087598df8d3e8ebd438d55f1782fb7f785df4840288786db4f5e402f9"
+  },
+  "Rpg/Textures/carpet_s.png": {
+    "source": "Environment/Packs/Library32/tiles/carpet_s.png",
+    "sha256": "bab85170dce905459876d23c2bcd6a3bc305e14dff83b5d286832995e751524e"
+  },
+  "Rpg/Textures/carpet_se.png": {
+    "source": "Environment/Packs/Library32/tiles/carpet_se.png",
+    "sha256": "6f8c1f2cc20b67708fd29a2ed26ff20823e28b4b1b987f6f6b94547a4807420a"
+  },
+  "Rpg/Textures/carpet_sw.png": {
+    "source": "Environment/Packs/Library32/tiles/carpet_sw.png",
+    "sha256": "c6987bc484f71d61572aa1961aba4ce230c61477854e9276a799166086c6c73b"
+  },
+  "Rpg/Textures/carpet_w.png": {
+    "source": "Environment/Packs/Library32/tiles/carpet_w.png",
+    "sha256": "e9e70154cbc227d3b9c2d53b1e431b6c7a38fb6732763e424da0ae69baabb59e"
+  },
+  "Rpg/Textures/doorway_floor.png": {
+    "source": "Environment/Packs/Library32/tiles/doorway_floor.png",
+    "sha256": "cb474073681e0826efdea84362fe0cdff86dcbd019c7cd3762f3c3a8dccb1c0c"
+  },
+  "Rpg/Textures/double_door.png": {
+    "source": "Environment/Packs/Library32/props/double_door.png",
+    "sha256": "e0728a1a5bbcec7c4908da90856a3b70075b70e80240d14a371ea49472b7b8aa"
+  },
+  "Rpg/Textures/floor_stone_01.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_stone_01.png",
+    "sha256": "6864b5f7086703b6419b9212f47f2046f7b22bf0eca6d1f2f6b205a88ceb08fe"
+  },
+  "Rpg/Textures/floor_stone_02.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_stone_02.png",
+    "sha256": "904888ca57a26bac1dc8c6bbac215f1fca914dba2e3b5802686677373d1bd565"
+  },
+  "Rpg/Textures/floor_stone_03.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_stone_03.png",
+    "sha256": "1302dc6745027486bb9985b8652b52036dcee1911a8b41489fd7698f6b70d964"
+  },
+  "Rpg/Textures/floor_stone_04.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_stone_04.png",
+    "sha256": "9ee95cdc571c965b4f4260f2511a875cba70ba2b04f85f643aa403c6399cbb83"
+  },
+  "Rpg/Textures/floor_stone_05.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_stone_05.png",
+    "sha256": "4070233a5bd0c00b62cadd3f36a371ba8ee0b4bf66bc33083634eb0bb00486c8"
+  },
+  "Rpg/Textures/floor_stone_06.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_stone_06.png",
+    "sha256": "c5228e9f5ec6c57e105550b24e54f4e81782c394092c7d99996f0c567e87f610"
+  },
+  "Rpg/Textures/floor_stone_07.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_stone_07.png",
+    "sha256": "be3fe6c6e0b9ef1028588586fd79367f9ebfdc8c806cadf8d380ecfb88c2d0d0"
+  },
+  "Rpg/Textures/floor_stone_08.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_stone_08.png",
+    "sha256": "813411e4f4a20d79b1e2c588d2e43b4af74087085e3ecc0aab52ff1b32faccc9"
+  },
+  "Rpg/Textures/floor_wood_01.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_wood_01.png",
+    "sha256": "6e471906c911a239ceb5e2731368c79d37b0fb7de0f8292ce6bdd1fedace2a51"
+  },
+  "Rpg/Textures/floor_wood_02.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_wood_02.png",
+    "sha256": "bd1b1c3e8ff53421499de9befd6af4ae7f07cd3f3b5a4201f545ea6ab9b65e98"
+  },
+  "Rpg/Textures/floor_wood_03.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_wood_03.png",
+    "sha256": "24004c38bc406159ad776993da02436620a3b2dbbe7df2e0ba94e4ccad26c6a1"
+  },
+  "Rpg/Textures/floor_wood_04.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_wood_04.png",
+    "sha256": "a856cc0e4ecbf02170c513ae094bf133a4dc0216f46c44a2053ef88ebbf2a255"
+  },
+  "Rpg/Textures/floor_wood_05.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_wood_05.png",
+    "sha256": "136c134973e6dc3348719b3cd0bf84ad28f8cc6698ac9abb7ff9a3ab7b895b5a"
+  },
+  "Rpg/Textures/floor_wood_06.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_wood_06.png",
+    "sha256": "667a7c3a81e301153a1ed771b65b1e18b414422d280498e31e05a2d35532d045"
+  },
+  "Rpg/Textures/floor_wood_07.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_wood_07.png",
+    "sha256": "12b476b1e7bcff4808c5c48efb4cdf17dd9be742354af4fce2ad9ee35bc040f6"
+  },
+  "Rpg/Textures/floor_wood_08.png": {
+    "source": "Environment/Packs/Library32/tiles/floor_wood_08.png",
+    "sha256": "2bb0e01a813fea90af3ec3cf40661f014d22ff9b8a50ecbc9d2a2bf902589407"
+  },
+  "Rpg/Textures/globe.png": {
+    "source": "Environment/Packs/Library32/props/globe.png",
+    "sha256": "7eefb100eca6b7b5be05442428628d605238094b81bf115f35ee7611d4734b6b"
+  },
+  "Rpg/Textures/hourglass.png": {
+    "source": "Environment/Packs/Library32/props/hourglass.png",
+    "sha256": "c7454f64ee0d3520b2c2eefc9310712b3b6956e39e97778233d9705c1c4c9128"
+  },
+  "Rpg/Textures/ink_quill.png": {
+    "source": "Environment/Packs/Library32/props/ink_quill.png",
+    "sha256": "21d4d9e4da36109ac42dee8944cc9e56c0c5bf308ec43e4dbc647fd97888c688"
+  },
+  "Rpg/Textures/ladder.png": {
+    "source": "Environment/Packs/Library32/props/ladder.png",
+    "sha256": "485915fc7529c3781c7a2628e699412d5af389cdf7dbdfed1c13bb29f0667df9"
+  },
+  "Rpg/Textures/landing_wood.png": {
+    "source": "Environment/Packs/Library32/tiles/landing_wood.png",
+    "sha256": "13f9b10d59352a7040d46b35ca275d56f20deacc9f8f36a4a89c304a3b3ce424"
+  },
+  "Rpg/Textures/lectern.png": {
+    "source": "Environment/Packs/Library32/props/lectern.png",
+    "sha256": "45b69f238985cafc1a7e78117d75cce6757980a69b19c1cc409c584c3eb32342"
+  },
+  "Rpg/Textures/open_book.png": {
+    "source": "Environment/Packs/Library32/props/open_book.png",
+    "sha256": "c1a7af040d46a4c705498ab2838c94baff2d16df232c4cef9b9aaedfd8b0a102"
+  },
+  "Rpg/Textures/parchment.png": {
+    "source": "Environment/Packs/Library32/props/parchment.png",
+    "sha256": "16af34b087365e7eacd38b484e351f523d4e992292878af0aa7fac13439bd019"
+  },
+  "Rpg/Textures/pillar.png": {
+    "source": "Environment/Packs/Library32/tiles/pillar.png",
+    "sha256": "dca56e87d5e5a03d4833efe90aaabe3f8248b2f0ad609f26579daf69d7757994"
+  },
+  "Rpg/Textures/potted_fern.png": {
+    "source": "Environment/Packs/Library32/props/potted_fern.png",
+    "sha256": "fda553936eac1cc34878828bec82d57b5c9fd2b1e4e864eab1ec6e1d10d047b3"
+  },
+  "Rpg/Textures/reading_chair.png": {
+    "source": "Environment/Packs/Library32/props/reading_chair.png",
+    "sha256": "8d88b6c88d8da7e8015a7a3dd69818bf5d97be427f72164817392f4c3e94881e"
+  },
+  "Rpg/Textures/reading_table.png": {
+    "source": "Environment/Packs/Library32/props/reading_table.png",
+    "sha256": "1f44322ef31b6b7fad0f21cc7a58da14a7067beee17f7f8abbf0c07777b5e7e2"
+  },
+  "Rpg/Textures/reception_desk.png": {
+    "source": "Environment/Packs/Library32/props/reception_desk.png",
+    "sha256": "d849a2c06557bbfe2755b8475d99d0640446aa6d906b33409b1a33e261a6c9a5"
+  },
+  "Rpg/Textures/runner_cross.png": {
+    "source": "Environment/Packs/Library32/tiles/runner_cross.png",
+    "sha256": "a7ebc35b07a7407a204cff1a62ab1660cf2b053c8628ca22d4081f29b4de8401"
+  },
+  "Rpg/Textures/runner_horizontal.png": {
+    "source": "Environment/Packs/Library32/tiles/runner_horizontal.png",
+    "sha256": "ea6630f01ec11634775e8c0c71358a55b5b3cff0f6d7d55370717fed22875943"
+  },
+  "Rpg/Textures/runner_t_e.png": {
+    "source": "Environment/Packs/Library32/tiles/runner_t_e.png",
+    "sha256": "1bc0e70716535794c379622fb88785d71c2f859870382e7d322d1e5e7ff0e45c"
+  },
+  "Rpg/Textures/runner_t_n.png": {
+    "source": "Environment/Packs/Library32/tiles/runner_t_n.png",
+    "sha256": "74224537abe03c7902384592c79392db2c98f06fb8404ad469a93cb68ce7973d"
+  },
+  "Rpg/Textures/runner_t_s.png": {
+    "source": "Environment/Packs/Library32/tiles/runner_t_s.png",
+    "sha256": "abc6bab389d8fd7f615f45c2278211b717904b92b2fbeb86d2d2821d27193712"
+  },
+  "Rpg/Textures/runner_t_w.png": {
+    "source": "Environment/Packs/Library32/tiles/runner_t_w.png",
+    "sha256": "e1a3c143964103f48ed429cd68f40bd046db4d73795e197d5077321894b879b9"
+  },
+  "Rpg/Textures/runner_vertical.png": {
+    "source": "Environment/Packs/Library32/tiles/runner_vertical.png",
+    "sha256": "a55ad857eb80693303adf5bcf5a7ec7443a24110e45326dbda3aa310be9fb72e"
+  },
+  "Rpg/Textures/scrolls.png": {
+    "source": "Environment/Packs/Library32/props/scrolls.png",
+    "sha256": "a481c0af78caaa34ce402b583ba6685b470d3c72fadf5d0302f9c3cd8c12a88e"
+  },
+  "Rpg/Textures/stairs_down_bottom.png": {
+    "source": "Environment/Packs/Library32/tiles/stairs_down_bottom.png",
+    "sha256": "b98639795609c9b5ff69b5164eccb1aecddc11b90a6ee2d42e68e79168757a3b"
+  },
+  "Rpg/Textures/stairs_down_middle.png": {
+    "source": "Environment/Packs/Library32/tiles/stairs_down_middle.png",
+    "sha256": "14d9db40cc54f656ad878ab576f04c0c958fae0db9b86fd99bd455d95d8fcf01"
+  },
+  "Rpg/Textures/stairs_down_top.png": {
+    "source": "Environment/Packs/Library32/tiles/stairs_down_top.png",
+    "sha256": "71190adccf2f5d104b5904454900eba1c10dca62880538c1bcc5bc6c53a8d9b9"
+  },
+  "Rpg/Textures/stairs_up_bottom.png": {
+    "source": "Environment/Packs/Library32/tiles/stairs_up_bottom.png",
+    "sha256": "2f810d4de0b7eb276ed23d2a7a1d8d6efd0740d7f4a1070f31746390b42c2a68"
+  },
+  "Rpg/Textures/stairs_up_middle.png": {
+    "source": "Environment/Packs/Library32/tiles/stairs_up_middle.png",
+    "sha256": "a9d3ee8eb69f272239921ceb187261f9d7bd675a1882d5717cb4bdb01a5dd43c"
+  },
+  "Rpg/Textures/stairs_up_top.png": {
+    "source": "Environment/Packs/Library32/tiles/stairs_up_top.png",
+    "sha256": "aecd1b831e62fee9b78503ee86c3241351d6e9e9e4cba26652b39c9bc37934b3"
+  },
+  "Rpg/Textures/standing_lamp.png": {
+    "source": "Environment/Packs/Library32/props/standing_lamp.png",
+    "sha256": "cf331d3f2f2f6706e7fe83b2a4fc835b77f2765ea662a36c863fb3a2e9e65c01"
+  },
+  "Rpg/Textures/wall_clock.png": {
+    "source": "Environment/Packs/Library32/props/wall_clock.png",
+    "sha256": "eeee332c4eb23ccbb11bc8cf0450f0dcab2e471b979b839e732a5dc114b08267"
+  },
+  "Rpg/Textures/wall_corner_ne.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_corner_ne.png",
+    "sha256": "2486456b47d04063eca85eb42d280e8bda8aa1fefe2f2e1d9ba92fb5e177b312"
+  },
+  "Rpg/Textures/wall_corner_nw.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_corner_nw.png",
+    "sha256": "76fe77f1a58a7bc54f188ec1bd562933c84cbe49c8e93f21a8f1b541846918da"
+  },
+  "Rpg/Textures/wall_corner_se.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_corner_se.png",
+    "sha256": "4fec9ce1024908ee7864f3eddab20ed60b77f2d14ebbbc35f7a4bb851db10425"
+  },
+  "Rpg/Textures/wall_corner_sw.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_corner_sw.png",
+    "sha256": "c51c833aaa811f3df9e3868387a6d7d9663584e0fa42c231594c1c18d98453d3"
+  },
+  "Rpg/Textures/wall_e.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_e.png",
+    "sha256": "935b9e9161c5f2437485231faa47d84fa4f473533b2cc0f4634bfb13fd5e6c58"
+  },
+  "Rpg/Textures/wall_inner_ne.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_inner_ne.png",
+    "sha256": "b529503780703b4c21923c4a716fa2b5b8b8628a3678babb243ff09e5132cc9d"
+  },
+  "Rpg/Textures/wall_inner_nw.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_inner_nw.png",
+    "sha256": "e3cefda7655ebf08fc6ca019f5441b209ba8bc7dbb9cac618a5f8567c20c8f8e"
+  },
+  "Rpg/Textures/wall_inner_se.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_inner_se.png",
+    "sha256": "94905dca37484c760dac251619bdd264fd5a3463012b14330d4ed38d0b363d1d"
+  },
+  "Rpg/Textures/wall_inner_sw.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_inner_sw.png",
+    "sha256": "3558ab6524521b86b7f7ec809d4441dc360bd9da8e78260c361c90db8e99ffb2"
+  },
+  "Rpg/Textures/wall_n_01.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_n_01.png",
+    "sha256": "baec5a45222c7b85b6564a8ae79fc80e29100e3ad192fb36931b00de4438804b"
+  },
+  "Rpg/Textures/wall_n_02.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_n_02.png",
+    "sha256": "6803d3a8a17c659287ee3b3f4ae97363237e126ac02e13266e09706e85a18bc2"
+  },
+  "Rpg/Textures/wall_n_03.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_n_03.png",
+    "sha256": "02ee39b12de056cf367b2a6cf0e94aed3c1da8fac4ad396c5ecaf9926703dd13"
+  },
+  "Rpg/Textures/wall_n_04.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_n_04.png",
+    "sha256": "0f4cbb3975cfe5e7988aa37c87389f92491eeada18fb000cbff99560b24930aa"
+  },
+  "Rpg/Textures/wall_s.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_s.png",
+    "sha256": "9c0169649ea63053aa55223923981d606684ed65dd1c31e67d0acd3350d5e7e1"
+  },
+  "Rpg/Textures/wall_sconce.png": {
+    "source": "Environment/Packs/Library32/props/wall_sconce.png",
+    "sha256": "148f52adbcf3652f58cbc96b5aa9cdd8382eeed4db27d6263fad32c6e69c971a"
+  },
+  "Rpg/Textures/wall_w.png": {
+    "source": "Environment/Packs/Library32/tiles/wall_w.png",
+    "sha256": "9ee09864a7c7e77aa86808b7e9474377f8796a47cadda77fe0d6608091bc419d"
+  }
+}

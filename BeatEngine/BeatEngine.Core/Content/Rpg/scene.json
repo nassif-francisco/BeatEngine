@@ -1,0 +1,25 @@
+{
+  "id": "library32",
+  "name": "La biblioteca",
+  "tileSize": 32,
+  "frameSize": 32,
+  "viewHeight": 320,
+  "spawn": [
+    656,
+    768
+  ],
+  "bounds": [
+    32,
+    64,
+    1280,
+    864
+  ],
+  "map": "Maps/Library32/library.map",
+  "atlas": "Environment/Packs/Library32/atlas.json",
+  "playerWalk": "Player/Library32/Player.png",
+  "playerIdle": "Player/Library32/Player_Idle.png",
+  "ground": "Environment/Packs/Library32/tiles/floor_wood_01.png",
+  "backgroundTiles": 1260,
+  "foregroundObjects": 206,
+  "collisionRectangles": 52
+}

@@ -2,10 +2,8 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
   <item>
     <shape android:shape="rectangle">
-      <solid android:color="#F5F2EB" />
+      <solid android:color="#19171F" />
     </shape>
   </item>
-  <item android:width="240dp" android:height="138dp" android:gravity="center">
-    <bitmap android:src="@drawable/splash" android:gravity="fill" />
-  </item>
+  <item android:width="128dp" android:height="128dp" android:gravity="center" android:drawable="@drawable/rpg_mark" />
 </layer-list>

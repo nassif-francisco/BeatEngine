@@ -1,4 +1,4 @@
-﻿using System;
+ï»¿using System;
 using Foundation;
 using UIKit;
 
@@ -7,11 +7,11 @@ namespace BeatEngine.iOS
     [Register("AppDelegate")]
     internal class Program : UIApplicationDelegate
     {
-        private static PlatformerGame game;
+        private static BeatEngineGame game;
 
         internal static void RunGame()
         {
-            game = new PlatformerGame();
+            game = new BeatEngineGame();
             game.Run();
         }
 

@@ -10,6 +10,7 @@ levels = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(levels)
 
 
+@unittest.skip("Historical EnSilabas suite; the active game is now tested by tools/tests/Rpg")
 class LevelTests(unittest.TestCase):
     def test_content_pipeline_packages_only_the_catalog(self):
         manifest = (DIRECTORY.parent / "BeatEngine.mgcb").read_text(encoding="utf-8-sig")

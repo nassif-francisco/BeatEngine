@@ -9,11 +9,11 @@ namespace BeatEngine.Android
     [Activity(
         Label = "@string/app_name",
         MainLauncher = true,
-        Icon = "@drawable/icon",
+        Icon = "@drawable/rpg_mark",
         Theme = "@style/Theme.Splash",
         AlwaysRetainTaskState = true,
         LaunchMode = LaunchMode.SingleInstance,
-        ScreenOrientation = ScreenOrientation.Portrait,
+        ScreenOrientation = ScreenOrientation.SensorLandscape,
         ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Keyboard | ConfigChanges.KeyboardHidden
     )]
     public class Activity1 : AndroidGameActivity
@@ -27,12 +27,25 @@ namespace BeatEngine.Android
 
             _game = new BeatEngineGame();
             _view = _game.Services.GetService(typeof(View)) as View;
-            //_view.SystemUiVisibility = (StatusBarVisibility)(SystemUiFlags.LayoutStable | SystemUiFlags.LayoutHideNavigation | SystemUiFlags.LayoutFullscreen | SystemUiFlags.HideNavigation | SystemUiFlags.Fullscreen | SystemUiFlags.ImmersiveSticky);
-
-            GameMode.IsRecordingMode = false; // Enable recording mode for Android
+            Window.AddFlags(WindowManagerFlags.Fullscreen);
 
             SetContentView(_view);
+            ApplyFullscreen();
             _game.Run();
+        }
+
+        public override void OnWindowFocusChanged(bool hasFocus)
+        {
+            base.OnWindowFocusChanged(hasFocus);
+            if (hasFocus) ApplyFullscreen();
+        }
+
+        private void ApplyFullscreen()
+        {
+            Window.DecorView.SystemUiVisibility = (StatusBarVisibility)(
+                SystemUiFlags.LayoutStable | SystemUiFlags.LayoutHideNavigation |
+                SystemUiFlags.LayoutFullscreen | SystemUiFlags.HideNavigation |
+                SystemUiFlags.Fullscreen | SystemUiFlags.ImmersiveSticky);
         }
     }
 }

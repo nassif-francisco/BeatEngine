@@ -160,4 +160,7 @@ def preview():
     success.alpha_composite(feedback('Bien hecho.'),(65,1500))
     for name,im in [('menu',menu),('gameplay',board),('hint',revealed),('success',success),('tutorial',tutorial(4))]:
         im.thumbnail((480,1066));temporary=out/f'{name}.new.png';im.save(temporary);temporary.replace(out/f'{name}.png')
-if __name__=='__main__':generate();preview()
+if __name__=='__main__':
+    if (CONTENT/'Rpg/Maps/test.map').exists():
+        raise SystemExit('This generator belongs to EnSilabas. Use tools/import_rpg_assets.py for the RPG port.')
+    generate();preview()

@@ -12,7 +12,7 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="..\BeatEngine.Core\Content\BeatEngine.mgcb" Link="Content\BeatEngine.mgcb" />
+    <MonoGameContentReference OutputFolder="Library32" Include="..\BeatEngine.Core\Content\BeatEngine.mgcb" Link="Content\BeatEngine.mgcb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BeatEngine.Core\BeatEngine.Core.csproj" />

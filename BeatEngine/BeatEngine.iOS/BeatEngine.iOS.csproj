@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0-ios</TargetFramework>
     <OutputType>Exe</OutputType>
@@ -6,7 +6,7 @@
     <CodesignKey>iPhone Developer</CodesignKey>
   </PropertyGroup>
   <ItemGroup>
-    <MonoGameContentReference Include="..\BeatEngine.Core\Content\BeatEngine.mgcb" Link="Content\BeatEngine.mgcb" />
+    <MonoGameContentReference OutputFolder="Library32" Include="..\BeatEngine.Core\Content\BeatEngine.mgcb" Link="Content\BeatEngine.mgcb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BeatEngine.Core\BeatEngine.Core.csproj" />
