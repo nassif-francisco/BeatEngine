@@ -61,3 +61,9 @@ it never changes the original desktop files. Do not run the old
 Port reference: `C:/RPGPrototype` commit
 `a7946d47d64c68b9c4dd066076a4300104507d22`. This repository's earlier Android
 launcher, shared-Core and scene/input work was reviewed before adapting it.
+
+## Rainbow integration
+
+Rainbow opens the same `C:/CommonMedia/Maps/Library32/library.map`. Save in Rainbow with Ctrl+S, then build the game: `Directory.Build.targets` imports the shared scene before the MonoGame content build. A blocked spawn, invalid hitbox or unknown asset fails the build with a diagnostic. `COMMON_MEDIA_ROOT` / `CommonMediaRoot` can relocate the shared folder. Builds without a shared project use the imported snapshot; `/p:ImportRainbowAssets=false` explicitly skips synchronization. Python 3 is required for synchronization.
+
+See `C:/RainbowProject/README.md` for palette, placement and collision controls. Changes reach installed phones after rebuilding and installing the APK.

@@ -24,7 +24,7 @@ shelf,100,0;130,0;130,200;100,200
 """));
 RpgMap Original()
 {
-    using var reader = File.OpenText(Path.Combine(AppContext.BaseDirectory, "test.map"));
+    using var reader = File.OpenText(Environment.GetEnvironmentVariable("RPG_TEST_MAP") ?? Path.Combine(AppContext.BaseDirectory, "test.map"));
     return RpgMap.Load(reader);
 }
 
@@ -47,12 +47,12 @@ Test("malformed maps fail with the offending line", () =>
     catch (InvalidDataException error) { Check(error.Message.Contains("line 2"), "Missing diagnostic"); return; }
     throw new Exception("Bad map accepted");
 });
-Test("movement matches the 32px scene at 96 world pixels per second", () =>
+Test("movement follows the configured speed in world pixels per second", () =>
 {
     var world = new RpgWorld(Fixture());
     world.Restore(new Vector2(-200, 300), Facing.Right);
     for (int i = 0; i < 60; i++) world.Update(Vector2.UnitX, 1f / 60);
-    Check(Math.Abs(world.Position.X + 104) < 0.01, "Frame-based movement");
+    Check(Math.Abs(world.Position.X - (-200 + RpgWorld.Speed)) < 0.01, "Frame-based movement");
     Check(world.Facing == Facing.Right && world.Moving, "Wrong animation state");
 });
 Test("30 and 60 fps produce the same displacement", () =>
@@ -69,7 +69,7 @@ Test("diagonal input has no speed advantage", () =>
     world.Restore(new Vector2(-200, 300), Facing.Down);
     var start = world.Position;
     world.Update(Vector2.One, 0.1f);
-    Check(Math.Abs(Vector2.Distance(start, world.Position) - 9.6f) < 0.01, "Fast diagonal");
+    Check(Math.Abs(Vector2.Distance(start, world.Position) - RpgWorld.Speed * 0.1f) < 0.01, "Fast diagonal");
 });
 Test("collision prevents tunneling through a bookshelf", () =>
 {

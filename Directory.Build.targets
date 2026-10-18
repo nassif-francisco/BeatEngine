@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <CommonMediaRoot Condition="'$(CommonMediaRoot)' == '' and '$(COMMON_MEDIA_ROOT)' != ''">$(COMMON_MEDIA_ROOT)</CommonMediaRoot>
+    <CommonMediaRoot Condition="'$(CommonMediaRoot)' == ''">C:/CommonMedia</CommonMediaRoot>
+    <ImportRainbowAssets Condition="'$(ImportRainbowAssets)' == '' and Exists('$(CommonMediaRoot)/rainbow.project')">true</ImportRainbowAssets>
+    <RainbowPython Condition="'$(RainbowPython)' == ''">python</RainbowPython>
+  </PropertyGroup>
+  <Target Name="ImportRainbowScene" BeforeTargets="CollectContentReferences"
+          Condition="'$(DesignTimeBuild)' != 'true' and '$(ImportRainbowAssets)' == 'true' and '@(MonoGameContentReference)' != ''">
+    <Exec Command="&quot;$(RainbowPython)&quot; &quot;$(MSBuildThisFileDirectory)tools/import_rpg_assets.py&quot; --media &quot;$(CommonMediaRoot)&quot;" />
+  </Target>
+</Project>
