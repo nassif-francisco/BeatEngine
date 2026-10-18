@@ -536,6 +536,17 @@
 /processorParam:TextureFormat=Color
 /build:Rpg/Textures/globe.png
 
+#begin Rpg/Textures/grandfather.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Rpg/Textures/grandfather.png
+
 #begin Rpg/Textures/hourglass.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1019,3 +1030,31 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Rpg/Textures/wall_w.png
+
+#begin Rpg/Dialogs/Portraits/dante.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Rpg/Dialogs/Portraits/dante.png
+
+#begin Rpg/Dialogs/Portraits/abuelo.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyEnabled=False
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Rpg/Dialogs/Portraits/abuelo.png
+
+#begin Rpg/Checkpoints/checkpoints.json
+/copy:Rpg/Checkpoints/checkpoints.json
+
+#begin Rpg/Dialogs/grandfather_intro.json
+/copy:Rpg/Dialogs/grandfather_intro.json

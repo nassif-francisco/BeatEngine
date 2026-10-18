@@ -1,0 +1,49 @@
+{
+  "id": "library_grandfather_intro",
+  "interactionId": "grandfather",
+  "objective": "Busca el libro azul",
+  "lines": [
+    {
+      "speaker": "Dante",
+      "text": "Abuelo, ¿cómo estás? ¿Por qué me pediste que viniera?"
+    },
+    {
+      "speaker": "Abuelo",
+      "text": "¡Dante querido! Sé que venir a la biblioteca no es lo más divertido para un niño de once años. Sin embargo, quería mostrarte algo."
+    },
+    {
+      "speaker": "Abuelo",
+      "text": "Hace dos días fue tu cumpleaños número once y... pues... es momento de presentarte algunas cosas."
+    },
+    {
+      "speaker": "Dante",
+      "text": "¿Qué cosa, abuelo? ¿Me compraste el caballo de pelaje plateado que quería para mi cumpleaños?"
+    },
+    {
+      "speaker": "Abuelo",
+      "text": "No, Dante... en realidad..."
+    },
+    {
+      "speaker": "Dante",
+      "text": "¡Ya sé! Me compraste los pantalones aterciopelados que están de moda. Todos los chicos del colegio hablan de ellos..."
+    },
+    {
+      "speaker": "Abuelo",
+      "text": "No, Dante... Bien, mejor velo por ti mismo."
+    },
+    {
+      "speaker": "Abuelo",
+      "text": "Busca el libro azul en esta biblioteca. Quiero que lo agarres, si puedes, y lo traigas para acá."
+    },
+    {
+      "speaker": "Dante",
+      "text": "¿Que si puedo? ¿Agarrar un libro? Pan comido, viejo."
+    }
+  ],
+  "repeatLines": [
+    {
+      "speaker": "Abuelo",
+      "text": "Vamos, busca el libro azul... ya entenderás..."
+    }
+  ]
+}

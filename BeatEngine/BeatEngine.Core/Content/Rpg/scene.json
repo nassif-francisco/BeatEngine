@@ -20,6 +20,13 @@
   "playerIdle": "Player/Library32/Player_Idle.png",
   "ground": "Environment/Packs/Library32/tiles/floor_wood_01.png",
   "backgroundTiles": 1260,
-  "foregroundObjects": 206,
-  "collisionRectangles": 52
+  "foregroundObjects": 207,
+  "collisionRectangles": 53,
+  "dialogue": "Dialogs/grandfather_intro.json",
+  "interactionZones": 1,
+  "portraits": {
+    "Dante": "Dialogs/Portraits/dante.png",
+    "Abuelo": "Dialogs/Portraits/abuelo.png"
+  },
+  "checkpoints": "Checkpoints/checkpoints.json"
 }

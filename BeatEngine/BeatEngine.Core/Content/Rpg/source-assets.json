@@ -1,11 +1,11 @@
 {
   "Rpg/Maps/test.map": {
     "source": "Maps/Library32/library.map",
-    "sha256": "c427966d130a6d39f40202987497bf0fb3e66a113bc5c964ceadfdf5da0577ff"
+    "sha256": "998ff06158751543e9ca1ec0112c14f3272270752c86504009130664df7d40e7"
   },
   "Rpg/scene.json": {
     "source": "Maps/Library32/scene.json",
-    "sha256": "d339513e758e347912978063d26c4ce89ce2b161f6e33f32739198134d782adf"
+    "sha256": "1cd6d45599b1499df75333f810680beda030d29f441dc315b4d6d808f29437b0"
   },
   "Rpg/Textures/ground.png": {
     "source": "Environment/Packs/Library32/tiles/floor_wood_01.png",
@@ -195,6 +195,10 @@
     "source": "Environment/Packs/Library32/props/globe.png",
     "sha256": "7eefb100eca6b7b5be05442428628d605238094b81bf115f35ee7611d4734b6b"
   },
+  "Rpg/Textures/grandfather.png": {
+    "source": "Environment/Packs/Library32/props/grandfather.png",
+    "sha256": "b8e76ade12d5e459f9e9262f45f2bd95a00f3a36c037174bb3e6cbb1f2ac8c02"
+  },
   "Rpg/Textures/hourglass.png": {
     "source": "Environment/Packs/Library32/props/hourglass.png",
     "sha256": "c7454f64ee0d3520b2c2eefc9310712b3b6956e39e97778233d9705c1c4c9128"
@@ -370,5 +374,21 @@
   "Rpg/Textures/wall_w.png": {
     "source": "Environment/Packs/Library32/tiles/wall_w.png",
     "sha256": "9ee09864a7c7e77aa86808b7e9474377f8796a47cadda77fe0d6608091bc419d"
+  },
+  "Rpg/Dialogs/Portraits/dante.png": {
+    "source": "Dialogs/Portraits/dante.png",
+    "sha256": "70d30467ddbdae410c10f6e5c45b7f68d6ca35c07dc1b8bb99c9ce8d23f0860b"
+  },
+  "Rpg/Dialogs/Portraits/abuelo.png": {
+    "source": "Dialogs/Portraits/abuelo.png",
+    "sha256": "e0467576b172b93fbebd90d8b66fca798e56f20212c136a4436a58541cab40d0"
+  },
+  "Rpg/Checkpoints/checkpoints.json": {
+    "source": "Checkpoints/checkpoints.json",
+    "sha256": "1d713b6662bd2013e098f2bcf9aaba90cabb1c8d45a6461bf17a5f8276efd94f"
+  },
+  "Rpg/Dialogs/grandfather_intro.json": {
+    "source": "Dialogs/grandfather_intro.json",
+    "sha256": "1e8c3e05f2b7ed64cff9ff549c73e838a7fa4caedcc1a48827e50868136a6403"
   }
 }

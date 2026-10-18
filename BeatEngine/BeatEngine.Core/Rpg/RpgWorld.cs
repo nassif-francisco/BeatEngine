@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace BeatEngine.Rpg;
@@ -10,6 +11,9 @@ public sealed class RpgWorld
     public const float Speed = 128; // 4 32px tiles per second.
     public const float SpriteScale = 1f;
     public const int FrameSize = 32;
+    public const float RunningMultiplier = 1.5f;
+    public HashSet<string> CompletedScenes { get; } = new(StringComparer.Ordinal);
+    public string Checkpoint { get; private set; }
     public RpgMap Map { get; }
     public Vector2 Position { get; private set; }
     public Facing Facing { get; private set; }
@@ -48,7 +52,22 @@ public sealed class RpgWorld
         AnimationTime = 0;
     }
 
-    public void Update(Vector2 input, float seconds)
+    public void CompleteScene(string id)
+    {
+        CompletedScenes.Add(id);
+        Checkpoint = id;
+    }
+
+    public void RestoreProgress(IEnumerable<string> completed, string checkpoint)
+    {
+        CompletedScenes.Clear();
+        if (completed != null)
+            foreach (string id in completed)
+                if (!string.IsNullOrWhiteSpace(id)) CompletedScenes.Add(id);
+        Checkpoint = string.IsNullOrWhiteSpace(checkpoint) ? null : checkpoint;
+    }
+
+    public void Update(Vector2 input, float seconds, bool running = false)
     {
         if (!float.IsFinite(seconds) || seconds <= 0 || !float.IsFinite(input.X) || !float.IsFinite(input.Y)) return;
         seconds = Math.Min(seconds, 0.1f); // Never jump through obstacles after resuming.
@@ -60,7 +79,8 @@ public sealed class RpgWorld
                 : (input.Y > 0 ? Facing.Down : Facing.Up);
 
         Vector2 before = Position;
-        Vector2 delta = input * Speed * seconds;
+        float speedFactor = running ? RunningMultiplier : 1f;
+        Vector2 delta = input * Speed * speedFactor * seconds;
         // Small axis-separated steps preserve collision at every frame rate and
         // allow the player to slide along a bookshelf rather than sticking to it.
         int steps = Math.Max(1, (int)Math.Ceiling(Math.Max(Math.Abs(delta.X), Math.Abs(delta.Y)) / 2));
@@ -75,6 +95,6 @@ public sealed class RpgWorld
         bool moving = Vector2.DistanceSquared(before, Position) > 0.0001f;
         if (moving != Moving) AnimationTime = 0;
         Moving = moving;
-        AnimationTime = (AnimationTime + seconds) % 120;
+        AnimationTime = (AnimationTime + seconds * speedFactor) % 120;
     }
 }

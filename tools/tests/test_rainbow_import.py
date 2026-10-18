@@ -36,6 +36,11 @@ class RainbowImportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'spawn is blocked'):
             MODULE.validate_map(self.map, self.assets, self.scene)
 
+    def test_logical_zone_overlapping_spawn_is_allowed(self):
+        self.map.write_text('BACKGROUND\nfloor,0,0\nHITBOXES\nlogical:grandfather,40,50;60,50;60,70;40,70')
+        counts = MODULE.validate_map(self.map, self.assets, self.scene)
+        self.assertEqual(counts['HITBOXES'], 1)
+
     def test_incremental_write_preserves_timestamp(self):
         self.map.write_bytes(b'existing')
         original = self.map.stat().st_mtime_ns

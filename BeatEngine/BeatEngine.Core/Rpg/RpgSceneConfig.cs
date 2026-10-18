@@ -1,4 +1,5 @@
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 
@@ -9,6 +10,9 @@ public sealed class RpgSceneConfig
     public string Name { get; set; } = "La biblioteca";
     public int FrameSize { get; set; } = 32;
     public float ViewHeight { get; set; } = 320;
+    public string Dialogue { get; set; }
+    public string Checkpoints { get; set; }
+    public Dictionary<string, string> Portraits { get; set; } = new();
     public float[] Spawn { get; set; }
     public float[] Bounds { get; set; }
 

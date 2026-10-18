@@ -166,6 +166,10 @@ def export():
         prop_atlas.alpha_composite(sprite, position)
         entries[name]['atlas'] = {'file': 'Library_Objects.png', 'rect': [*position, sprite.width, sprite.height]}
     prop_atlas.save(PACK / 'Library_Objects.png')
+    existing = json.loads((PACK / 'atlas.json').read_text(encoding='utf-8')) if (PACK / 'atlas.json').exists() else {}
+    for name, entry in existing.get('assets', {}).items():
+        if name not in entries and (MEDIA / entry['file']).exists():
+            entries[name] = entry
     metadata = {'tileSize': 32, 'filter': 'nearest', 'alpha': 'binary', 'assets': entries,
                 'player': {'walk': 'Player/Library32/Player.png', 'idle': 'Player/Library32/Player_Idle.png',
                            'frameSize': [32, 32], 'sheetSize': [128, 128], 'columns': 4,

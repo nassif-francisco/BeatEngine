@@ -15,11 +15,13 @@ public readonly record struct WorldRect(float X, float Y, float Width, float Hei
 }
 
 public sealed record MapTile(string Name, Vector2 Position, bool Foreground);
+public sealed record MapInteraction(string Id, WorldRect Bounds);
 
 public sealed class RpgMap
 {
     public List<MapTile> Tiles { get; } = new();
     public List<WorldRect> Obstacles { get; } = new();
+    public List<MapInteraction> Interactions { get; } = new();
     public WorldRect Bounds { get; private set; }
     public Vector2 Spawn { get; private set; }
 
@@ -51,7 +53,15 @@ public sealed class RpgMap
                     float left = vertices.Min(v => v.X), top = vertices.Min(v => v.Y);
                     var box = new WorldRect(left, top, vertices.Max(v => v.X) - left, vertices.Max(v => v.Y) - top);
                     if (box.Width <= 0 || box.Height <= 0) throw new FormatException("Empty hitbox");
-                    map.Obstacles.Add(box);
+                    string prefix = values[0].StartsWith("logical", StringComparison.Ordinal) ? "logical"
+                        : values[0].StartsWith("interaction:", StringComparison.Ordinal) ? "interaction:" : null;
+                    if (prefix != null)
+                    {
+                        string id = values[0].Substring(prefix.Length).TrimStart(':', '_', '-', ' ');
+                        if (string.IsNullOrWhiteSpace(id)) throw new FormatException("Logical hitbox requires an action name");
+                        map.Interactions.Add(new MapInteraction(id, box));
+                    }
+                    else map.Obstacles.Add(box);
                 }
                 else if (section is "BACKGROUND" or "FOREGROUND")
                 {

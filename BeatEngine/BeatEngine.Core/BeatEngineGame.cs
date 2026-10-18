@@ -37,7 +37,7 @@ public sealed class BeatEngineGame : Game
 
     protected override void LoadContent()
     {
-        scene = new RpgScene(GraphicsDevice, Content);
+        scene = new RpgScene(GraphicsDevice, Content, Window);
     }
 
     protected override void Update(GameTime gameTime)

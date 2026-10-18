@@ -1,0 +1,30 @@
+{
+  "entries": [
+    {
+      "id": "inicio",
+      "name": "Inicio",
+      "description": "Dante está cerca de la entrada de la biblioteca. Aún no ha hablado con Abuelo; la conversación inicial está pendiente.",
+      "aliases": [
+        "0",
+        "entrada",
+        "initial",
+        "start"
+      ],
+      "completedScenes": []
+    },
+    {
+      "id": "library_grandfather_intro",
+      "name": "Después de hablar con Abuelo",
+      "description": "Dante ya terminó la conversación inicial con Abuelo y debe buscar el libro azul. Al restaurar este checkpoint, vuelve a la entrada de la biblioteca. Al hablar de nuevo con Abuelo, recibe el recordatorio de buscar el libro.",
+      "aliases": [
+        "1",
+        "abuelo",
+        "despues de hablar con abuelo",
+        "after_grandfather"
+      ],
+      "completedScenes": [
+        "library_grandfather_intro"
+      ]
+    }
+  ]
+}

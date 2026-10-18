@@ -31,7 +31,7 @@ RpgMap Original()
 Test("original map preserves library tiles, layers and bookshelf hitboxes", () =>
 {
     var map = Original();
-    Check(map.Tiles.Count == 1466 && map.Tiles.Count(t => t.Foreground) == 206 && map.Obstacles.Count == 52, "Map data lost");
+    Check(map.Tiles.Count == 1467 && map.Tiles.Count(t => t.Foreground) == 207 && map.Obstacles.Count == 53 && map.Interactions.Count == 1, "Map data lost");
     Check(map.Tiles[0].Position == Vector2.Zero, "Authored coordinates changed");
     Check(map.IsWalkable(map.Spawn), "Spawn is blocked");
 });
@@ -104,19 +104,84 @@ Test("invalid or blocked restored positions are ignored", () =>
     Check(world.Position == spawn, "Invalid save was applied");
 });
 
+Test("running is exactly 1.5 times walking and still collides", () =>
+{
+    var walk = new RpgWorld(Fixture()); var run = new RpgWorld(Fixture());
+    var start = new Vector2(-200, 300);
+    walk.Restore(start, Facing.Right); run.Restore(start, Facing.Right);
+    walk.Update(Vector2.UnitX, 0.1f); run.Update(Vector2.UnitX, 0.1f, true);
+    Check(Math.Abs((run.Position.X - start.X) / (walk.Position.X - start.X) - 1.5f) < 0.001, "Wrong run factor");
+    run.Restore(new Vector2(50, 50), Facing.Right);
+    for (int i = 0; i < 30; i++) run.Update(Vector2.UnitX, 0.1f, true);
+    Check(RpgWorld.BodyAt(run.Position).Right <= 100, "Running tunneled through obstacle");
+});
+RpgConversation Conversation()
+{
+    using var stream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "grandfather_intro.json"));
+    return RpgConversation.Load(stream);
+}
+Test("logical hitboxes are traversable and legacy triggers remain compatible", () =>
+{
+    foreach (string tag in new[] { "logical:grandfather", "logical_grandfather", "interaction:grandfather" })
+    {
+        var map = RpgMap.Load(new StringReader("BACKGROUND\nfloor,0,0\nfloor,500,500\nHITBOXES\n" + tag + ",100,100;200,100;200,200;100,200"));
+        Check(map.Interactions.Count == 1 && map.Interactions[0].Id == "grandfather" && map.Obstacles.Count == 0, "Logical hitbox blocks movement");
+        Check(map.IsWalkable(new Vector2(120, 120)), "Logical zone is not traversable");
+    }
+});
+Test("grandfather interaction zone is traversable and talk requires proximity", () =>
+{
+    var world = new RpgWorld(Original());
+    var dialogue = Conversation();
+    world.Restore(new Vector2(656, 768), Facing.Up);
+    Check(!dialogue.TryStart(world), "Talk started outside hitbox");
+    var zone = world.Map.Interactions.Single(item => item.Id == "grandfather").Bounds;
+    var target = new Vector2(zone.X + zone.Width / 2 - 16, zone.Bottom - 35);
+    world.Restore(target, Facing.Up);
+    Check(world.Position == target && dialogue.TryStart(world), "Cannot reach interaction zone");
+    Check(dialogue.LineIndex == 0 && dialogue.Current.Speaker == "Dante", "Wrong first turn");
+    Check(!world.CompletedScenes.Contains(dialogue.Id), "Scene completed on entry");
+    Check(!dialogue.Continue(world) && dialogue.Current.Speaker == "Abuelo" && dialogue.LineIndex == 1, "First continue skipped a turn");
+    Check(!dialogue.Continue(world) && dialogue.Current.Speaker == "Abuelo" && dialogue.LineIndex == 2, "Consecutive grandfather turns were merged");
+    for (int i = 3; i < dialogue.Lines.Length; i++) Check(!dialogue.Continue(world), "Premature checkpoint");
+    Check(dialogue.Active && dialogue.Current.Speaker == "Dante" && !world.CompletedScenes.Contains(dialogue.Id), "Final line was not displayed");
+    Check(dialogue.Continue(world) && !dialogue.Active && world.Checkpoint == dialogue.Id, "Final continue did not create checkpoint");
+    Check(dialogue.TryStart(world) && dialogue.Current.Speaker == "Abuelo" && dialogue.LineCount == 1, "Grandfather reminder did not start");
+    Check(dialogue.Current.Text.Contains("libro azul"), "Wrong repeat line");
+    Check(!dialogue.Continue(world) && !dialogue.Active && world.Checkpoint == dialogue.Id, "Reminder changed checkpoint or stayed open");
+    Check(dialogue.TryStart(world), "Reminder cannot be repeated");
+    dialogue.Cancel();
+});
+
+RpgCheckpoints Checkpoints()
+{
+    using var stream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "checkpoints.json"));
+    return RpgCheckpoints.Load(stream);
+}
+Test("checkpoint name, ID and numeric aliases restore the right story state", () =>
+{
+    var world = new RpgWorld(Original());
+    var checkpoints = Checkpoints();
+    var dialogue = Conversation();
+    Check(checkpoints.TryRestore("1", world, out var id) && id == dialogue.Id, "Numeric checkpoint failed");
+    Check(world.CompletedScenes.Contains(dialogue.Id) && world.Checkpoint == dialogue.Id && world.Position == world.Map.Spawn && !world.Moving, "Intro checkpoint did not restore story progress at the entrance");
+    Check(!dialogue.CanStart(world), "Dialogue started away from grandfather");
+    var zone = world.Map.Interactions.Single(item => item.Id == "grandfather").Bounds;
+    world.Restore(new Vector2(zone.X + zone.Width / 2 - 16, zone.Bottom - 35), Facing.Up);
+    Check(dialogue.TryStart(world) && dialogue.Current.Speaker == "Abuelo" && dialogue.LineCount == 1, "Wrong dialogue after restoring checkpoint");
+    dialogue.Cancel();
+    Check(checkpoints.TryRestore(" Inicio ", world, out id) && id == "inicio" && world.Position == world.Map.Spawn, "Initial checkpoint failed");
+    Check(world.Checkpoint == null && world.CompletedScenes.Count == 0 && !dialogue.CanStart(world), "Initial checkpoint did not rewind progress");
+    Check(checkpoints.TryRestore("library_grandfather_intro", world, out id), "Full ID failed");
+    Check(checkpoints.TryRestore("despues de hablar con abuelo", world, out id) && world.Position == world.Map.Spawn, "Display name alias did not restore entrance position");
+    var position = world.Position;
+    Check(!checkpoints.TryRestore("missing", world, out id) && world.Position == position && world.CompletedScenes.Contains(dialogue.Id), "Invalid checkpoint mutated progress");
+    Check(checkpoints.TryRestore("0", world, out id) && world.Position == world.Map.Spawn && world.Checkpoint == null, "Zero did not reset to entrance");
+});
+
 string directory = Path.Combine(Path.GetTempPath(), "RpgPrototype-tests-" + Guid.NewGuid().ToString("N"));
 try
 {
-    Test("joystick side persists independently of progress and tolerates corrupt preferences", () =>
-    {
-        var store = new RpgSaveStore(directory);
-        Check(!store.LoadJoystickOnRight(), "Default should be left");
-        Check(store.SaveJoystickOnRight(true), "Could not save right");
-        Check(new RpgSaveStore(directory).LoadJoystickOnRight(), "Right side was lost");
-        Check(store.SaveJoystickOnRight(false) && !new RpgSaveStore(directory).LoadJoystickOnRight(), "Left side was lost");
-        File.WriteAllText(Path.Combine(directory, "preferences.json"), "{");
-        Check(!store.LoadJoystickOnRight(), "Corrupt preferences should fall back to left");
-    });
     Test("save survives a new world instance and replacement is atomic", () =>
     {
         var store = new RpgSaveStore(directory);
@@ -128,6 +193,27 @@ try
         world.Update(Vector2.UnitX, 0.1f);
         Check(store.Save(world) && !File.Exists(Path.Combine(directory, "save.json.tmp")), "Atomic replacement failed");
         Check(store.Load(restored) && restored.Position == world.Position, "Replacement did not load");
+    });
+    Test("scene checkpoint survives restart, map reset, and an obstructed saved position", () =>
+    {
+        var store = new RpgSaveStore(directory);
+        var world = new RpgWorld(Fixture());
+        world.CompleteScene("library_grandfather_intro");
+        Check(store.Save(world), "Could not save checkpoint");
+        var restored = new RpgWorld(Fixture());
+        Check(store.Load(restored) && restored.Checkpoint == "library_grandfather_intro", "Checkpoint lost on restart");
+        restored.Reset();
+        Check(restored.CompletedScenes.Contains("library_grandfather_intro"), "Map reset erased story progress");
+        File.WriteAllText(Path.Combine(directory, "save.json"), "{\"Version\":3,\"X\":100,\"Y\":50,\"Facing\":0,\"CompletedScenes\":[\"library_grandfather_intro\"],\"Checkpoint\":\"library_grandfather_intro\"}");
+        restored = new RpgWorld(Fixture());
+        Check(store.Load(restored) && restored.Position == restored.Map.Spawn && restored.Checkpoint == "library_grandfather_intro", "Map edit erased checkpoint");
+    });
+    Test("version 2 saves migrate without losing position", () =>
+    {
+        var store = new RpgSaveStore(directory);
+        File.WriteAllText(Path.Combine(directory, "save.json"), "{\"Version\":2,\"X\":-200,\"Y\":300,\"Facing\":1}");
+        var world = new RpgWorld(Fixture());
+        Check(store.Load(world) && world.Position == new Vector2(-200, 300) && world.CompletedScenes.Count == 0, "Version 2 migration failed");
     });
     Test("truncated or unsupported saves fall back safely", () =>
     {

@@ -16,8 +16,10 @@ def verify(apk):
         actual = {name for name in archive.namelist() if name.startswith('assets/Content/') and not name.endswith('/')}
         if actual != EXPECTED:
             raise AssertionError(f'Missing: {sorted(EXPECTED - actual)}; unexpected content: {len(actual - EXPECTED)} files')
-        source_map = ROOT / 'BeatEngine/BeatEngine.Core/Content/Rpg/Maps/test.map'
-        assert archive.read('assets/Content/Rpg/Maps/test.map') == source_map.read_bytes(), 'Map changed in packaging'
+        for name in json.loads(MANIFEST.read_text()):
+            if not name.endswith('.png'):
+                source = ROOT / 'BeatEngine/BeatEngine.Core/Content' / name
+                assert archive.read('assets/Content/' + name) == source.read_bytes(), f'{name} changed in packaging'
     print('PASS: APK has exactly the library content files and an unchanged authored map.')
 
 

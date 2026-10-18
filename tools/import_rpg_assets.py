@@ -46,7 +46,8 @@ def validate_map(path, assets, scene=None):
                 xs, ys = zip(*points)
                 if max(xs) <= min(xs) or max(ys) <= min(ys):
                     raise ValueError('hitbox has no area')
-                obstacles.append((min(xs), min(ys), max(xs), max(ys)))
+                if not name.startswith(("logical", "interaction:")):
+                    obstacles.append((min(xs), min(ys), max(xs), max(ys)))
             else:
                 raise ValueError('missing layer header')
             counts[section] += 1
@@ -91,6 +92,12 @@ def import_assets(media, scene_path=None):
         'Rpg/Textures/player_idle.png': media / scene['playerIdle'],
         **{f'Rpg/Textures/{name}.png': media / entry['file'] for name, entry in sorted(atlas['assets'].items())}
     }
+    for portrait in scene.get("portraits", {}).values():
+        sources["Rpg/" + portrait] = media / portrait
+    if scene.get("checkpoints"):
+        sources["Rpg/" + scene["checkpoints"]] = media / scene["checkpoints"]
+    if scene.get("dialogue"):
+        sources["Rpg/" + scene["dialogue"]] = media / scene["dialogue"]
     for source in sources.values():
         if not source.is_file():
             raise FileNotFoundError(source)
@@ -125,6 +132,8 @@ def import_assets(media, scene_path=None):
 /build:Fonts/RpgHud.spritefont
 '''
     for name in sources:
+        if name not in ('Rpg/Maps/test.map', 'Rpg/scene.json') and not name.endswith('.png'):
+            manifest += f'\n#begin {name}\n/copy:{name}\n'
         if not name.endswith('.png'):
             continue
         manifest += f'''

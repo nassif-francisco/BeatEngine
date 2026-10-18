@@ -5,9 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../../../BeatEngine/BeatEngine.Core/Rpg/RpgCheckpoints.cs" Link="RpgCheckpoints.cs" />
+    <Compile Include="../../../BeatEngine/BeatEngine.Core/Rpg/RpgConversation.cs" Link="RpgConversation.cs" />
     <Compile Include="../../../BeatEngine/BeatEngine.Core/Rpg/RpgMap.cs" Link="RpgMap.cs" />
     <Compile Include="../../../BeatEngine/BeatEngine.Core/Rpg/RpgWorld.cs" Link="RpgWorld.cs" />
     <Compile Include="../../../BeatEngine/BeatEngine.Core/Rpg/RpgSaveStore.cs" Link="RpgSaveStore.cs" />
     <None Include="../../../BeatEngine/BeatEngine.Core/Content/Rpg/Maps/test.map" Link="test.map" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../../BeatEngine/BeatEngine.Core/Content/Rpg/Dialogs/grandfather_intro.json" Link="grandfather_intro.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../../BeatEngine/BeatEngine.Core/Content/Rpg/Checkpoints/checkpoints.json" Link="checkpoints.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
